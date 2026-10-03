@@ -77,12 +77,16 @@ import {
   Unlink,
   Globe,
   ExternalLink,
+  UserPlus,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 import { apiClient } from '@/lib/api/client';
 import { useAuth } from '@/features/auth/context/auth-context';
 import { SellerFinanceReportsTab } from '@/components/seller/SellerFinanceReportsTab';
 import { QuickCreateMiniatureModal } from '@/components/seller/QuickCreateMiniatureModal';
+import { ManualPreOrderModal } from '@/components/seller/ManualPreOrderModal';
+import { ImportPreOrdersModal } from '@/components/seller/ImportPreOrdersModal';
 
 export default function SellerPortalPage() {
   const queryClient = useQueryClient();
@@ -141,6 +145,8 @@ export default function SellerPortalPage() {
 
   // Quick create miniature modal state
   const [showQuickCreateModal, setShowQuickCreateModal] = useState(false);
+  const [showManualPreOrderModal, setShowManualPreOrderModal] = useState(false);
+  const [showImportPreOrdersModal, setShowImportPreOrdersModal] = useState(false);
 
   // Pre-Order offer fields
   const [isPreOrder, setIsPreOrder] = useState(false);
@@ -1642,17 +1648,37 @@ export default function SellerPortalPage() {
                 </button>
               </div>
 
-              <button
-                onClick={() => {
-                  if (reportData?.rows) {
-                    exportPreOrdersToCsv(reportData.rows);
-                  }
-                }}
-                disabled={!reportData?.rows?.length}
-                className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-secondary hover:bg-primary/20 hover:text-primary text-xs font-bold border border-border transition-colors disabled:opacity-50"
-              >
-                <Download className="h-4 w-4" /> Exportar Relatório (.csv)
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowManualPreOrderModal(true)}
+                  className="inline-flex items-center gap-2 h-9 px-3.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm transition-all"
+                  title="Cadastrar colecionador e pré-venda individualmente com geração automática de senha"
+                >
+                  <UserPlus className="h-4 w-4" /> + Cadastrar Pré-Venda
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowImportPreOrdersModal(true)}
+                  className="inline-flex items-center gap-2 h-9 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
+                  title="Importar planilha de pré-vendas com parcelas pagas e a vencer"
+                >
+                  <FileSpreadsheet className="h-4 w-4" /> Importar Planilha (.csv)
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (reportData?.rows) {
+                      exportPreOrdersToCsv(reportData.rows);
+                    }
+                  }}
+                  disabled={!reportData?.rows?.length}
+                  className="inline-flex items-center gap-2 h-9 px-3.5 rounded-lg bg-secondary hover:bg-primary/20 hover:text-primary text-xs font-bold border border-border transition-colors disabled:opacity-50"
+                >
+                  <Download className="h-4 w-4" /> Exportar (.csv)
+                </button>
+              </div>
             </div>
 
             {/* Financial Summary Strip */}
@@ -4944,6 +4970,32 @@ export default function SellerPortalPage() {
           setOfferTitle(`${createdVariation.name} - ${isPreOrder ? 'Pré-Venda' : 'Pronta Entrega'}`);
           setShowQuickCreateModal(false);
           setShowCreateOffer(true);
+        }}
+      />
+
+      {/* MANUAL PRE-ORDER CREATION MODAL */}
+      <ManualPreOrderModal
+        isOpen={showManualPreOrderModal}
+        onClose={() => setShowManualPreOrderModal(false)}
+        sellerStoreName={profile?.storeName || 'Loja do Vendedor'}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders-report'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders-dashboard'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-collectors-status'] });
+        }}
+      />
+
+      {/* IMPORT PRE-ORDERS MODAL */}
+      <ImportPreOrdersModal
+        isOpen={showImportPreOrdersModal}
+        onClose={() => setShowImportPreOrdersModal(false)}
+        sellerStoreName={profile?.storeName || 'Loja do Vendedor'}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders-report'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-pre-orders-dashboard'] });
+          queryClient.invalidateQueries({ queryKey: ['seller-collectors-status'] });
         }}
       />
     </div>

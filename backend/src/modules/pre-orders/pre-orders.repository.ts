@@ -1,5 +1,6 @@
 import { eq, and, desc, asc, sql, inArray } from 'drizzle-orm';
 import { db } from '../../database/client';
+import bcrypt from 'bcryptjs';
 import {
   preOrder,
   preOrderInstallment,
@@ -8,10 +9,15 @@ import {
   variation,
   casting,
   miniatureBrand,
+  scale,
   appUser,
+  role,
+  userRole,
   sellerProfile,
   commercialInventory,
   inventoryMovement,
+  userSubscription,
+  subscriptionPlan,
 } from '../../database/schema';
 import {
   CreatePreOrderReservationInput,
@@ -21,6 +27,8 @@ import {
   UpdatePreOrderStatusInput,
   UpdatePreOrderFulfillmentInput,
   CollectorsStatusQuery,
+  CreateManualPreOrderInput,
+  ImportPreOrdersBatchInput,
 } from './pre-orders.schemas';
 import { BadRequestError, NotFoundError } from '../../shared/errors/api-error';
 
@@ -1533,6 +1541,492 @@ export class PreOrdersRepository {
       maxOverdueDays: maxDaysOverdue,
       preOrders: formattedPreOrders,
       installments: flatInstallments,
+    };
+  }
+
+  // ============================================================================
+  // MANUAL PRE-ORDERS & BATCH IMPORT
+  // ============================================================================
+
+  async findOrCreateCollector(
+    tx: any,
+    collectorInput: { name: string; email: string; whatsapp?: string | null }
+  ) {
+    const normEmail = collectorInput.email.trim().toLowerCase();
+    const [existing] = await tx
+      .select()
+      .from(appUser)
+      .where(eq(appUser.normalizedEmail, normEmail))
+      .limit(1);
+
+    if (existing) {
+      if (collectorInput.whatsapp && !existing.whatsapp) {
+        await tx
+          .update(appUser)
+          .set({ whatsapp: collectorInput.whatsapp.trim(), updatedAt: new Date() })
+          .where(eq(appUser.id, existing.id));
+        existing.whatsapp = collectorInput.whatsapp.trim();
+      }
+      return {
+        user: existing,
+        isNewUser: false,
+        temporaryPassword: null as string | null,
+      };
+    }
+
+    const defaultPassword = 'MiniHub@2026';
+    const passwordHash = await bcrypt.hash(defaultPassword, 10);
+
+    const [newUser] = await tx
+      .insert(appUser)
+      .values({
+        name: collectorInput.name.trim(),
+        email: collectorInput.email.trim(),
+        normalizedEmail: normEmail,
+        whatsapp: collectorInput.whatsapp?.trim() || null,
+        passwordHash,
+        status: 'ACTIVE',
+        isCollectionPublic: true,
+      })
+      .returning();
+
+    // Link COLLECTOR role
+    const [collectorRole] = await tx
+      .select()
+      .from(role)
+      .where(eq(role.code, 'COLLECTOR'))
+      .limit(1);
+
+    if (collectorRole) {
+      await tx
+        .insert(userRole)
+        .values({
+          userId: newUser.id,
+          roleId: collectorRole.id,
+        })
+        .onConflictDoNothing();
+    }
+
+    // Link FREE (Starter) plan
+    const [freePlan] = await tx
+      .select()
+      .from(subscriptionPlan)
+      .where(eq(subscriptionPlan.code, 'FREE'))
+      .limit(1);
+
+    if (freePlan) {
+      await tx
+        .insert(userSubscription)
+        .values({
+          userId: newUser.id,
+          planId: freePlan.id,
+          status: 'ACTIVE',
+          billingCycle: 'MONTHLY',
+          paymentMethod: 'FREE',
+          startedAt: new Date(),
+        })
+        .onConflictDoNothing();
+    }
+
+    return {
+      user: newUser,
+      isNewUser: true,
+      temporaryPassword: defaultPassword,
+    };
+  }
+
+  async findOrCreatePreOrderOffer(
+    tx: any,
+    sellerId: string,
+    miniature: {
+      name: string;
+      brandName?: string | null;
+      scaleDenominator?: number;
+      photoUrl?: string | null;
+      estimatedArrival?: string | null;
+    },
+    unitPrice: string
+  ) {
+    const rawBrandName = miniature.brandName?.trim() || 'Outros';
+    const normBrand = rawBrandName.toLowerCase();
+
+    let [foundBrand] = await tx
+      .select()
+      .from(miniatureBrand)
+      .where(eq(miniatureBrand.normalizedName, normBrand))
+      .limit(1);
+
+    if (!foundBrand) {
+      const [newBrand] = await tx
+        .insert(miniatureBrand)
+        .values({
+          name: rawBrandName,
+          normalizedName: normBrand,
+          status: 'ACTIVE',
+        })
+        .returning();
+      foundBrand = newBrand;
+    }
+
+    // Scale
+    const denom = miniature.scaleDenominator || 64;
+    let [foundScale] = await tx
+      .select()
+      .from(scale)
+      .where(eq(scale.denominator, denom))
+      .limit(1);
+
+    if (!foundScale) {
+      const [newScale] = await tx
+        .insert(scale)
+        .values({
+          name: `1:${denom}`,
+          numerator: 1,
+          denominator: denom,
+          normalizedValue: (1 / denom).toFixed(6),
+          status: 'ACTIVE',
+        })
+        .returning();
+      foundScale = newScale;
+    }
+
+    // Casting
+    const rawName = miniature.name.trim();
+    const normCasting = rawName.toLowerCase();
+    let [foundCasting] = await tx
+      .select()
+      .from(casting)
+      .where(
+        and(
+          eq(casting.miniatureBrandId, foundBrand.id),
+          eq(casting.normalizedName, normCasting)
+        )
+      )
+      .limit(1);
+
+    if (!foundCasting) {
+      const [newCasting] = await tx
+        .insert(casting)
+        .values({
+          miniatureBrandId: foundBrand.id,
+          name: rawName,
+          normalizedName: normCasting,
+          status: 'ACTIVE',
+        })
+        .returning();
+      foundCasting = newCasting;
+    }
+
+    // Variation
+    let [foundVariation] = await tx
+      .select()
+      .from(variation)
+      .where(
+        and(
+          eq(variation.castingId, foundCasting.id),
+          eq(variation.name, rawName)
+        )
+      )
+      .limit(1);
+
+    if (!foundVariation) {
+      const [newVar] = await tx
+        .insert(variation)
+        .values({
+          castingId: foundCasting.id,
+          scaleId: foundScale?.id,
+          name: rawName,
+          photoUrl: miniature.photoUrl?.trim() || null,
+          status: 'ACTIVE',
+        })
+        .returning();
+      foundVariation = newVar;
+    }
+
+    // Commercial Product
+    let [cp] = await tx
+      .select()
+      .from(commercialProduct)
+      .where(eq(commercialProduct.variationId, foundVariation.id))
+      .limit(1);
+
+    if (!cp) {
+      const [newCp] = await tx
+        .insert(commercialProduct)
+        .values({
+          variationId: foundVariation.id,
+          isActive: true,
+        })
+        .returning();
+      cp = newCp;
+    }
+
+    // Offer
+    let [targetOffer] = await tx
+      .select()
+      .from(offer)
+      .where(
+        and(
+          eq(offer.commercialProductId, cp.id),
+          eq(offer.sellerId, sellerId),
+          eq(offer.isPreOrder, true)
+        )
+      )
+      .limit(1);
+
+    if (!targetOffer) {
+      const [newOffer] = await tx
+        .insert(offer)
+        .values({
+          commercialProductId: cp.id,
+          sellerId,
+          title: rawName,
+          price: unitPrice,
+          condition: 'LACRADO',
+          status: 'ACTIVE',
+          isPreOrder: true,
+          preOrderEstimatedArrival: miniature.estimatedArrival || null,
+          allowDepositAndBalance: true,
+          allowFullOnArrival: true,
+          allowInstallments: true,
+          maxInstallments: 12,
+          photos: miniature.photoUrl ? [miniature.photoUrl] : [],
+        })
+        .returning();
+
+      await tx.insert(commercialInventory).values({
+        offerId: newOffer.id,
+        onHand: 100,
+        reserved: 0,
+        committed: 0,
+      });
+
+      targetOffer = newOffer;
+    }
+
+    return {
+      offerId: targetOffer.id,
+      variationId: foundVariation.id,
+    };
+  }
+
+  async createManualPreOrder(
+    sellerId: string,
+    sellerStoreName: string,
+    input: CreateManualPreOrderInput
+  ) {
+    return db.transaction(async (tx) => {
+      // 1. Provision / get collector
+      const { user: collector, isNewUser, temporaryPassword } =
+        await this.findOrCreateCollector(tx, input.collector);
+
+      // 2. Provision / get offer & variation
+      const quantity = Math.max(1, input.miniature.quantity || 1);
+      const totalAmountNum = parseFloat(input.financial.totalAmount);
+      const unitPrice = (totalAmountNum / quantity).toFixed(2);
+
+      const { offerId, variationId } = await this.findOrCreatePreOrderOffer(
+        tx,
+        sellerId,
+        input.miniature,
+        unitPrice
+      );
+
+      // 3. Compute paid and remaining amounts
+      let paidAmountNum = 0;
+      for (const inst of input.financial.installments) {
+        if (inst.status === 'PAID') {
+          const val = parseFloat(inst.settledAmount || inst.amount) || 0;
+          paidAmountNum += val;
+        }
+      }
+
+      const remainingAmountNum = Math.max(0, totalAmountNum - paidAmountNum);
+      const isFullyPaid = remainingAmountNum <= 0.001;
+
+      const preOrderNumber = `PRE-MAN-${Date.now().toString(36).toUpperCase()}-${Math.floor(
+        100 + Math.random() * 900
+      )}`;
+
+      // 4. Insert pre_order
+      const [newPreOrder] = await tx
+        .insert(preOrder)
+        .values({
+          preOrderNumber,
+          buyerId: collector.id,
+          sellerId,
+          offerId,
+          variationId,
+          status: isFullyPaid ? 'ARRIVED' : 'RESERVED',
+          paymentPlan: input.financial.paymentPlan,
+          quantity,
+          totalAmount: totalAmountNum.toFixed(2),
+          paidAmount: paidAmountNum.toFixed(2),
+          remainingAmount: remainingAmountNum.toFixed(2),
+          estimatedArrival: input.miniature.estimatedArrival || null,
+          hasArrived: false,
+          fulfillmentStatus: 'NA_GARAGEM',
+          requiresApproval: false,
+          notes: input.financial.notes || null,
+        })
+        .returning();
+
+      if (!newPreOrder) {
+        throw new Error('Falha ao criar registro de pré-venda');
+      }
+
+      // 5. Insert installments
+      for (const inst of input.financial.installments) {
+        const isPaid = inst.status === 'PAID';
+        const paidAtDate = isPaid
+          ? inst.paidAt
+            ? new Date(inst.paidAt)
+            : new Date()
+          : null;
+        const paidVal = isPaid ? (inst.settledAmount || inst.amount) : null;
+
+        await tx.insert(preOrderInstallment).values({
+          preOrderId: newPreOrder.id,
+          installmentNumber: inst.installmentNumber,
+          totalInstallments: inst.totalInstallments,
+          amount: parseFloat(inst.amount).toFixed(2),
+          dueDate: inst.dueDate.slice(0, 10),
+          status: isPaid ? 'PAID' : 'PENDING',
+          paidAt: paidAtDate,
+          paidAmount: paidVal ? parseFloat(paidVal).toFixed(2) : null,
+          paymentMethod: inst.paymentMethod || 'PIX',
+          description:
+            inst.description ||
+            (inst.installmentNumber === 1 && isPaid
+              ? '1ª Parcela (Sinal / Entrada)'
+              : `Parcela ${inst.installmentNumber} de ${inst.totalInstallments}`),
+          notes: inst.notes || null,
+        });
+      }
+
+      // 6. Build WhatsApp share message
+      let whatsappMessage = `Olá ${collector.name}! Sua pré-venda da miniatura *${input.miniature.name}* foi cadastrada na loja *${sellerStoreName}*!\n\n` +
+        `📦 *Pedido:* ${preOrderNumber}\n` +
+        `💰 *Valor Total:* R$ ${totalAmountNum.toFixed(2).replace('.', ',')}\n` +
+        `✅ *Total Já Pago:* R$ ${paidAmountNum.toFixed(2).replace('.', ',')}\n` +
+        `⏳ *Saldo Restante:* R$ ${remainingAmountNum.toFixed(2).replace('.', ',')}\n`;
+
+      if (input.miniature.estimatedArrival) {
+        whatsappMessage += `📅 *Previsão de Chegada:* ${input.miniature.estimatedArrival}\n`;
+      }
+
+      whatsappMessage += `\nPara acompanhar o status da sua miniatura e as datas de vencimento, acesse o MiniHub Car:\n` +
+        `👉 https://minihubcar.com.br/login\n` +
+        `👤 *E-mail:* ${collector.email}\n`;
+
+      if (isNewUser && temporaryPassword) {
+        whatsappMessage += `🔑 *Senha provisória:* ${temporaryPassword} (você pode alterá-la no seu perfil).\n`;
+      }
+
+      const cleanPhone = (collector.whatsapp || '').replace(/\D/g, '');
+      const whatsappShareUrl = cleanPhone
+        ? `https://wa.me/55${cleanPhone.replace(/^55/, '')}?text=${encodeURIComponent(whatsappMessage)}`
+        : null;
+
+      return {
+        preOrder: newPreOrder,
+        collector: {
+          id: collector.id,
+          name: collector.name,
+          email: collector.email,
+          whatsapp: collector.whatsapp,
+          isNewUser,
+          temporaryPassword,
+        },
+        financial: {
+          totalAmount: totalAmountNum.toFixed(2),
+          paidAmount: paidAmountNum.toFixed(2),
+          remainingAmount: remainingAmountNum.toFixed(2),
+          installmentsCount: input.financial.installments.length,
+          paidInstallmentsCount: input.financial.installments.filter((i) => i.status === 'PAID').length,
+          pendingInstallmentsCount: input.financial.installments.filter((i) => i.status === 'PENDING').length,
+        },
+        whatsappMessage,
+        whatsappShareUrl,
+      };
+    });
+  }
+
+  async importPreOrdersBatch(
+    sellerId: string,
+    sellerStoreName: string,
+    items: CreateManualPreOrderInput[]
+  ) {
+    const results: Array<{
+      preOrderNumber: string;
+      collectorName: string;
+      collectorEmail: string;
+      collectorWhatsapp: string | null;
+      isNewUser: boolean;
+      temporaryPassword: string | null;
+      miniatureName: string;
+      totalAmount: string;
+      paidAmount: string;
+      remainingAmount: string;
+      whatsappShareUrl: string | null;
+    }> = [];
+
+    const errors: Array<{
+      index: number;
+      item: string;
+      error: string;
+    }> = [];
+
+    let newCollectorsCount = 0;
+    let totalContractedAmount = 0;
+    let totalPaidAmount = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item) continue;
+
+      try {
+        const res = await this.createManualPreOrder(sellerId, sellerStoreName, item);
+        if (!res || !res.preOrder) continue;
+
+        if (res.collector.isNewUser) {
+          newCollectorsCount++;
+        }
+        totalContractedAmount += parseFloat(res.financial.totalAmount) || 0;
+        totalPaidAmount += parseFloat(res.financial.paidAmount) || 0;
+
+        results.push({
+          preOrderNumber: res.preOrder.preOrderNumber,
+          collectorName: res.collector.name,
+          collectorEmail: res.collector.email,
+          collectorWhatsapp: res.collector.whatsapp,
+          isNewUser: res.collector.isNewUser,
+          temporaryPassword: res.collector.temporaryPassword,
+          miniatureName: item.miniature.name,
+          totalAmount: res.financial.totalAmount,
+          paidAmount: res.financial.paidAmount,
+          remainingAmount: res.financial.remainingAmount,
+          whatsappShareUrl: res.whatsappShareUrl,
+        });
+      } catch (err: any) {
+        errors.push({
+          index: i + 1,
+          item: item?.miniature?.name || `Linha ${i + 1}`,
+          error: err.message || 'Erro desconhecido ao processar item',
+        });
+      }
+    }
+
+    return {
+      totalProcessed: items.length,
+      successCount: results.length,
+      errorCount: errors.length,
+      newCollectorsCount,
+      totalContractedAmount: totalContractedAmount.toFixed(2),
+      totalPaidAmount: totalPaidAmount.toFixed(2),
+      totalRemainingAmount: Math.max(0, totalContractedAmount - totalPaidAmount).toFixed(2),
+      results,
+      errors,
     };
   }
 }

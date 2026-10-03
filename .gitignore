@@ -15,3 +15,4 @@ catalogos/
 scratch/
 *.pptx
 relatorio-pre-vendas.csv
+*.tsbuildinfo

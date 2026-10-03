@@ -451,6 +451,114 @@ export async function rejectPreOrderReservation(preOrderId: string, reason?: str
   return res.data;
 }
 
+export interface ManualInstallmentInput {
+  installmentNumber: number;
+  totalInstallments: number;
+  amount: string;
+  dueDate: string;
+  status: 'PENDING' | 'PAID';
+  paidAt?: string | null;
+  settledAmount?: string | null;
+  paymentMethod?: 'PIX' | 'DINHEIRO' | 'TRANSFERENCIA' | 'CARTAO' | 'OUTRO';
+  description?: string | null;
+  notes?: string | null;
+}
+
+export interface CreateManualPreOrderInput {
+  collector: {
+    name: string;
+    email: string;
+    whatsapp?: string | null;
+  };
+  miniature: {
+    name: string;
+    brandName?: string | null;
+    scaleDenominator?: number;
+    photoUrl?: string | null;
+    estimatedArrival?: string | null;
+    quantity?: number;
+  };
+  financial: {
+    totalAmount: string;
+    paymentPlan: 'DEPOSIT_AND_BALANCE' | 'FULL_ON_ARRIVAL' | 'INSTALLMENTS';
+    installments: ManualInstallmentInput[];
+    notes?: string | null;
+  };
+}
+
+export interface ManualPreOrderResponse {
+  preOrder: {
+    id: string;
+    preOrderNumber: string;
+    totalAmount: string;
+    paidAmount: string;
+    remainingAmount: string;
+    status: string;
+  };
+  collector: {
+    id: string;
+    name: string;
+    email: string;
+    whatsapp: string | null;
+    isNewUser: boolean;
+    temporaryPassword: string | null;
+  };
+  financial: {
+    totalAmount: string;
+    paidAmount: string;
+    remainingAmount: string;
+    installmentsCount: number;
+    paidInstallmentsCount: number;
+    pendingInstallmentsCount: number;
+  };
+  whatsappMessage: string;
+  whatsappShareUrl: string | null;
+}
+
+export interface ImportPreOrdersBatchResponse {
+  totalProcessed: number;
+  successCount: number;
+  errorCount: number;
+  newCollectorsCount: number;
+  totalContractedAmount: string;
+  totalPaidAmount: string;
+  totalRemainingAmount: string;
+  results: Array<{
+    preOrderNumber: string;
+    collectorName: string;
+    collectorEmail: string;
+    collectorWhatsapp: string | null;
+    isNewUser: boolean;
+    temporaryPassword: string | null;
+    miniatureName: string;
+    totalAmount: string;
+    paidAmount: string;
+    remainingAmount: string;
+    whatsappShareUrl: string | null;
+  }>;
+  errors: Array<{
+    index: number;
+    item: string;
+    error: string;
+  }>;
+}
+
+export async function createManualPreOrder(data: CreateManualPreOrderInput) {
+  const res = await apiClient<{ data: ManualPreOrderResponse }>('/sellers/me/pre-orders/manual', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return res.data;
+}
+
+export async function importPreOrdersBatch(items: CreateManualPreOrderInput[]) {
+  const res = await apiClient<{ data: ImportPreOrdersBatchResponse }>('/sellers/me/pre-orders/import', {
+    method: 'POST',
+    body: JSON.stringify({ items }),
+  });
+  return res.data;
+}
+
 // Client-side CSV generator with UTF-8 BOM
 export function exportPreOrdersToCsv(rows: PreOrdersReportRow[], filename = 'relatorio-pre-vendas.csv') {
   if (!rows || rows.length === 0) {

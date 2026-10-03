@@ -119,3 +119,52 @@ export const rejectPreOrderReservationSchema = z.object({
 
 export type RejectPreOrderReservationInput = z.infer<typeof rejectPreOrderReservationSchema>;
 
+// ============================================================================
+// MANUAL PRE-ORDER & BATCH IMPORT SCHEMAS
+// ============================================================================
+
+export const manualInstallmentItemSchema = z.object({
+  installmentNumber: z.number().int().min(1),
+  totalInstallments: z.number().int().min(1),
+  amount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Valor da parcela inválido'),
+  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data de vencimento inválida (YYYY-MM-DD)'),
+  status: z.enum(['PENDING', 'PAID']).default('PENDING'),
+  paidAt: z.string().optional().nullable(),
+  settledAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Valor baixado inválido').optional().nullable(),
+  paymentMethod: z.enum(['PIX', 'DINHEIRO', 'TRANSFERENCIA', 'CARTAO', 'OUTRO']).default('PIX'),
+  description: z.string().max(100).optional().nullable(),
+  notes: z.string().max(500).optional().nullable(),
+});
+
+export type ManualInstallmentItem = z.infer<typeof manualInstallmentItemSchema>;
+
+export const createManualPreOrderSchema = z.object({
+  collector: z.object({
+    name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres').max(150),
+    email: z.string().email('E-mail inválido').max(320),
+    whatsapp: z.string().max(30).optional().nullable(),
+  }),
+  miniature: z.object({
+    name: z.string().min(2, 'Nome da miniatura deve ter no mínimo 2 caracteres').max(255),
+    brandName: z.string().max(100).optional().nullable(),
+    scaleDenominator: z.number().int().min(1).default(64),
+    photoUrl: z.string().url().optional().nullable(),
+    estimatedArrival: z.string().max(100).optional().nullable(),
+    quantity: z.number().int().min(1).default(1),
+  }),
+  financial: z.object({
+    totalAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Valor total inválido'),
+    paymentPlan: z.enum(['DEPOSIT_AND_BALANCE', 'FULL_ON_ARRIVAL', 'INSTALLMENTS']).default('INSTALLMENTS'),
+    installments: z.array(manualInstallmentItemSchema).min(1, 'Informe pelo menos uma parcela'),
+    notes: z.string().max(1000).optional().nullable(),
+  }),
+});
+
+export type CreateManualPreOrderInput = z.infer<typeof createManualPreOrderSchema>;
+
+export const importPreOrdersBatchSchema = z.object({
+  items: z.array(createManualPreOrderSchema).min(1, 'Ao menos um item deve ser importado'),
+});
+
+export type ImportPreOrdersBatchInput = z.infer<typeof importPreOrdersBatchSchema>;
+

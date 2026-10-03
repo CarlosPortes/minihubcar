@@ -58,4 +58,21 @@ export async function preOrdersRoutes(app: FastifyInstance) {
     { preHandler: [authenticate] },
     controller.getCollectorFinancialSummary
   );
+
+  // Manual pre-order and batch import
+  app.post(
+    '/sellers/me/pre-orders/manual',
+    { preHandler: [authenticate] },
+    controller.createManualPreOrder
+  );
+  app.post(
+    '/sellers/me/pre-orders/import',
+    { preHandler: [authenticate] },
+    controller.importPreOrdersBatch
+  );
+  app.get(
+    '/sellers/me/pre-orders/import/template',
+    { preHandler: [authenticate] },
+    controller.downloadTemplateCsv
+  );
 }

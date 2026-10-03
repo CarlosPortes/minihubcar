@@ -16,6 +16,8 @@ import {
   collectorParamSchema,
   approvePreOrderReservationSchema,
   rejectPreOrderReservationSchema,
+  createManualPreOrderSchema,
+  importPreOrdersBatchSchema,
 } from './pre-orders.schemas';
 
 export class PreOrdersController {
@@ -108,6 +110,27 @@ export class PreOrdersController {
     const { collectorId } = collectorParamSchema.parse(request.params);
     const result = await this.service.getCollectorFinancialSummary(request.user.sub, collectorId);
     return reply.status(200).send({ data: result });
+  };
+
+  createManualPreOrder = async (request: FastifyRequest, reply: FastifyReply) => {
+    const input = createManualPreOrderSchema.parse(request.body);
+    const result = await this.service.createManualPreOrder(request.user.sub, input);
+    return reply.status(201).send({ data: result });
+  };
+
+  importPreOrdersBatch = async (request: FastifyRequest, reply: FastifyReply) => {
+    const input = importPreOrdersBatchSchema.parse(request.body);
+    const result = await this.service.importPreOrdersBatch(request.user.sub, input);
+    return reply.status(201).send({ data: result });
+  };
+
+  downloadTemplateCsv = async (request: FastifyRequest, reply: FastifyReply) => {
+    const csvContent = this.service.getImportTemplateCsv();
+    return reply
+      .header('Content-Type', 'text/csv; charset=utf-8')
+      .header('Content-Disposition', 'attachment; filename="modelo_importacao_pre_vendas.csv"')
+      .status(200)
+      .send(csvContent);
   };
 }
 
