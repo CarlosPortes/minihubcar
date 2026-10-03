@@ -100,6 +100,26 @@ async function migratePhase3And4() {
   await sqlClient`CREATE INDEX IF NOT EXISTS ix_feedback_suggestion_type ON feedback_suggestion(type);`;
   console.log('✅ Tabela feedback_suggestion verificada/criada.');
 
+  // 4.1 Tabela user_collection_photo (Fotos da coleção física)
+  await sqlClient`
+    CREATE TABLE IF NOT EXISTS user_collection_photo (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+      photo_url VARCHAR(1000) NOT NULL,
+      caption VARCHAR(200),
+      status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+      reviewed_by UUID REFERENCES app_user(id),
+      reviewed_at TIMESTAMPTZ,
+      rejection_reason TEXT,
+      sort_order INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `;
+  await sqlClient`CREATE INDEX IF NOT EXISTS ix_user_col_photo_user ON user_collection_photo(user_id);`;
+  await sqlClient`CREATE INDEX IF NOT EXISTS ix_user_col_photo_status ON user_collection_photo(status);`;
+  console.log('✅ Tabela user_collection_photo verificada/criada.');
+
   // 5. Tabelas direct_conversation e direct_message
   await sqlClient`
     CREATE TABLE IF NOT EXISTS direct_conversation (
