@@ -120,13 +120,6 @@
       "when": 1790700000000,
       "tag": "0016_add_donations",
       "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "7",
-      "when": 1790813822296,
-      "tag": "0017_living_blob",
-      "breakpoints": true
     }
   ]
 }
