@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Car, ShieldCheck, FileText, Sparkles, Heart, Compass, MapPin, BarChart3 } from 'lucide-react';
+import { Car, ShieldCheck, FileText, Sparkles, Heart, Compass, MapPin, BarChart3, BookOpen } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 
 export function Footer() {
@@ -47,6 +47,15 @@ export function Footer() {
               <Compass className="h-3.5 w-3.5 text-primary" /> {t('footer.institutional')}
             </h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <Link
+                  href="/guias"
+                  className="text-amber-400 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <BookOpen className="h-3 w-3" />
+                  Manuais e Guias (PDF)
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/about"
@@ -190,6 +199,8 @@ export function Footer() {
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted-foreground">
           <p>© {currentYear} MiniHub Car. {t('footer.allRightsReserved')} {t('footer.copyright')}</p>
           <div className="flex items-center gap-4">
+            <Link href="/guias" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">Guias & Manuais (PDF)</Link>
+            <span>•</span>
             <Link href="/terms" className="hover:text-foreground transition-colors">{t('footer.termsOfUse')}</Link>
             <span>•</span>
             <Link href="/privacy" className="hover:text-foreground transition-colors">{t('footer.privacyPolicy')}</Link>

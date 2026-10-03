@@ -25,6 +25,7 @@ import {
   UploadCloud,
   Crown,
   Shapes,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/context/auth-context';
 import { useTranslation } from '@/i18n';
@@ -59,6 +60,7 @@ export function Sidebar() {
     { name: t('common.cart'), href: '/cart', icon: ShoppingBag },
     { name: t('nav.orders'), href: '/orders', icon: PackageCheck },
     { name: t('nav.sellerArea'), href: '/seller', icon: Store },
+    { name: 'Guias e Manuais', href: '/guias', icon: BookOpen },
     { name: t('nav.plans'), href: '/plans', icon: Crown },
     { name: t('nav.donate'), href: '/donate', icon: HeartHandshake },
     { name: t('nav.dataImport'), href: '/import', icon: UploadCloud },

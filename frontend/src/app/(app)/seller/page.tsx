@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commercialApi, SellerProfileResponse, OfferDetail } from '@/lib/api/commercial';
 import { garageApi, SellerShippingIntegration } from '@/lib/api/garage';
@@ -79,6 +80,7 @@ import {
   ExternalLink,
   UserPlus,
   FileSpreadsheet,
+  BookOpen,
 } from 'lucide-react';
 
 import { apiClient } from '@/lib/api/client';
@@ -1486,6 +1488,36 @@ export default function SellerPortalPage() {
             >
               <Plus className="h-4 w-4" /> Lançar Nova Pré-Venda
             </button>
+          </div>
+
+          {/* QUICK HELP / GUIA DO VENDEDOR BANNER */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <div className="text-xs">
+                <p className="font-bold text-foreground">Dúvidas sobre o funcionamento das pré-vendas e modalidades?</p>
+                <p className="text-muted-foreground">Consulte a <strong>Apostila de Treinamento do Vendedor Homologado</strong> ou acesse a nossa central de manuais em PDF.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+              <a
+                href="/docs/Documento_2_Apostila_Treinamento_Vendedores.pdf"
+                download="Documento_2_Apostila_Treinamento_Vendedores.pdf"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card hover:bg-secondary border border-border text-foreground text-xs font-semibold transition-colors"
+              >
+                <Download className="h-3.5 w-3.5 text-amber-400" />
+                Baixar Apostila (PDF)
+              </a>
+              <Link
+                href="/guias"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition-colors"
+              >
+                Ver Todos os Guias
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
 
           {/* THE 3 INTERACTIVE PRE-ORDER CARDS */}
