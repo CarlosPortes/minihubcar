@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: minihub-car-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: minihub_car
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - minihub_car_data:/var/lib/postgresql/data
+
+volumes:
+  minihub_car_data:

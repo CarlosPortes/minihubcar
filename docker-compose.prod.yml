@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: minihub-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-minihub_car}
+      POSTGRES_USER: ${POSTGRES_USER:-minihub_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}
+    volumes:
+      - minihub_pg_data:/var/lib/postgresql/data
+    ports:
+      # Porta 5434 no host para evitar conflito com outros bancos (como ativoarboreo)
+      - "127.0.0.1:5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-minihub_admin} -d ${POSTGRES_DB:-minihub_car}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: minihub-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 3333
+      HOST: 0.0.0.0
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-minihub_admin}:${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}@minihub-postgres:5432/${POSTGRES_DB:-minihub_car}
+      JWT_SECRET: ${JWT_SECRET:-minihub-collector-jwt-secret-prod-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-minihub-collector-refresh-secret-prod-2026}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://minihubcar.com.br}
+      STORAGE_LOCAL_PATH: ./uploads
+      DONATION_PIX_KEY: ${DONATION_PIX_KEY:-5accf9cd-a478-4e40-a223-a3fbff42b868}
+      DONATION_MONTHLY_GOAL: ${DONATION_MONTHLY_GOAL:-110.00}
+    volumes:
+      - minihub_uploads:/app/backend/uploads
+      - ./catalogos:/app/catalogos:ro
+    ports:
+      # Porta 3334 no host para a API do MiniHub Car
+      - "127.0.0.1:3334:3333"
+    networks:
+      - default
+      - eco_eco-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api/v1}
+    container_name: minihub-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      NEXT_PUBLIC_BACKEND_URL: http://minihub-backend:3333
+    ports:
+      # Porta 3002 no host (evita qualquer conflito caso ativoarboreo use 3000 ou 3001)
+      - "127.0.0.1:3002:3000"
+    networks:
+      - default
+      - eco_eco-network
+
+volumes:
+  minihub_pg_data:
+  minihub_uploads:
+
+networks:
+  default:
+  eco_eco-network:
+    external: true
