@@ -177,6 +177,19 @@ export async function seedHotWheelsFullCatalog(
 
   console.log(`📂 Arquivo CSV encontrado: ${csvPath}`);
 
+  // Garantir que as colunas de variação comportem textos descritivos longos sem estourar varchar
+  try {
+    await sqlClient`ALTER TABLE variation ALTER COLUMN color TYPE VARCHAR(500);`;
+    await sqlClient`ALTER TABLE variation ALTER COLUMN name TYPE VARCHAR(300);`;
+    await sqlClient`ALTER TABLE variation ALTER COLUMN finish TYPE VARCHAR(255);`;
+    await sqlClient`ALTER TABLE variation ALTER COLUMN edition TYPE VARCHAR(255);`;
+    await sqlClient`ALTER TABLE variation ALTER COLUMN release_year TYPE INTEGER;`;
+    await sqlClient`ALTER TABLE product_identifier ALTER COLUMN code TYPE VARCHAR(500);`;
+    await sqlClient`ALTER TABLE product_identifier ALTER COLUMN normalized_code TYPE VARCHAR(500);`;
+  } catch (alterErr) {
+    // Silently ignore if already expanded or non-blocking
+  }
+
   // Base directory for photos
   const basePhotosDir = path.dirname(csvPath);
 
@@ -294,13 +307,26 @@ export async function seedHotWheelsFullCatalog(
       row[h] = values[idx]?.trim() || '';
     });
 
-    const year = row['ano_lancamento'] ? parseInt(row['ano_lancamento'], 10) : 2026;
+    let year = 2026;
+    const rawYear = row['ano_lancamento'] || '';
+    const matchYear = rawYear.match(/\b(19\d\d|20\d\d)\b/);
+    if (matchYear && matchYear[1]) {
+      year = parseInt(matchYear[1], 10);
+    } else {
+      const parsed = parseInt(rawYear, 10);
+      if (parsed >= 1968 && parsed <= 2030) {
+        year = parsed;
+      }
+    }
 
     let descricao = row['descricao'];
     const castingName = extractCastingName(descricao || 'Hot Wheels');
     const normalizedCasting = castingName.toLowerCase();
 
-    let code = row['codigo_hotwheels']?.toUpperCase();
+    let code = (row['codigo_hotwheels']?.toUpperCase() || '').trim();
+    if (code.length > 140) {
+      code = code.slice(0, 140);
+    }
     if (!code) {
       const cleanSlug = (s: string) => (s || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 15);
       const cSlug = cleanSlug(castingName);
@@ -477,6 +503,19 @@ export async function seedHotWheelsFullCatalog(
       continue;
     }
 
+    const rawColor = row['cor'] || null;
+    const safeColor = rawColor ? rawColor.slice(0, 490) : null;
+    const safeName = (descricao || 'Hot Wheels').slice(0, 290);
+    const safeEdition = edition ? edition.slice(0, 240) : null;
+    const safeCollectorNumber = collectorNumber ? collectorNumber.slice(0, 50) : null;
+    const safeSeriesNumber = seriesNumber ? seriesNumber.slice(0, 50) : null;
+    const safeLineType = lineType ? lineType.slice(0, 50) : null;
+    const safeRarity = rarity ? rarity.slice(0, 50) : null;
+    let finalDescription = description;
+    if (rawColor && rawColor.length > 490) {
+      finalDescription = `${finalDescription || ''}\nCor original: ${rawColor}`.trim();
+    }
+
     if (existingVariationId) {
       // Update existing variation (NÃO DUPLICA!)
       await db
@@ -485,16 +524,16 @@ export async function seedHotWheelsFullCatalog(
           castingId,
           seriesId,
           scaleId: scale64!.id,
-          name: descricao,
+          name: safeName,
           releaseYear,
-          color: row['cor'] || null,
-          edition: edition || null,
-          collectorNumber,
-          seriesNumber,
-          lineType,
-          rarity,
+          color: safeColor,
+          edition: safeEdition,
+          collectorNumber: safeCollectorNumber,
+          seriesNumber: safeSeriesNumber,
+          lineType: safeLineType,
+          rarity: safeRarity,
           photoUrl,
-          description,
+          description: finalDescription,
           updatedAt: new Date(),
         })
         .where(eq(variation.id, existingVariationId));
@@ -508,16 +547,16 @@ export async function seedHotWheelsFullCatalog(
           castingId,
           seriesId,
           scaleId: scale64!.id,
-          name: descricao,
+          name: safeName,
           releaseYear,
-          color: row['cor'] || null,
-          edition: edition || null,
-          collectorNumber,
-          seriesNumber,
-          lineType,
-          rarity,
+          color: safeColor,
+          edition: safeEdition,
+          collectorNumber: safeCollectorNumber,
+          seriesNumber: safeSeriesNumber,
+          lineType: safeLineType,
+          rarity: safeRarity,
           photoUrl,
-          description,
+          description: finalDescription,
         })
         .returning();
 

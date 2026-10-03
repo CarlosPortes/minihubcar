@@ -12,6 +12,10 @@ pnpm-debug.log*
 coverage/
 drizzle/meta/
 catalogos/
+!catalogos/Bburago/
+!catalogos/Bburago/collect_bburago_catalog.py
+!catalogos/Bburago/bburago_catalogo.csv
+!catalogos/HW/collect_hotwheels_fandom_crawler.py
 scratch/
 *.pptx
 relatorio-pre-vendas.csv

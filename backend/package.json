@@ -25,7 +25,8 @@
     "db:seed:fandom": "tsx src/database/seed-fandom-catalog.ts",
     "db:seed:poprace": "tsx src/database/seed-poprace-catalog.ts",
     "db:seed:matchbox": "tsx src/database/seed-matchbox-catalog.ts",
-    "db:seed:spark": "tsx src/database/seed-spark-catalog.ts"
+    "db:seed:spark": "tsx src/database/seed-spark-catalog.ts",
+    "db:seed:bburago": "tsx src/database/seed-bburago-catalog.ts"
   },
 
   "dependencies": {
