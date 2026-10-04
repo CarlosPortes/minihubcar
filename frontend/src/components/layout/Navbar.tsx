@@ -3,7 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/context/auth-context';
-import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag } from 'lucide-react';
+import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag, MessageSquare } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { communityApi, DirectConversationItem } from '@/lib/api/community';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 import { useTranslation } from '@/i18n';
@@ -16,6 +18,18 @@ export function Navbar({ onSearchFocus }: NavbarProps) {
   const { user, logout, isAuthenticated, claimAdmin } = useAuth();
   const { t } = useTranslation();
   const isAdmin = user?.roles?.includes('CATALOG_ADMIN') || user?.roles?.includes('SYSTEM_ADMIN');
+
+  // Consulta conversas com mensagens não lidas
+  const { data: convsRes } = useQuery({
+    queryKey: ['community-conversations-unread-popup'],
+    queryFn: () => communityApi.listConversations(),
+    enabled: Boolean(isAuthenticated && user),
+    refetchInterval: 30000,
+  });
+
+  const unreadMessagesCount = (convsRes?.data || [])
+    .filter((c: DirectConversationItem) => c.unreadCount > 0)
+    .reduce((sum: number, c: DirectConversationItem) => sum + c.unreadCount, 0);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-card/80 px-4 md:px-6 backdrop-blur-md">
@@ -52,6 +66,21 @@ export function Navbar({ onSearchFocus }: NavbarProps) {
       <div className="flex items-center gap-2">
         <LanguageSelector />
         <ThemeSelector />
+
+        {isAuthenticated && (
+          <Link
+            href="/community?tab=messages"
+            title="Chat da Comunidade"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground hover:bg-primary/20 hover:text-primary border border-border transition-colors relative"
+          >
+            <MessageSquare className="h-4 w-4" />
+            {unreadMessagesCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-primary text-[10px] font-black text-primary-foreground shadow-sm animate-pulse">
+                {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+              </span>
+            )}
+          </Link>
+        )}
 
         {isAuthenticated && (
           <Link

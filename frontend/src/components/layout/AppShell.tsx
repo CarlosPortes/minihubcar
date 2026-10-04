@@ -5,6 +5,7 @@ import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { Footer } from './Footer';
+import { NewMessagesPopup } from '@/features/community/NewMessagesPopup';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <MobileNav />
+      <NewMessagesPopup />
     </div>
   );
 }

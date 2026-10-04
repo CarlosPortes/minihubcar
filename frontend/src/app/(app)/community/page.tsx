@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { communityApi, ShowcaseCollector } from '@/lib/api/community';
 import {
@@ -24,13 +25,29 @@ import {
 } from 'lucide-react';
 import { DirectMessagesSection } from '@/features/community/DirectMessagesSection';
 
-export default function CommunityPage() {
-  const [activeTab, setActiveTab] = useState<'SHOWCASE' | 'MESSAGES'>('SHOWCASE');
-  const [chatRecipientId, setChatRecipientId] = useState<string | null>(null);
+function CommunityContent() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const userParam = searchParams.get('userId');
+
+  const [activeTab, setActiveTab] = useState<'SHOWCASE' | 'MESSAGES'>(
+    tabParam === 'messages' ? 'MESSAGES' : 'SHOWCASE'
+  );
+  const [chatRecipientId, setChatRecipientId] = useState<string | null>(userParam || null);
   const [searchTerm, setSearchTerm] = useState('');
   const [onlyWithPhotos, setOnlyWithPhotos] = useState(false);
   const [selectedCollector, setSelectedCollector] = useState<ShowcaseCollector | null>(null);
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (tabParam === 'messages') {
+      setActiveTab('MESSAGES');
+    }
+    if (userParam) {
+      setChatRecipientId(userParam);
+      setActiveTab('MESSAGES');
+    }
+  }, [tabParam, userParam]);
 
   const { data: showcaseRes, isLoading } = useQuery({
     queryKey: ['community-showcase', searchTerm],
@@ -496,5 +513,20 @@ function PublicCollectionModal({ collector, onClose, onOpenPhoto, onStartChat }:
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm font-semibold">Carregando Comunidade...</p>
+        </div>
+      }
+    >
+      <CommunityContent />
+    </Suspense>
   );
 }
