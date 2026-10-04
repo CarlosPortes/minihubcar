@@ -19,14 +19,18 @@ const __dirname = path.dirname(__filename);
 
 // Montadoras conhecidas da Bburago
 const KNOWN_AUTOMAKERS: Array<{ name: string; country: string; patterns: RegExp[] }> = [
-  { name: 'Ferrari', country: 'Itália', patterns: [/\bferrari\b/i, /\bsf90\b/i, /\b499p\b/i, /\bf1-75\b/i, /\b296\b/i, /\broma\b/i, /\bdaytona\b/i, /\bf40\b/i, /\bmonza\b/i] },
-  { name: 'Red Bull Racing', country: 'Áustria', patterns: [/\bred bull\b/i, /\brb19\b/i, /\brb18\b/i, /\brb16\b/i, /\bverstappen\b/i, /\bperez\b/i] },
+  { name: 'Ferrari', country: 'Itália', patterns: [/\bferrari\b/i, /\blaferrari\b/i, /\bf80\b/i, /\bsf90\b/i, /\bsf-24\b/i, /\bsf-23\b/i, /\b499p\b/i, /\b488\b/i, /\bf1-75\b/i, /\b296\b/i, /\broma\b/i, /\bdaytona\b/i, /\bf40\b/i, /\bmonza\b/i] },
+  { name: 'Red Bull Racing', country: 'Áustria', patterns: [/\bred\s*bull\b/i, /\brb21\b/i, /\brb20\b/i, /\brb19\b/i, /\brb18\b/i, /\brb16\b/i, /\bverstappen\b/i, /\bperez\b/i] },
   { name: 'Lamborghini', country: 'Itália', patterns: [/\blamborghini\b/i, /\brevuelto\b/i, /\bsian\b/i, /\bhurac[aá]n\b/i, /\baventador\b/i, /\burus\b/i, /\bcountach\b/i, /\bterzo\b/i] },
   { name: 'Porsche', country: 'Alemanha', patterns: [/\bporsche\b/i, /\b911\b/i, /\bgt3\b/i, /\btaycan\b/i, /\b918\b/i] },
   { name: 'Bugatti', country: 'França', patterns: [/\bbugatti\b/i, /\bchiron\b/i, /\bdivo\b/i, /\bbolide\b/i] },
-  { name: 'Mercedes-Benz', country: 'Alemanha', patterns: [/\bmercedes\b/i, /\bamg\b/i, /\bw14\b/i, /\bw13\b/i, /\bhamilton\b/i, /\brussell\b/i] },
-  { name: 'McLaren', country: 'Reino Unido', patterns: [/\bmclaren\b/i, /\bmcl60\b/i, /\bmcl36\b/i, /\bnorris\b/i, /\bpiastri\b/i, /\bsenana\b/i, /\b720s\b/i] },
-  { name: 'Alpine', country: 'França', patterns: [/\balpine\b/i, /\ba523\b/i, /\ba522\b/i, /\bgasly\b/i, /\bocon\b/i, /\ba110\b/i] },
+  { name: 'Mercedes-Benz', country: 'Alemanha', patterns: [/\bmercedes\b/i, /\bamg\b/i, /\bw16\b/i, /\bw15\b/i, /\bw14\b/i, /\bw13\b/i, /\bhamilton\b/i, /\brussell\b/i, /\bantonelli\b/i] },
+  { name: 'McLaren', country: 'Reino Unido', patterns: [/\bmclaren\b/i, /\bmcl38\b/i, /\bmcl60\b/i, /\bmcl36\b/i, /\bnorris\b/i, /\bpiastri\b/i, /\bsenana\b/i, /\b720s\b/i] },
+  { name: 'Toyota', country: 'Japão', patterns: [/\btoyota\b/i, /\bgr010\b/i, /\bsupra\b/i] },
+  { name: 'Jaguar', country: 'Reino Unido', patterns: [/\bjaguar\b/i, /\be-type\b/i] },
+  { name: 'Renault', country: 'França', patterns: [/\brenault\b/i] },
+  { name: 'MINI', country: 'Reino Unido', patterns: [/\bmini\b/i, /\bcooper\b/i] },
+  { name: 'Alpine', country: 'França', patterns: [/\balpine\b/i, /\ba524\b/i, /\ba523\b/i, /\ba522\b/i, /\bgasly\b/i, /\bocon\b/i, /\ba110\b/i] },
   { name: 'Alfa Romeo', country: 'Itália', patterns: [/\balfa romeo\b/i, /\bc43\b/i, /\bc42\b/i, /\bgiulia\b/i, /\btonale\b/i, /\bvalse\b/i] },
   { name: 'Aston Martin', country: 'Reino Unido', patterns: [/\baston martin\b/i, /\bvalkyrie\b/i, /\bvantage\b/i, /\bdbx\b/i] },
   { name: 'BMW', country: 'Alemanha', patterns: [/\bbmw\b/i, /\bm3\b/i, /\bm4\b/i, /\bm8\b/i, /\bz4\b/i] },
@@ -325,6 +329,9 @@ export async function seedBburagoCatalog(customPath?: string) {
       .filter(Boolean)
       .join('\n\n');
 
+    const releaseYear = row['ano_modelo'] ? parseInt(row['ano_modelo'], 10) : undefined;
+    const edition = row['piloto'] ? `Piloto: ${row['piloto']}` : undefined;
+
     // Verificar se variação já existe
     const normSku = sku.toLowerCase();
     const existingVarId = identifierMap.get(normSku);
@@ -339,6 +346,8 @@ export async function seedBburagoCatalog(customPath?: string) {
           name: title.slice(0, 200),
           color,
           photoUrl,
+          releaseYear,
+          edition,
           description: desc,
           updatedAt: new Date(),
         })
@@ -354,6 +363,8 @@ export async function seedBburagoCatalog(customPath?: string) {
           name: title.slice(0, 200),
           color,
           photoUrl,
+          releaseYear,
+          edition,
           description: desc,
         })
         .returning();
