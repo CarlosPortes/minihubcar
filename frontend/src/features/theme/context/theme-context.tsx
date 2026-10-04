@@ -104,12 +104,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.setAttribute('data-theme', saved);
       if (saved === 'light') {
         document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
       } else {
         document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
       }
     } else {
       document.documentElement.setAttribute('data-theme', 'dark');
       document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     }
     setMounted(true);
   }, []);
@@ -120,8 +123,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute('data-theme', newTheme);
     if (newTheme === 'light') {
       document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     }
   };
 

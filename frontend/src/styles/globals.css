@@ -12,6 +12,14 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
+  input, textarea, select {
+    color: var(--foreground);
+    caret-color: var(--primary);
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.75;
+  }
 }
 
 /* Custom scrollbar */

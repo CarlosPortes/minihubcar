@@ -173,9 +173,11 @@ export function DirectMessagesSection({
               placeholder="Buscar nas conversas..."
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-card border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              autoComplete="off"
+              style={{ color: 'var(--foreground)' }}
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
             />
-            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
         </div>
 
@@ -197,7 +199,7 @@ export function DirectMessagesSection({
                   key={c.id}
                   onClick={() => handleSelectConversation(c)}
                   className={`w-full p-4 text-left flex items-start gap-3 transition-colors ${
-                    isSelected ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-secondary/40'
+                    isSelected ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-secondary/60'
                   }`}
                 >
                   {/* Avatar */}
@@ -296,7 +298,7 @@ export function DirectMessagesSection({
             </div>
 
             {/* Message Feed */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-secondary/5">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-background/50">
               {isLoadingMessages ? (
                 <div className="py-20 text-center text-xs text-muted-foreground">Carregando mensagens...</div>
               ) : messages.length === 0 ? (
@@ -314,10 +316,10 @@ export function DirectMessagesSection({
                       className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}
                     >
                       <div
-                        className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
+                        className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                           isMine
-                            ? 'bg-primary text-primary-foreground rounded-br-none shadow-sm'
-                            : 'bg-card border border-border text-foreground rounded-bl-none shadow-sm'
+                            ? 'bg-primary text-primary-foreground font-normal rounded-br-none shadow-sm'
+                            : 'bg-card border border-border text-foreground font-normal rounded-bl-none shadow-sm'
                         }`}
                       >
                         <p className="whitespace-pre-line">{msg.content}</p>
@@ -346,19 +348,23 @@ export function DirectMessagesSection({
             </div>
 
             {/* Message Input Form */}
-            <form onSubmit={handleSendMessage} className="p-3.5 border-t border-border bg-card flex items-center gap-2">
+            <form onSubmit={handleSendMessage} className="p-3 md:p-4 border-t border-border bg-card flex items-center gap-2.5">
               <input
                 type="text"
                 placeholder={`Mensagem para ${activePartner.name}...`}
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-secondary/40 border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                autoComplete="off"
+                spellCheck="false"
+                style={{ color: 'var(--foreground)' }}
+                className="flex-1 px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition-all shadow-inner"
               />
 
               <button
                 type="submit"
                 disabled={!messageText.trim() || isSending}
-                className="p-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-all shrink-0 shadow-sm"
+                className="p-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-all shrink-0 shadow-md flex items-center justify-center cursor-pointer"
+                title="Enviar mensagem"
               >
                 <Send className="w-4 h-4" />
               </button>
