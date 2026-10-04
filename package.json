@@ -12,7 +12,19 @@
     "test": "pnpm --recursive run test",
     "db:generate": "pnpm --filter backend db:generate",
     "db:migrate": "pnpm --filter backend db:migrate",
+    "db:migrate:phases": "pnpm --filter backend db:migrate:phases",
     "db:seed": "pnpm --filter backend db:seed",
-    "db:seed:hw:full": "pnpm --filter backend db:seed:hw:full"
+    "db:seed:prod": "pnpm --filter backend db:seed:prod",
+    "db:seed:automakers": "pnpm --filter backend db:seed:automakers",
+    "db:seed:hw": "pnpm --filter backend db:seed:hw",
+    "db:seed:hw:full": "pnpm --filter backend db:seed:hw:full",
+    "db:seed:hw2026": "pnpm --filter backend db:seed:hw2026",
+    "db:seed:bburago": "pnpm --filter backend db:seed:bburago",
+    "db:seed:spark": "pnpm --filter backend db:seed:spark",
+    "db:seed:poprace": "pnpm --filter backend db:seed:poprace",
+    "db:seed:matchbox": "pnpm --filter backend db:seed:matchbox",
+    "db:seed:minigtbrasil": "pnpm --filter backend db:seed:minigtbrasil",
+    "db:seed:ar": "pnpm --filter backend db:seed:ar",
+    "db:seed:fandom": "pnpm --filter backend db:seed:fandom"
   }
 }
