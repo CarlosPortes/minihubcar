@@ -30,6 +30,8 @@ catalogos/HW/hw_catalogo_amostra.csv
 
 scratch/
 *.pptx
+*.xlsx
 relatorio-pre-vendas.csv
 *.tsbuildinfo
+avatar/exp*.jpeg
 

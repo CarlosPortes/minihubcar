@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/context/auth-context';
-import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag, MessageSquare } from 'lucide-react';
+import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag, MessageSquare, Menu } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { communityApi, DirectConversationItem } from '@/lib/api/community';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
@@ -12,9 +12,10 @@ import { useTranslation } from '@/i18n';
 
 interface NavbarProps {
   onSearchFocus?: () => void;
+  onOpenMobileMenu?: () => void;
 }
 
-export function Navbar({ onSearchFocus }: NavbarProps) {
+export function Navbar({ onSearchFocus, onOpenMobileMenu }: NavbarProps) {
   const { user, logout, isAuthenticated, claimAdmin } = useAuth();
   const { t } = useTranslation();
   const isAdmin = user?.roles?.includes('CATALOG_ADMIN') || user?.roles?.includes('SYSTEM_ADMIN');
@@ -34,6 +35,19 @@ export function Navbar({ onSearchFocus }: NavbarProps) {
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-card/80 px-4 md:px-6 backdrop-blur-md">
       <div className="flex items-center gap-3">
+        {/* Botão de Menu Hambúrguer para Mobile / PWA */}
+        <button
+          type="button"
+          onClick={onOpenMobileMenu}
+          aria-label="Abrir menu de navegação"
+          className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground hover:bg-secondary/80 border border-border transition-colors relative"
+        >
+          <Menu className="h-5 w-5" />
+          {isAdmin && (
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-background" />
+          )}
+        </button>
+
         <Link href="/dashboard" className="flex items-center gap-2 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20 text-primary border border-primary/30 group-hover:scale-105 transition-transform">
             <Car className="h-5 w-5 text-primary" />
