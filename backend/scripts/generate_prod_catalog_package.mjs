@@ -187,12 +187,13 @@ async function main() {
   // 4. Castings que não existem
   sqlChunks.push(`-- 4. Cria Castings Inéditos (que não existem na base)\n`);
   sqlChunks.push(`INSERT INTO casting (miniature_brand_id, name, normalized_name, fantasy_flag, status)\n`);
-  sqlChunks.push(`SELECT DISTINCT b.id, t.name, t.normalized_name, false, 'ACTIVE'\n`);
+  sqlChunks.push(`SELECT DISTINCT ON (b.id, t.normalized_name) b.id, t.name, t.normalized_name, false, 'ACTIVE'\n`);
   sqlChunks.push(`FROM temp_catalog_hw_delta t\n`);
   sqlChunks.push(`CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b\n`);
   sqlChunks.push(`WHERE NOT EXISTS (\n`);
   sqlChunks.push(`  SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))\n`);
   sqlChunks.push(`)\n`);
+  sqlChunks.push(`ORDER BY b.id, t.normalized_name\n`);
   sqlChunks.push(`ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;\n\n`);
 
   // 5. Inserção das novas Variações e Identificadores via CTE dinâmica
@@ -204,7 +205,7 @@ async function main() {
   sqlChunks.push(`    (SELECT id FROM identifier_type WHERE code = 'MATTEL_CODE' LIMIT 1) as type_id\n`);
   sqlChunks.push(`),\n`);
   sqlChunks.push(`new_items AS (\n`);
-  sqlChunks.push(`  SELECT DISTINCT ON (t.code)\n`);
+  sqlChunks.push(`  SELECT DISTINCT ON (upper(trim(t.code)))\n`);
   sqlChunks.push(`    gen_random_uuid() as new_var_id,\n`);
   sqlChunks.push(`    c.id as casting_id,\n`);
   sqlChunks.push(`    s.id as series_id,\n`);
@@ -214,7 +215,7 @@ async function main() {
   sqlChunks.push(`    t.release_year,\n`);
   sqlChunks.push(`    t.line_type,\n`);
   sqlChunks.push(`    t.photo_url,\n`);
-  sqlChunks.push(`    t.code\n`);
+  sqlChunks.push(`    upper(trim(t.code)) as code\n`);
   sqlChunks.push(`  FROM temp_catalog_hw_delta t\n`);
   sqlChunks.push(`  CROSS JOIN hw_info h\n`);
   sqlChunks.push(`  JOIN casting c ON c.miniature_brand_id = h.brand_id AND c.normalized_name = t.normalized_name\n`);
@@ -222,6 +223,7 @@ async function main() {
   sqlChunks.push(`  WHERE NOT EXISTS (\n`);
   sqlChunks.push(`    SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))\n`);
   sqlChunks.push(`  )\n`);
+  sqlChunks.push(`  ORDER BY upper(trim(t.code))\n`);
   sqlChunks.push(`),\n`);
   sqlChunks.push(`ins_vars AS (\n`);
   sqlChunks.push(`  INSERT INTO variation (id, casting_id, series_id, scale_id, name, release_year, line_type, photo_url, status)\n`);

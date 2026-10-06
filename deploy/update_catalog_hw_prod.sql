@@ -1,6 +1,6 @@
 -- ========================================================
 -- ATUALIZAÇÃO E ENRIQUECIMENTO DO CATÁLOGO HW (PRODUÇÃO)
--- Gerado em: 2026-10-06T09:45:24.327Z
+-- Gerado em: 2026-10-06T09:51:53.816Z
 -- ========================================================
 
 BEGIN;
@@ -12200,12 +12200,13 @@ WHERE v.id = pi.variation_id;
 
 -- 4. Cria Castings Inéditos (que não existem na base)
 INSERT INTO casting (miniature_brand_id, name, normalized_name, fantasy_flag, status)
-SELECT DISTINCT b.id, t.name, t.normalized_name, false, 'ACTIVE'
+SELECT DISTINCT ON (b.id, t.normalized_name) b.id, t.name, t.normalized_name, false, 'ACTIVE'
 FROM temp_catalog_hw_delta t
 CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b
 WHERE NOT EXISTS (
   SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))
 )
+ORDER BY b.id, t.normalized_name
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 
 -- 5. Cria Novas Variações e seus respectivos Product Identifiers
@@ -12216,7 +12217,7 @@ WITH hw_info AS (
     (SELECT id FROM identifier_type WHERE code = 'MATTEL_CODE' LIMIT 1) as type_id
 ),
 new_items AS (
-  SELECT DISTINCT ON (t.code)
+  SELECT DISTINCT ON (upper(trim(t.code)))
     gen_random_uuid() as new_var_id,
     c.id as casting_id,
     s.id as series_id,
@@ -12226,7 +12227,7 @@ new_items AS (
     t.release_year,
     t.line_type,
     t.photo_url,
-    t.code
+    upper(trim(t.code)) as code
   FROM temp_catalog_hw_delta t
   CROSS JOIN hw_info h
   JOIN casting c ON c.miniature_brand_id = h.brand_id AND c.normalized_name = t.normalized_name
@@ -12234,6 +12235,7 @@ new_items AS (
   WHERE NOT EXISTS (
     SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))
   )
+  ORDER BY upper(trim(t.code))
 ),
 ins_vars AS (
   INSERT INTO variation (id, casting_id, series_id, scale_id, name, release_year, line_type, photo_url, status)
