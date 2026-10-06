@@ -1,1609 +1,3221 @@
 -- ========================================================
 -- ATUALIZAÇÃO E ENRIQUECIMENTO DO CATÁLOGO HW (PRODUÇÃO)
--- Gerado em: 2026-10-06T09:13:18.728Z
+-- Gerado em: 2026-10-06T09:45:24.327Z
 -- ========================================================
 
 BEGIN;
 
--- 1. Criação/Atualização de Séries Hot Wheels
+-- 0. Garantir entidades base no banco de produção
+INSERT INTO miniature_brand (name, normalized_name, status)
+VALUES ('Hot Wheels', 'hot wheels', 'ACTIVE')
+ON CONFLICT (normalized_name) DO UPDATE SET name = EXCLUDED.name;
+
+INSERT INTO scale (name, numerator, denominator, normalized_value, status)
+VALUES ('1:64', 1, 64, 0.015625, 'ACTIVE')
+ON CONFLICT (numerator, denominator) DO UPDATE SET name = EXCLUDED.name;
+
+INSERT INTO identifier_type (code, name, status)
+SELECT 'MATTEL_CODE', 'Código Mattel', 'ACTIVE'
+WHERE NOT EXISTS (SELECT 1 FROM identifier_type WHERE code = 'MATTEL_CODE');
+
+-- 1. Criação/Atualização de Séries Hot Wheels (com ID dinâmico da marca)
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2026', 'fast & furious premium series 2026', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2026', 'fast & furious premium series 2026', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2026', 'car culture 2026', 'ACTIVE')
+SELECT b.id, 'Car Culture 2026', 'car culture 2026', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Dream Garage', 'hw dream garage', 'ACTIVE')
+SELECT b.id, 'HW Dream Garage', 'hw dream garage', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Exoticars', 'exoticars', 'ACTIVE')
+SELECT b.id, 'Exoticars', 'exoticars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Batman', 'batman', 'ACTIVE')
+SELECT b.id, 'Batman', 'batman', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Drop Tops', 'drop tops', 'ACTIVE')
+SELECT b.id, 'Drop Tops', 'drop tops', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'X-Raycers', 'x-raycers', 'ACTIVE')
+SELECT b.id, 'X-Raycers', 'x-raycers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW EV', 'hw ev', 'ACTIVE')
+SELECT b.id, 'HW EV', 'hw ev', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Nightspeed', 'nightspeed', 'ACTIVE')
+SELECT b.id, 'Nightspeed', 'nightspeed', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Experimotors', 'experimotors', 'ACTIVE')
+SELECT b.id, 'Experimotors', 'experimotors', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Truckin'' Along', 'truckin'' along', 'ACTIVE')
+SELECT b.id, 'Truckin'' Along', 'truckin'' along', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Factory Fresh', 'factory fresh', 'ACTIVE')
+SELECT b.id, 'Factory Fresh', 'factory fresh', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Layin'' Low', 'layin'' low', 'ACTIVE')
+SELECT b.id, 'Layin'' Low', 'layin'' low', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2026', 'hot wheels boulevard 2026', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2026', 'hot wheels boulevard 2026', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Fan Driven', 'hw fan driven', 'ACTIVE')
+SELECT b.id, 'HW Fan Driven', 'hw fan driven', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Formula 1', 'formula 1', 'ACTIVE')
+SELECT b.id, 'Formula 1', 'formula 1', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mattel', 'mattel', 'ACTIVE')
+SELECT b.id, 'Mattel', 'mattel', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Starting Grid', 'hw starting grid', 'ACTIVE')
+SELECT b.id, 'HW Starting Grid', 'hw starting grid', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Screen Time', 'screen time', 'ACTIVE')
+SELECT b.id, 'Screen Time', 'screen time', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Heavyweights', 'hw heavyweights', 'ACTIVE')
+SELECT b.id, 'HW Heavyweights', 'hw heavyweights', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2026', 'pop culture 2026', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2026', 'pop culture 2026', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW All Drivers Welcome', 'hw all drivers welcome', 'ACTIVE')
+SELECT b.id, 'HW All Drivers Welcome', 'hw all drivers welcome', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Ferrari', 'ferrari', 'ACTIVE')
+SELECT b.id, 'Ferrari', 'ferrari', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Mods', 'hw mods', 'ACTIVE')
+SELECT b.id, 'HW Mods', 'hw mods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Sweet Rides', 'sweet rides', 'ACTIVE')
+SELECT b.id, 'Sweet Rides', 'sweet rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW J-Imports', 'hw j-imports', 'ACTIVE')
+SELECT b.id, 'HW J-Imports', 'hw j-imports', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Euro', 'hw euro', 'ACTIVE')
+SELECT b.id, 'HW Euro', 'hw euro', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Then and Now', 'then and now', 'ACTIVE')
+SELECT b.id, 'Then and Now', 'then and now', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Drag Racers', 'drag racers', 'ACTIVE')
+SELECT b.id, 'Drag Racers', 'drag racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Compact Kings', 'compact kings', 'ACTIVE')
+SELECT b.id, 'Compact Kings', 'compact kings', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Wagons', 'wagons', 'ACTIVE')
+SELECT b.id, 'Wagons', 'wagons', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Rod Squad', 'rod squad', 'ACTIVE')
+SELECT b.id, 'Rod Squad', 'rod squad', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Tooned', 'tooned', 'ACTIVE')
+SELECT b.id, 'Tooned', 'tooned', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2025', 'pop culture 2025', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2025', 'pop culture 2025', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '0/5', '0/5', 'ACTIVE')
+SELECT b.id, '0/5', '0/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '5/5', '5/5', 'ACTIVE')
+SELECT b.id, '5/5', '5/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '4/5', '4/5', 'ACTIVE')
+SELECT b.id, '4/5', '4/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '3/5', '3/5', 'ACTIVE')
+SELECT b.id, '3/5', '3/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2/5', '2/5', 'ACTIVE')
+SELECT b.id, '2/5', '2/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1/5', '1/5', 'ACTIVE')
+SELECT b.id, '1/5', '1/5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'European Car Culture Themed Multipack', 'european car culture themed multipack', 'ACTIVE')
+SELECT b.id, 'European Car Culture Themed Multipack', 'european car culture themed multipack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#86', '#86', 'ACTIVE')
+SELECT b.id, '#86', '#86', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#87', '#87', 'ACTIVE')
+SELECT b.id, '#87', '#87', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#88', '#88', 'ACTIVE')
+SELECT b.id, '#88', '#88', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#89', '#89', 'ACTIVE')
+SELECT b.id, '#89', '#89', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#90', '#90', 'ACTIVE')
+SELECT b.id, '#90', '#90', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#91', '#91', 'ACTIVE')
+SELECT b.id, '#91', '#91', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'N/A', 'n/a', 'ACTIVE')
+SELECT b.id, 'N/A', 'n/a', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Super Treasure Hunt', 'super treasure hunt', 'ACTIVE')
+SELECT b.id, 'Super Treasure Hunt', 'super treasure hunt', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2026!', 'new for 2026!', 'ACTIVE')
+SELECT b.id, 'New for 2026!', 'new for 2026!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2025', 'fast & furious premium series 2025', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2025', 'fast & furious premium series 2025', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Screen Time', 'hw screen time', 'ACTIVE')
+SELECT b.id, 'HW Screen Time', 'hw screen time', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Designed By', 'hw designed by', 'ACTIVE')
+SELECT b.id, 'HW Designed By', 'hw designed by', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Metro', 'hw metro', 'ACTIVE')
+SELECT b.id, 'HW Metro', 'hw metro', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2025', 'car culture 2025', 'ACTIVE')
+SELECT b.id, 'Car Culture 2025', 'car culture 2025', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2025', 'hot wheels boulevard 2025', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2025', 'hot wheels boulevard 2025', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Art Cars', 'hw art cars', 'ACTIVE')
+SELECT b.id, 'HW Art Cars', 'hw art cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW First Response', 'hw first response', 'ACTIVE')
+SELECT b.id, 'HW First Response', 'hw first response', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Let''s Race', 'hot wheels let''s race', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Let''s Race', 'hot wheels let''s race', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Hot Trucks', 'hw hot trucks', 'ACTIVE')
+SELECT b.id, 'HW Hot Trucks', 'hw hot trucks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Ride-Ons', 'hw ride-ons', 'ACTIVE')
+SELECT b.id, 'HW Ride-Ons', 'hw ride-ons', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2024', 'pop culture 2024', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2024', 'pop culture 2024', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Celebration Racers', 'hw celebration racers', 'ACTIVE')
+SELECT b.id, 'HW Celebration Racers', 'hw celebration racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW: ''70s vs. ''90s', 'hw: ''70s vs. ''90s', 'ACTIVE')
+SELECT b.id, 'HW: ''70s vs. ''90s', 'hw: ''70s vs. ''90s', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mustang 60th', 'mustang 60th', 'ACTIVE')
+SELECT b.id, 'Mustang 60th', 'mustang 60th', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Safari Mode', 'safari mode', 'ACTIVE')
+SELECT b.id, 'Safari Mode', 'safari mode', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Modified', 'hw modified', 'ACTIVE')
+SELECT b.id, 'HW Modified', 'hw modified', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Dirt', 'hw dirt', 'ACTIVE')
+SELECT b.id, 'HW Dirt', 'hw dirt', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Track Aces', 'track aces', 'ACTIVE')
+SELECT b.id, 'Track Aces', 'track aces', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Race Day', 'hw race day', 'ACTIVE')
+SELECT b.id, 'HW Race Day', 'hw race day', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast Foodie', 'fast foodie', 'ACTIVE')
+SELECT b.id, 'Fast Foodie', 'fast foodie', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Reverse Rake', 'hw reverse rake', 'ACTIVE')
+SELECT b.id, 'HW Reverse Rake', 'hw reverse rake', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Exotics', 'hw exotics', 'ACTIVE')
+SELECT b.id, 'HW Exotics', 'hw exotics', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania', 'muscle mania', 'ACTIVE')
+SELECT b.id, 'Muscle Mania', 'muscle mania', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Moto', 'hw moto', 'ACTIVE')
+SELECT b.id, 'HW Moto', 'hw moto', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Wagons', 'hw wagons', 'ACTIVE')
+SELECT b.id, 'HW Wagons', 'hw wagons', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Wild Widebody', 'wild widebody', 'ACTIVE')
+SELECT b.id, 'Wild Widebody', 'wild widebody', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Peak Pursuit', 'peak pursuit', 'ACTIVE')
+SELECT b.id, 'Peak Pursuit', 'peak pursuit', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Track Champs', 'hw track champs', 'ACTIVE')
+SELECT b.id, 'HW Track Champs', 'hw track champs', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mattel 80th Anniversary Multipack', 'mattel 80th anniversary multipack', 'ACTIVE')
+SELECT b.id, 'Mattel 80th Anniversary Multipack', 'mattel 80th anniversary multipack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2025 Fast & Furious Premium Series', '2025 fast & furious premium series', 'ACTIVE')
+SELECT b.id, '2025 Fast & Furious Premium Series', '2025 fast & furious premium series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#74', '#74', 'ACTIVE')
+SELECT b.id, '#74', '#74', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#75', '#75', 'ACTIVE')
+SELECT b.id, '#75', '#75', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#76', '#76', 'ACTIVE')
+SELECT b.id, '#76', '#76', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#77', '#77', 'ACTIVE')
+SELECT b.id, '#77', '#77', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#78', '#78', 'ACTIVE')
+SELECT b.id, '#78', '#78', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#79', '#79', 'ACTIVE')
+SELECT b.id, '#79', '#79', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#80', '#80', 'ACTIVE')
+SELECT b.id, '#80', '#80', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#81', '#81', 'ACTIVE')
+SELECT b.id, '#81', '#81', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#82', '#82', 'ACTIVE')
+SELECT b.id, '#82', '#82', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#83', '#83', 'ACTIVE')
+SELECT b.id, '#83', '#83', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#84', '#84', 'ACTIVE')
+SELECT b.id, '#84', '#84', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#85', '#85', 'ACTIVE')
+SELECT b.id, '#85', '#85', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2024', 'fast & furious premium series 2024', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2024', 'fast & furious premium series 2024', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Fast Transit', 'hw fast transit', 'ACTIVE')
+SELECT b.id, 'HW Fast Transit', 'hw fast transit', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Green Speed', 'hw green speed', 'ACTIVE')
+SELECT b.id, 'HW Green Speed', 'hw green speed', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Xtreme Sports', 'hw xtreme sports', 'ACTIVE')
+SELECT b.id, 'HW Xtreme Sports', 'hw xtreme sports', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Mega Bite', 'hw mega bite', 'ACTIVE')
+SELECT b.id, 'HW Mega Bite', 'hw mega bite', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Roadsters', 'hw roadsters', 'ACTIVE')
+SELECT b.id, 'HW Roadsters', 'hw roadsters', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2024', 'hot wheels boulevard 2024', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2024', 'hot wheels boulevard 2024', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Turbo', 'hw turbo', 'ACTIVE')
+SELECT b.id, 'HW Turbo', 'hw turbo', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2024', 'car culture 2024', 'ACTIVE')
+SELECT b.id, 'Car Culture 2024', 'car culture 2024', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Quarter Mile Heroes', 'quarter mile heroes', 'ACTIVE')
+SELECT b.id, 'Quarter Mile Heroes', 'quarter mile heroes', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW: The ''90s', 'hw: the ''90s', 'ACTIVE')
+SELECT b.id, 'HW: The ''90s', 'hw: the ''90s', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Rolling Metal', 'hw rolling metal', 'ACTIVE')
+SELECT b.id, 'HW Rolling Metal', 'hw rolling metal', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Vans', 'hw vans', 'ACTIVE')
+SELECT b.id, 'HW Vans', 'hw vans', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Flames 5-Pack', 'hw flames 5-pack', 'ACTIVE')
+SELECT b.id, 'HW Flames 5-Pack', 'hw flames 5-pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'ZAMAC Themed Multipack', 'zamac themed multipack', 'ACTIVE')
+SELECT b.id, 'ZAMAC Themed Multipack', 'zamac themed multipack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2024 Japan Collectors Convention', '2024 japan collectors convention', 'ACTIVE')
+SELECT b.id, '2024 Japan Collectors Convention', '2024 japan collectors convention', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#62', '#62', 'ACTIVE')
+SELECT b.id, '#62', '#62', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#63', '#63', 'ACTIVE')
+SELECT b.id, '#63', '#63', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#64', '#64', 'ACTIVE')
+SELECT b.id, '#64', '#64', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#65', '#65', 'ACTIVE')
+SELECT b.id, '#65', '#65', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#66', '#66', 'ACTIVE')
+SELECT b.id, '#66', '#66', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#67', '#67', 'ACTIVE')
+SELECT b.id, '#67', '#67', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#68', '#68', 'ACTIVE')
+SELECT b.id, '#68', '#68', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#70', '#70', 'ACTIVE')
+SELECT b.id, '#70', '#70', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#71', '#71', 'ACTIVE')
+SELECT b.id, '#71', '#71', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#72', '#72', 'ACTIVE')
+SELECT b.id, '#72', '#72', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '#73', '#73', 'ACTIVE')
+SELECT b.id, '#73', '#73', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2023', 'fast & furious premium series 2023', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2023', 'fast & furious premium series 2023', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2023', 'pop culture 2023', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2023', 'pop culture 2023', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW: The ''80s', 'hw: the ''80s', 'ACTIVE')
+SELECT b.id, 'HW: The ''80s', 'hw: the ''80s', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Retro Racers', 'retro racers', 'ACTIVE')
+SELECT b.id, 'Retro Racers', 'retro racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2023', 'hot wheels boulevard 2023', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2023', 'hot wheels boulevard 2023', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Brick Rides', 'brick rides', 'ACTIVE')
+SELECT b.id, 'Brick Rides', 'brick rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Haulers', 'hw haulers', 'ACTIVE')
+SELECT b.id, 'HW Haulers', 'hw haulers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Sky Show', 'sky show', 'ACTIVE')
+SELECT b.id, 'Sky Show', 'sky show', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Surf''s Up', 'surf''s up', 'ACTIVE')
+SELECT b.id, 'Surf''s Up', 'surf''s up', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW 55 Race Team', 'hw 55 race team', 'ACTIVE')
+SELECT b.id, 'HW 55 Race Team', 'hw 55 race team', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2023', 'car culture 2023', 'ACTIVE')
+SELECT b.id, 'Car Culture 2023', 'car culture 2023', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Sports', 'hw sports', 'ACTIVE')
+SELECT b.id, 'HW Sports', 'hw sports', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drag Strip', 'hw drag strip', 'ACTIVE')
+SELECT b.id, 'HW Drag Strip', 'hw drag strip', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mud Studs', 'mud studs', 'ACTIVE')
+SELECT b.id, 'Mud Studs', 'mud studs', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Gassers', 'hw gassers', 'ACTIVE')
+SELECT b.id, 'HW Gassers', 'hw gassers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Rescue', 'hw rescue', 'ACTIVE')
+SELECT b.id, 'HW Rescue', 'hw rescue', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Baja Blazers', 'baja blazers', 'ACTIVE')
+SELECT b.id, 'Baja Blazers', 'baja blazers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Slammed', 'hw slammed', 'ACTIVE')
+SELECT b.id, 'HW Slammed', 'hw slammed', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'NFT Garage: 2022 Series Completion Car', 'nft garage: 2022 series completion car', 'ACTIVE')
+SELECT b.id, 'NFT Garage: 2022 Series Completion Car', 'nft garage: 2022 series completion car', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '50', '50', 'ACTIVE')
+SELECT b.id, '50', '50', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '51', '51', 'ACTIVE')
+SELECT b.id, '51', '51', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '52', '52', 'ACTIVE')
+SELECT b.id, '52', '52', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '53', '53', 'ACTIVE')
+SELECT b.id, '53', '53', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '54', '54', 'ACTIVE')
+SELECT b.id, '54', '54', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '55', '55', 'ACTIVE')
+SELECT b.id, '55', '55', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '56', '56', 'ACTIVE')
+SELECT b.id, '56', '56', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '57', '57', 'ACTIVE')
+SELECT b.id, '57', '57', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '58', '58', 'ACTIVE')
+SELECT b.id, '58', '58', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '59', '59', 'ACTIVE')
+SELECT b.id, '59', '59', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '60', '60', 'ACTIVE')
+SELECT b.id, '60', '60', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '61', '61', 'ACTIVE')
+SELECT b.id, '61', '61', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2022', 'hot wheels boulevard 2022', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2022', 'hot wheels boulevard 2022', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2022', 'car culture 2022', 'ACTIVE')
+SELECT b.id, 'Car Culture 2022', 'car culture 2022', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2022', 'pop culture 2022', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2022', 'pop culture 2022', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Street Beasts', 'street beasts', 'ACTIVE')
+SELECT b.id, 'Street Beasts', 'street beasts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Hatchbacks', 'hw hatchbacks', 'ACTIVE')
+SELECT b.id, 'HW Hatchbacks', 'hw hatchbacks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Chevy Bel Air', 'chevy bel air', 'ACTIVE')
+SELECT b.id, 'Chevy Bel Air', 'chevy bel air', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Contoured', 'hw contoured', 'ACTIVE')
+SELECT b.id, 'HW Contoured', 'hw contoured', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Speed Team', 'hw speed team', 'ACTIVE')
+SELECT b.id, 'HW Speed Team', 'hw speed team', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Spoiler Alert', 'spoiler alert', 'ACTIVE')
+SELECT b.id, 'Spoiler Alert', 'spoiler alert', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Daredevils', 'hw daredevils', 'ACTIVE')
+SELECT b.id, 'HW Daredevils', 'hw daredevils', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drift', 'hw drift', 'ACTIVE')
+SELECT b.id, 'HW Drift', 'hw drift', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Rally Champs', 'rally champs', 'ACTIVE')
+SELECT b.id, 'Rally Champs', 'rally champs', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '38', '38', 'ACTIVE')
+SELECT b.id, '38', '38', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '39', '39', 'ACTIVE')
+SELECT b.id, '39', '39', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '40', '40', 'ACTIVE')
+SELECT b.id, '40', '40', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '41', '41', 'ACTIVE')
+SELECT b.id, '41', '41', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '42', '42', 'ACTIVE')
+SELECT b.id, '42', '42', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '43', '43', 'ACTIVE')
+SELECT b.id, '43', '43', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '44', '44', 'ACTIVE')
+SELECT b.id, '44', '44', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '45', '45', 'ACTIVE')
+SELECT b.id, '45', '45', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '46', '46', 'ACTIVE')
+SELECT b.id, '46', '46', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '47', '47', 'ACTIVE')
+SELECT b.id, '47', '47', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '48', '48', 'ACTIVE')
+SELECT b.id, '48', '48', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '49', '49', 'ACTIVE')
+SELECT b.id, '49', '49', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2021', 'hot wheels boulevard 2021', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2021', 'hot wheels boulevard 2021', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2021', 'fast & furious premium series 2021', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2021', 'fast & furious premium series 2021', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2021', 'pop culture 2021', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2021', 'pop culture 2021', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Glow Racers', 'hw glow racers', 'ACTIVE')
+SELECT b.id, 'HW Glow Racers', 'hw glow racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Getaways', 'hw getaways', 'ACTIVE')
+SELECT b.id, 'HW Getaways', 'hw getaways', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Dino Riders', 'dino riders', 'ACTIVE')
+SELECT b.id, 'Dino Riders', 'dino riders', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mattel Games', 'mattel games', 'ACTIVE')
+SELECT b.id, 'Mattel Games', 'mattel games', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Holiday Racers', 'holiday racers', 'ACTIVE')
+SELECT b.id, 'Holiday Racers', 'holiday racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Track Stars', 'track stars', 'ACTIVE')
+SELECT b.id, 'Track Stars', 'track stars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2021', 'car culture 2021', 'ACTIVE')
+SELECT b.id, 'Car Culture 2021', 'car culture 2021', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Speed Graphics', 'hw speed graphics', 'ACTIVE')
+SELECT b.id, 'HW Speed Graphics', 'hw speed graphics', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Torque', 'hw torque', 'ACTIVE')
+SELECT b.id, 'HW Torque', 'hw torque', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Space', 'hw space', 'ACTIVE')
+SELECT b.id, 'HW Space', 'hw space', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Race Team', 'hw race team', 'ACTIVE')
+SELECT b.id, 'HW Race Team', 'hw race team', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Flames', 'hw flames', 'ACTIVE')
+SELECT b.id, 'HW Flames', 'hw flames', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '26', '26', 'ACTIVE')
+SELECT b.id, '26', '26', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '27', '27', 'ACTIVE')
+SELECT b.id, '27', '27', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '28', '28', 'ACTIVE')
+SELECT b.id, '28', '28', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '29', '29', 'ACTIVE')
+SELECT b.id, '29', '29', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '30', '30', 'ACTIVE')
+SELECT b.id, '30', '30', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '31', '31', 'ACTIVE')
+SELECT b.id, '31', '31', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '32', '32', 'ACTIVE')
+SELECT b.id, '32', '32', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '33', '33', 'ACTIVE')
+SELECT b.id, '33', '33', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '34', '34', 'ACTIVE')
+SELECT b.id, '34', '34', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '35', '35', 'ACTIVE')
+SELECT b.id, '35', '35', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '36', '36', 'ACTIVE')
+SELECT b.id, '36', '36', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '37', '37', 'ACTIVE')
+SELECT b.id, '37', '37', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Legends Tour Special Edition', 'legends tour special edition', 'ACTIVE')
+SELECT b.id, 'Legends Tour Special Edition', 'legends tour special edition', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Borla Car Culture 2-Pack', 'borla car culture 2-pack', 'ACTIVE')
+SELECT b.id, 'Borla Car Culture 2-Pack', 'borla car culture 2-pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2020', 'car culture 2020', 'ACTIVE')
+SELECT b.id, 'Car Culture 2020', 'car culture 2020', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2020', 'fast & furious premium series 2020', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2020', 'fast & furious premium series 2020', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2020', 'pop culture 2020', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2020', 'pop culture 2020', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Honda', 'honda', 'ACTIVE')
+SELECT b.id, 'Honda', 'honda', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Speed Blur', 'speed blur', 'ACTIVE')
+SELECT b.id, 'Speed Blur', 'speed blur', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Porsche', 'porsche', 'ACTIVE')
+SELECT b.id, 'Porsche', 'porsche', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2020', 'hot wheels boulevard 2020', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2020', 'hot wheels boulevard 2020', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Olympic Games Tokyo 2020', 'olympic games tokyo 2020', 'ACTIVE')
+SELECT b.id, 'Olympic Games Tokyo 2020', 'olympic games tokyo 2020', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Nightburnerz', 'nightburnerz', 'ACTIVE')
+SELECT b.id, 'Nightburnerz', 'nightburnerz', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '16', '16', 'ACTIVE')
+SELECT b.id, '16', '16', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '17', '17', 'ACTIVE')
+SELECT b.id, '17', '17', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '18', '18', 'ACTIVE')
+SELECT b.id, '18', '18', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '19', '19', 'ACTIVE')
+SELECT b.id, '19', '19', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '20', '20', 'ACTIVE')
+SELECT b.id, '20', '20', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '21', '21', 'ACTIVE')
+SELECT b.id, '21', '21', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '22', '22', 'ACTIVE')
+SELECT b.id, '22', '22', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '24', '24', 'ACTIVE')
+SELECT b.id, '24', '24', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '25', '25', 'ACTIVE')
+SELECT b.id, '25', '25', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast & Furious Premium Series 2019', 'fast & furious premium series 2019', 'ACTIVE')
+SELECT b.id, 'Fast & Furious Premium Series 2019', 'fast & furious premium series 2019', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2019', 'pop culture 2019', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2019', 'pop culture 2019', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Nissan', 'nissan', 'ACTIVE')
+SELECT b.id, 'Nissan', 'nissan', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Replica Entertainment 2019', 'replica entertainment 2019', 'ACTIVE')
+SELECT b.id, 'Replica Entertainment 2019', 'replica entertainment 2019', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2019', 'car culture 2019', 'ACTIVE')
+SELECT b.id, 'Car Culture 2019', 'car culture 2019', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Game Over', 'hw game over', 'ACTIVE')
+SELECT b.id, 'HW Game Over', 'hw game over', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Volkswagen', 'volkswagen', 'ACTIVE')
+SELECT b.id, 'Volkswagen', 'volkswagen', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Super Chromes', 'super chromes', 'ACTIVE')
+SELECT b.id, 'Super Chromes', 'super chromes', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2019!', 'new for 2019!', 'ACTIVE')
+SELECT b.id, 'New for 2019!', 'new for 2019!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '7', '7', 'ACTIVE')
+SELECT b.id, '7', '7', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '8', '8', 'ACTIVE')
+SELECT b.id, '8', '8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '9', '9', 'ACTIVE')
+SELECT b.id, '9', '9', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '10', '10', 'ACTIVE')
+SELECT b.id, '10', '10', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '12', '12', 'ACTIVE')
+SELECT b.id, '12', '12', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '13', '13', 'ACTIVE')
+SELECT b.id, '13', '13', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '14', '14', 'ACTIVE')
+SELECT b.id, '14', '14', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '15', '15', 'ACTIVE')
+SELECT b.id, '15', '15', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'American Pickup', 'american pickup', 'ACTIVE')
+SELECT b.id, 'American Pickup', 'american pickup', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2018', 'pop culture 2018', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2018', 'pop culture 2018', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Replica Entertainment 2018', 'replica entertainment 2018', 'ACTIVE')
+SELECT b.id, 'Replica Entertainment 2018', 'replica entertainment 2018', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2018!', 'new for 2018!', 'ACTIVE')
+SELECT b.id, 'New for 2018!', 'new for 2018!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2018', 'car culture 2018', 'ACTIVE')
+SELECT b.id, 'Car Culture 2018', 'car culture 2018', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Year of the Dog', 'year of the dog', 'ACTIVE')
+SELECT b.id, 'Year of the Dog', 'year of the dog', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New Model', 'new model', 'ACTIVE')
+SELECT b.id, 'New Model', 'new model', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '50th Anniversary Throwback', '50th anniversary throwback', 'ACTIVE')
+SELECT b.id, '50th Anniversary Throwback', '50th anniversary throwback', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '100 Years of Chevy Trucks', '100 years of chevy trucks', 'ACTIVE')
+SELECT b.id, '100 Years of Chevy Trucks', '100 years of chevy trucks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Display Case', 'hot wheels display case', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Display Case', 'hot wheels display case', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1', '1', 'ACTIVE')
+SELECT b.id, '1', '1', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2', '2', 'ACTIVE')
+SELECT b.id, '2', '2', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '3', '3', 'ACTIVE')
+SELECT b.id, '3', '3', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '4', '4', 'ACTIVE')
+SELECT b.id, '4', '4', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '5', '5', 'ACTIVE')
+SELECT b.id, '5', '5', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '6', '6', 'ACTIVE')
+SELECT b.id, '6', '6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2017', 'pop culture 2017', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2017', 'pop culture 2017', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Replica Entertainment 2017', 'replica entertainment 2017', 'ACTIVE')
+SELECT b.id, 'Replica Entertainment 2017', 'replica entertainment 2017', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2017!', 'new for 2017!', 'ACTIVE')
+SELECT b.id, 'New for 2017!', 'new for 2017!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2017', 'car culture 2017', 'ACTIVE')
+SELECT b.id, 'Car Culture 2017', 'car culture 2017', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Camouflage Trucks', 'camouflage trucks', 'ACTIVE')
+SELECT b.id, 'Camouflage Trucks', 'camouflage trucks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2016', 'pop culture 2016', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2016', 'pop culture 2016', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2016!', 'new for 2016!', 'ACTIVE')
+SELECT b.id, 'New for 2016!', 'new for 2016!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Treasure Hunt', 'treasure hunt', 'ACTIVE')
+SELECT b.id, 'Treasure Hunt', 'treasure hunt', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Year of the Monkey', 'year of the monkey', 'ACTIVE')
+SELECT b.id, 'Year of the Monkey', 'year of the monkey', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2016', 'new for 2016', 'ACTIVE')
+SELECT b.id, 'New for 2016', 'new for 2016', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New For 2016!!', 'new for 2016!!', 'ACTIVE')
+SELECT b.id, 'New For 2016!!', 'new for 2016!!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for2016!!', 'new for2016!!', 'ACTIVE')
+SELECT b.id, 'New for2016!!', 'new for2016!!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car Culture 2016', 'car culture 2016', 'ACTIVE')
+SELECT b.id, 'Car Culture 2016', 'car culture 2016', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Walgreens', 'walgreens', 'ACTIVE')
+SELECT b.id, 'Walgreens', 'walgreens', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Trucks 5-Pack', 'hot trucks 5-pack', 'ACTIVE')
+SELECT b.id, 'Hot Trucks 5-Pack', 'hot trucks 5-pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2015!', 'new for 2015!', 'ACTIVE')
+SELECT b.id, 'New for 2015!', 'new for 2015!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2015', 'pop culture 2015', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2015', 'pop culture 2015', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Year of the Sheep', 'year of the sheep', 'ACTIVE')
+SELECT b.id, 'Year of the Sheep', 'year of the sheep', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Entertainment: Friday Night Lights', 'hot wheels entertainment: friday night lights', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Entertainment: Friday Night Lights', 'hot wheels entertainment: friday night lights', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2014', 'pop culture 2014', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2014', 'pop culture 2014', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2014!!', 'new for 2014!!', 'ACTIVE')
+SELECT b.id, 'New for 2014!!', 'new for 2014!!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Year of the Horse', 'year of the horse', 'ACTIVE')
+SELECT b.id, 'Year of the Horse', 'year of the horse', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Road Trippin''', 'hw road trippin''', 'ACTIVE')
+SELECT b.id, 'HW Road Trippin''', 'hw road trippin''', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HWC Series 13: Real Riders', 'hwc series 13: real riders', 'ACTIVE')
+SELECT b.id, 'HWC Series 13: Real Riders', 'hwc series 13: real riders', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop Culture 2013', 'pop culture 2013', 'ACTIVE')
+SELECT b.id, 'Pop Culture 2013', 'pop culture 2013', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New for 2013!', 'new for 2013!', 'ACTIVE')
+SELECT b.id, 'New for 2013!', 'new for 2013!', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2013', 'hot wheels boulevard 2013', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2013', 'hot wheels boulevard 2013', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Showroom: HW Hot Trucks', 'hw showroom: hw hot trucks', 'ACTIVE')
+SELECT b.id, 'HW Showroom: HW Hot Trucks', 'hw showroom: hw hot trucks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Ferrari 5-Pack', 'ferrari 5-pack', 'ACTIVE')
+SELECT b.id, 'Ferrari 5-Pack', 'ferrari 5-pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Boulevard 2012', 'hot wheels boulevard 2012', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Boulevard 2012', 'hot wheels boulevard 2012', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2012 New Models', '2012 new models', 'ACTIVE')
+SELECT b.id, '2012 New Models', '2012 new models', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Treasure Hunts', 'treasure hunts', 'ACTIVE')
+SELECT b.id, 'Treasure Hunts', 'treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - Mopar', 'muscle mania - mopar', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - Mopar', 'muscle mania - mopar', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - MoparNew in Mainline', 'muscle mania - moparnew in mainline', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - MoparNew in Mainline', 'muscle mania - moparnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - MoparKmart Exclusive', 'muscle mania - moparkmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - MoparKmart Exclusive', 'muscle mania - moparkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - MoparWalmart Exclusive', 'muscle mania - moparwalmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - MoparWalmart Exclusive', 'muscle mania - moparwalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Faster Than Ever', 'faster than ever', 'ACTIVE')
+SELECT b.id, 'Faster Than Ever', 'faster than ever', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - GMNew in Mainline', 'muscle mania - gmnew in mainline', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - GMNew in Mainline', 'muscle mania - gmnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - GMKmart ExclusiveNew in Mainline', 'muscle mania - gmkmart exclusivenew in mainline', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - GMKmart ExclusiveNew in Mainline', 'muscle mania - gmkmart exclusivenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - GM', 'muscle mania - gm', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - GM', 'muscle mania - gm', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - GMWalmart Exclusive', 'muscle mania - gmwalmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - GMWalmart Exclusive', 'muscle mania - gmwalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Toys R Us Exclusive', 'toys r us exclusive', 'ACTIVE')
+SELECT b.id, 'Toys R Us Exclusive', 'toys r us exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - GMKmart Exclusive', 'muscle mania - gmkmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - GMKmart Exclusive', 'muscle mania - gmkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - Ford', 'muscle mania - ford', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - Ford', 'muscle mania - ford', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - FordKmart Exclusive', 'muscle mania - fordkmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - FordKmart Exclusive', 'muscle mania - fordkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle Mania - FordWalmart Exclusive', 'muscle mania - fordwalmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle Mania - FordWalmart Exclusive', 'muscle mania - fordwalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW All Stars', 'hw all stars', 'ACTIVE')
+SELECT b.id, 'HW All Stars', 'hw all stars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW All StarsWalmart Exclusive', 'hw all starswalmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW All StarsWalmart Exclusive', 'hw all starswalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW All StarsNew in Mainline', 'hw all starsnew in mainline', 'ACTIVE')
+SELECT b.id, 'HW All StarsNew in Mainline', 'hw all starsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW All StarsKmart Exclusive', 'hw all starskmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW All StarsKmart Exclusive', 'hw all starskmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW City Works', 'hw city works', 'ACTIVE')
+SELECT b.id, 'HW City Works', 'hw city works', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW City WorksKmart Exclusive', 'hw city workskmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW City WorksKmart Exclusive', 'hw city workskmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW City WorksWalmart Exclusive', 'hw city workswalmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW City WorksWalmart Exclusive', 'hw city workswalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Performance', 'hw performance', 'ACTIVE')
+SELECT b.id, 'HW Performance', 'hw performance', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW PerformanceWalmart Exclusive', 'hw performancewalmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW PerformanceWalmart Exclusive', 'hw performancewalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW PerformanceKmart Exclusive', 'hw performancekmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW PerformanceKmart Exclusive', 'hw performancekmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heat Fleet', 'heat fleet', 'ACTIVE')
+SELECT b.id, 'Heat Fleet', 'heat fleet', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Main Street', 'hw main street', 'ACTIVE')
+SELECT b.id, 'HW Main Street', 'hw main street', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Main StreetNew in Mainline', 'hw main streetnew in mainline', 'ACTIVE')
+SELECT b.id, 'HW Main StreetNew in Mainline', 'hw main streetnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Main StreetKmart Exclusive', 'hw main streetkmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW Main StreetKmart Exclusive', 'hw main streetkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Racing', 'hw racing', 'ACTIVE')
+SELECT b.id, 'HW Racing', 'hw racing', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW RacingWalmart Exclusive', 'hw racingwalmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW RacingWalmart Exclusive', 'hw racingwalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW RacingKmart Exclusive', 'hw racingkmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW RacingKmart Exclusive', 'hw racingkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW RacingNew in Mainline', 'hw racingnew in mainline', 'ACTIVE')
+SELECT b.id, 'HW RacingNew in Mainline', 'hw racingnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Race Course', 'thrill racers - race course', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Race Course', 'thrill racers - race course', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Swamp Rally', 'thrill racers - swamp rally', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Swamp Rally', 'thrill racers - swamp rally', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Space', 'thrill racers - space', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Space', 'thrill racers - space', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - City Stunt', 'thrill racers - city stunt', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - City Stunt', 'thrill racers - city stunt', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Volcano', 'thrill racers - volcano', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Volcano', 'thrill racers - volcano', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Beach', 'thrill racers - beach', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Beach', 'thrill racers - beach', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Ice', 'thrill racers - ice', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Ice', 'thrill racers - ice', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Prehistoric', 'thrill racers - prehistoric', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Prehistoric', 'thrill racers - prehistoric', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - PrehistoricNew in Mainline', 'thrill racers - prehistoricnew in mainline', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - PrehistoricNew in Mainline', 'thrill racers - prehistoricnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Earthquake', 'thrill racers - earthquake', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Earthquake', 'thrill racers - earthquake', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Code Cars', 'hw code cars', 'ACTIVE')
+SELECT b.id, 'HW Code Cars', 'hw code cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Year of the Dragon Edition', 'year of the dragon edition', 'ACTIVE')
+SELECT b.id, 'Year of the Dragon Edition', 'year of the dragon edition', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HWC.com 11 Neo-Classics 1/6', 'hwc.com 11 neo-classics 1/6', 'ACTIVE')
+SELECT b.id, 'HWC.com 11 Neo-Classics 1/6', 'hwc.com 11 neo-classics 1/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'The Hot Ones', 'the hot ones', 'ACTIVE')
+SELECT b.id, 'The Hot Ones', 'the hot ones', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Cars of the Decades', 'cars of the decades', 'ACTIVE')
+SELECT b.id, 'Cars of the Decades', 'cars of the decades', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Racing: Offroad', 'hot wheels racing: offroad', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Racing: Offroad', 'hot wheels racing: offroad', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Speed Machines', 'speed machines', 'ACTIVE')
+SELECT b.id, 'Speed Machines', 'speed machines', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2011 New Models', '2011 new models', 'ACTIVE')
+SELECT b.id, '2011 New Models', '2011 new models', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heat FleetKmart Exclusive', 'heat fleetkmart exclusive', 'ACTIVE')
+SELECT b.id, 'Heat FleetKmart Exclusive', 'heat fleetkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heat FleetToys R Us Exclusive', 'heat fleettoys r us exclusive', 'ACTIVE')
+SELECT b.id, 'Heat FleetToys R Us Exclusive', 'heat fleettoys r us exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heat FleetNew in Mainline', 'heat fleetnew in mainline', 'ACTIVE')
+SELECT b.id, 'Heat FleetNew in Mainline', 'heat fleetnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heat FleetWalmart ExclusiveNew in Mainline', 'heat fleetwalmart exclusivenew in mainline', 'ACTIVE')
+SELECT b.id, 'Heat FleetWalmart ExclusiveNew in Mainline', 'heat fleetwalmart exclusivenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle ManiaWalmart Exclusive', 'muscle maniawalmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle ManiaWalmart Exclusive', 'muscle maniawalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle ManiaKmart Exclusive', 'muscle maniakmart exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle ManiaKmart Exclusive', 'muscle maniakmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Muscle ManiaToys R Us Exclusive', 'muscle maniatoys r us exclusive', 'ACTIVE')
+SELECT b.id, 'Muscle ManiaToys R Us Exclusive', 'muscle maniatoys r us exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'NightburnerzKmart Exclusive', 'nightburnerzkmart exclusive', 'ACTIVE')
+SELECT b.id, 'NightburnerzKmart Exclusive', 'nightburnerzkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'NightburnerzWalmart Exclusive', 'nightburnerzwalmart exclusive', 'ACTIVE')
+SELECT b.id, 'NightburnerzWalmart Exclusive', 'nightburnerzwalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drag Racers', 'hw drag racers', 'ACTIVE')
+SELECT b.id, 'HW Drag Racers', 'hw drag racers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drag RacersWalmart Exclusive', 'hw drag racerswalmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW Drag RacersWalmart Exclusive', 'hw drag racerswalmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drag RacersKmart Exclusive', 'hw drag racerskmart exclusive', 'ACTIVE')
+SELECT b.id, 'HW Drag RacersKmart Exclusive', 'hw drag racerskmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Drag RacersNew in Mainline', 'hw drag racersnew in mainline', 'ACTIVE')
+SELECT b.id, 'HW Drag RacersNew in Mainline', 'hw drag racersnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Faster Than EverKmart Exclusive', 'faster than everkmart exclusive', 'ACTIVE')
+SELECT b.id, 'Faster Than EverKmart Exclusive', 'faster than everkmart exclusive', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW RacingWalmart ExclusiveNew in Mainline', 'hw racingwalmart exclusivenew in mainline', 'ACTIVE')
+SELECT b.id, 'HW RacingWalmart ExclusiveNew in Mainline', 'hw racingwalmart exclusivenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Desert', 'thrill racers - desert', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Desert', 'thrill racers - desert', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Highway', 'thrill racers - highway', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Highway', 'thrill racers - highway', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - IceNew in Mainline', 'thrill racers - icenew in mainline', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - IceNew in Mainline', 'thrill racers - icenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - CaveNew in Mainline', 'thrill racers - cavenew in mainline', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - CaveNew in Mainline', 'thrill racers - cavenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Cave', 'thrill racers - cave', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Cave', 'thrill racers - cave', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Jungle', 'thrill racers - jungle', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Jungle', 'thrill racers - jungle', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - JungleNew in Mainline', 'thrill racers - junglenew in mainline', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - JungleNew in Mainline', 'thrill racers - junglenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Thrill Racers - Raceway', 'thrill racers - raceway', 'ACTIVE')
+SELECT b.id, 'Thrill Racers - Raceway', 'thrill racers - raceway', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HW Video Game Heroes', 'hw video game heroes', 'ACTIVE')
+SELECT b.id, 'HW Video Game Heroes', 'hw video game heroes', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Slick Rides', 'slick rides', 'ACTIVE')
+SELECT b.id, 'Slick Rides', 'slick rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Valentine''s', 'valentine''s', 'ACTIVE')
+SELECT b.id, 'Valentine''s', 'valentine''s', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Cop Rods', 'cop rods', 'ACTIVE')
+SELECT b.id, 'Cop Rods', 'cop rods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fire Rods', 'fire rods', 'ACTIVE')
+SELECT b.id, 'Fire Rods', 'fire rods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Military Rods', 'military rods', 'ACTIVE')
+SELECT b.id, 'Military Rods', 'military rods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HWC.com Series 8: Real Riders', 'hwc.com series 8: real riders', 'ACTIVE')
+SELECT b.id, 'HWC.com Series 8: Real Riders', 'hwc.com series 8: real riders', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Ferrari Racer', 'ferrari racer', 'ACTIVE')
+SELECT b.id, 'Ferrari Racer', 'ferrari racer', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Modern Classics', 'modern classics', 'ACTIVE')
+SELECT b.id, 'Modern Classics', 'modern classics', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'New Models', 'new models', 'ACTIVE')
+SELECT b.id, 'New Models', 'new models', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'All Stars', 'all stars', 'ACTIVE')
+SELECT b.id, 'All Stars', 'all stars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'All StarsNew in Mainline', 'all starsnew in mainline', 'ACTIVE')
+SELECT b.id, 'All StarsNew in Mainline', 'all starsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Web Trading Cars', 'web trading cars', 'ACTIVE')
+SELECT b.id, 'Web Trading Cars', 'web trading cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Track StarsNew in Mainline', 'track starsnew in mainline', 'ACTIVE')
+SELECT b.id, 'Track StarsNew in Mainline', 'track starsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Exotics', 'team: exotics', 'ACTIVE')
+SELECT b.id, 'Team: Exotics', 'team: exotics', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Surf''s Up', 'team: surf''s up', 'ACTIVE')
+SELECT b.id, 'Team: Surf''s Up', 'team: surf''s up', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Jet Rides', 'team: jet rides', 'ACTIVE')
+SELECT b.id, 'Team: Jet Rides', 'team: jet rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Rat Rods', 'team: rat rods', 'ACTIVE')
+SELECT b.id, 'Team: Rat Rods', 'team: rat rods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Rat RodsNew in Mainline', 'team: rat rodsnew in mainline', 'ACTIVE')
+SELECT b.id, 'Team: Rat RodsNew in Mainline', 'team: rat rodsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Volkswagen', 'team: volkswagen', 'ACTIVE')
+SELECT b.id, 'Team: Volkswagen', 'team: volkswagen', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Muscle Mania', 'team: muscle mania', 'ACTIVE')
+SELECT b.id, 'Team: Muscle Mania', 'team: muscle mania', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Muscle ManiaNew in Mainline', 'team: muscle manianew in mainline', 'ACTIVE')
+SELECT b.id, 'Team: Muscle ManiaNew in Mainline', 'team: muscle manianew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Hot Trucks', 'team: hot trucks', 'ACTIVE')
+SELECT b.id, 'Team: Hot Trucks', 'team: hot trucks', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Ford Racing', 'team: ford racing', 'ACTIVE')
+SELECT b.id, 'Team: Ford Racing', 'team: ford racing', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Hot Wheels Racing', 'team: hot wheels racing', 'ACTIVE')
+SELECT b.id, 'Team: Hot Wheels Racing', 'team: hot wheels racing', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Hot Wheels RacingNew in Mainline', 'team: hot wheels racingnew in mainline', 'ACTIVE')
+SELECT b.id, 'Team: Hot Wheels RacingNew in Mainline', 'team: hot wheels racingnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Custom Bikes', 'team: custom bikes', 'ACTIVE')
+SELECT b.id, 'Team: Custom Bikes', 'team: custom bikes', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Engine Revealers', 'team: engine revealers', 'ACTIVE')
+SELECT b.id, 'Team: Engine Revealers', 'team: engine revealers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Team: Drag Racing', 'team: drag racing', 'ACTIVE')
+SELECT b.id, 'Team: Drag Racing', 'team: drag racing', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Treasure HuntNew in Mainline', 'treasure huntnew in mainline', 'ACTIVE')
+SELECT b.id, 'Treasure HuntNew in Mainline', 'treasure huntnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Super Treasure HuntNew in Mainline', 'super treasure huntnew in mainline', 'ACTIVE')
+SELECT b.id, 'Super Treasure HuntNew in Mainline', 'super treasure huntnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mystery Cars', 'mystery cars', 'ACTIVE')
+SELECT b.id, 'Mystery Cars', 'mystery cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mystery CarsNew in Mainline', 'mystery carsnew in mainline', 'ACTIVE')
+SELECT b.id, 'Mystery CarsNew in Mainline', 'mystery carsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2007 New Models', '2007 new models', 'ACTIVE')
+SELECT b.id, '2007 New Models', '2007 new models', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Pop-Offs', 'pop-offs', 'ACTIVE')
+SELECT b.id, 'Pop-Offs', 'pop-offs', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Camaro', 'camaro', 'ACTIVE')
+SELECT b.id, 'Camaro', 'camaro', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Design', 'hot wheels design', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Design', 'hot wheels design', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Taxi Rods', 'taxi rods', 'ACTIVE')
+SELECT b.id, 'Taxi Rods', 'taxi rods', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Taxi RodsNew in Mainline', 'taxi rodsnew in mainline', 'ACTIVE')
+SELECT b.id, 'Taxi RodsNew in Mainline', 'taxi rodsnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Gold Rides', 'gold rides', 'ACTIVE')
+SELECT b.id, 'Gold Rides', 'gold rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Engine Revealers', 'engine revealers', 'ACTIVE')
+SELECT b.id, 'Engine Revealers', 'engine revealers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hummer', 'hummer', 'ACTIVE')
+SELECT b.id, 'Hummer', 'hummer', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Street Beast II', 'street beast ii', 'ACTIVE')
+SELECT b.id, 'Street Beast II', 'street beast ii', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Aerial Attack', 'aerial attack', 'ACTIVE')
+SELECT b.id, 'Aerial Attack', 'aerial attack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Racing', 'hot wheels racing', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Racing', 'hot wheels racing', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Ragtops & Roadsters', 'ragtops & roadsters', 'ACTIVE')
+SELECT b.id, 'Ragtops & Roadsters', 'ragtops & roadsters', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Ragtops & RoadstersNew in Mainline', 'ragtops & roadstersnew in mainline', 'ACTIVE')
+SELECT b.id, 'Ragtops & RoadstersNew in Mainline', 'ragtops & roadstersnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Code Cars', 'code cars', 'ACTIVE')
+SELECT b.id, 'Code Cars', 'code cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2006 First Editions', '2006 first editions', 'ACTIVE')
+SELECT b.id, '2006 First Editions', '2006 first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2006 Treasure Hunts Series', '2006 treasure hunts series', 'ACTIVE')
+SELECT b.id, '2006 Treasure Hunts Series', '2006 treasure hunts series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Drift Kings', 'drift kings', 'ACTIVE')
+SELECT b.id, 'Drift Kings', 'drift kings', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Dropstars', 'dropstars', 'ACTIVE')
+SELECT b.id, 'Dropstars', 'dropstars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mopar Madness', 'mopar madness', 'ACTIVE')
+SELECT b.id, 'Mopar Madness', 'mopar madness', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Chrome Burnerz', 'chrome burnerz', 'ACTIVE')
+SELECT b.id, 'Chrome Burnerz', 'chrome burnerz', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Tag Rides', 'tag rides', 'ACTIVE')
+SELECT b.id, 'Tag Rides', 'tag rides', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Spy Force', 'spy force', 'ACTIVE')
+SELECT b.id, 'Spy Force', 'spy force', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Bone Blazers', 'bone blazers', 'ACTIVE')
+SELECT b.id, 'Bone Blazers', 'bone blazers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Bone BlazersNew in Mainline', 'bone blazersnew in mainline', 'ACTIVE')
+SELECT b.id, 'Bone BlazersNew in Mainline', 'bone blazersnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Motown Metal', 'motown metal', 'ACTIVE')
+SELECT b.id, 'Motown Metal', 'motown metal', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Highway Horror', 'highway horror', 'ACTIVE')
+SELECT b.id, 'Highway Horror', 'highway horror', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Red Line', 'red line', 'ACTIVE')
+SELECT b.id, 'Red Line', 'red line', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hi-Rakers', 'hi-rakers', 'ACTIVE')
+SELECT b.id, 'Hi-Rakers', 'hi-rakers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'WWE', 'wwe', 'ACTIVE')
+SELECT b.id, 'WWE', 'wwe', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Track AcesFaster Than Ever', 'track acesfaster than ever', 'ACTIVE')
+SELECT b.id, 'Track AcesFaster Than Ever', 'track acesfaster than ever', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2006 Open Stock', '2006 open stock', 'ACTIVE')
+SELECT b.id, '2006 Open Stock', '2006 open stock', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2006 Open StockNew In Mainline', '2006 open stocknew in mainline', 'ACTIVE')
+SELECT b.id, '2006 Open StockNew In Mainline', '2006 open stocknew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2006 Mystery Car Series', '2006 mystery car series', 'ACTIVE')
+SELECT b.id, '2006 Mystery Car Series', '2006 mystery car series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Treasure Hunts', '2001 treasure hunts', 'ACTIVE')
+SELECT b.id, '2001 Treasure Hunts', '2001 treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 First Editions', '2001 first editions', 'ACTIVE')
+SELECT b.id, '2001 First Editions', '2001 first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Fossil Fuel Series', '2001 fossil fuel series', 'ACTIVE')
+SELECT b.id, '2001 Fossil Fuel Series', '2001 fossil fuel series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Turbo Taxi Series', '2001 turbo taxi series', 'ACTIVE')
+SELECT b.id, '2001 Turbo Taxi Series', '2001 turbo taxi series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Rat Rods Series', '2001 rat rods series', 'ACTIVE')
+SELECT b.id, '2001 Rat Rods Series', '2001 rat rods series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Anime Series', '2001 anime series', 'ACTIVE')
+SELECT b.id, '2001 Anime Series', '2001 anime series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Rod Squadron Series', '2001 rod squadron series', 'ACTIVE')
+SELECT b.id, '2001 Rod Squadron Series', '2001 rod squadron series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Skull & Crossbones Series', '2001 skull & crossbones series', 'ACTIVE')
+SELECT b.id, '2001 Skull & Crossbones Series', '2001 skull & crossbones series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Logo-Motive Series', '2001 logo-motive series', 'ACTIVE')
+SELECT b.id, '2001 Logo-Motive Series', '2001 logo-motive series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Monsters Series', '2001 monsters series', 'ACTIVE')
+SELECT b.id, '2001 Monsters Series', '2001 monsters series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Extreme Sports Series', '2001 extreme sports series', 'ACTIVE')
+SELECT b.id, '2001 Extreme Sports Series', '2001 extreme sports series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Company Cars Series', '2001 company cars series', 'ACTIVE')
+SELECT b.id, '2001 Company Cars Series', '2001 company cars series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Hippie Mobiles SeriesNew in Mainline', '2001 hippie mobiles seriesnew in mainline', 'ACTIVE')
+SELECT b.id, '2001 Hippie Mobiles SeriesNew in Mainline', '2001 hippie mobiles seriesnew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Hippie Mobiles Series', '2001 hippie mobiles series', 'ACTIVE')
+SELECT b.id, '2001 Hippie Mobiles Series', '2001 hippie mobiles series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2001 Skin Deep Series', '2001 skin deep series', 'ACTIVE')
+SELECT b.id, '2001 Skin Deep Series', '2001 skin deep series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Future Fleet 2000', 'future fleet 2000', 'ACTIVE')
+SELECT b.id, 'Future Fleet 2000', 'future fleet 2000', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Rod Magazine', 'hot rod magazine', 'ACTIVE')
+SELECT b.id, 'Hot Rod Magazine', 'hot rod magazine', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Rod MagazineNew In Mainline', 'hot rod magazinenew in mainline', 'ACTIVE')
+SELECT b.id, 'Hot Rod MagazineNew In Mainline', 'hot rod magazinenew in mainline', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Seein'' 3-D', 'seein'' 3-d', 'ACTIVE')
+SELECT b.id, 'Seein'' 3-D', 'seein'' 3-d', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Snack Time', 'snack time', 'ACTIVE')
+SELECT b.id, 'Snack Time', 'snack time', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mad Maniax', 'mad maniax', 'ACTIVE')
+SELECT b.id, 'Mad Maniax', 'mad maniax', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Attack Pack', 'attack pack', 'ACTIVE')
+SELECT b.id, 'Attack Pack', 'attack pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Circus on Wheels Series', 'circus on wheels series', 'ACTIVE')
+SELECT b.id, 'Circus on Wheels Series', 'circus on wheels series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'CD Customs Series', 'cd customs series', 'ACTIVE')
+SELECT b.id, 'CD Customs Series', 'cd customs series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Kung Fu Force series', 'kung fu force series', 'ACTIVE')
+SELECT b.id, 'Kung Fu Force series', 'kung fu force series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Speed Blaster Series', 'speed blaster series', 'ACTIVE')
+SELECT b.id, 'Speed Blaster Series', 'speed blaster series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Tony Hawk Skate Series', 'tony hawk skate series', 'ACTIVE')
+SELECT b.id, 'Tony Hawk Skate Series', 'tony hawk skate series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Secret Code Series', 'secret code series', 'ACTIVE')
+SELECT b.id, 'Secret Code Series', 'secret code series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2000 Treasure Hunts', '2000 treasure hunts', 'ACTIVE')
+SELECT b.id, '2000 Treasure Hunts', '2000 treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2000 First Editions', '2000 first editions', 'ACTIVE')
+SELECT b.id, '2000 First Editions', '2000 first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2000 Virtual Collection', '2000 virtual collection', 'ACTIVE')
+SELECT b.id, '2000 Virtual Collection', '2000 virtual collection', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2000 Hot Wheels', '2000 hot wheels', 'ACTIVE')
+SELECT b.id, '2000 Hot Wheels', '2000 hot wheels', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 First Editions', '1999 first editions', 'ACTIVE')
+SELECT b.id, '1999 First Editions', '1999 first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Treasure Hunts', '1999 treasure hunts', 'ACTIVE')
+SELECT b.id, '1999 Treasure Hunts', '1999 treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Buggin'' Out Series', '1999 buggin'' out series', 'ACTIVE')
+SELECT b.id, '1999 Buggin'' Out Series', '1999 buggin'' out series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 X-Ray Cruisers Series', '1999 x-ray cruisers series', 'ACTIVE')
+SELECT b.id, '1999 X-Ray Cruisers Series', '1999 x-ray cruisers series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Street Art Series', 'street art series', 'ACTIVE')
+SELECT b.id, 'Street Art Series', 'street art series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Pinstripe Power Series', '1999 pinstripe power series', 'ACTIVE')
+SELECT b.id, '1999 Pinstripe Power Series', '1999 pinstripe power series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Game Over Series', '1999 game over series', 'ACTIVE')
+SELECT b.id, '1999 Game Over Series', '1999 game over series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Surf ''N Fun Series', 'surf ''n fun series', 'ACTIVE')
+SELECT b.id, 'Surf ''N Fun Series', 'surf ''n fun series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'X-Treme Speed Series', 'x-treme speed series', 'ACTIVE')
+SELECT b.id, 'X-Treme Speed Series', 'x-treme speed series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Sugar Rush Series II', '1999 sugar rush series ii', 'ACTIVE')
+SELECT b.id, '1999 Sugar Rush Series II', '1999 sugar rush series ii', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mega Graphics Series', 'mega graphics series', 'ACTIVE')
+SELECT b.id, 'Mega Graphics Series', 'mega graphics series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Terrorific Series', 'terrorific series', 'ACTIVE')
+SELECT b.id, 'Terrorific Series', 'terrorific series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Classic Games Series', '1999 classic games series', 'ACTIVE')
+SELECT b.id, '1999 Classic Games Series', '1999 classic games series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Car-Toon Friends Series', 'car-toon friends series', 'ACTIVE')
+SELECT b.id, 'Car-Toon Friends Series', 'car-toon friends series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Hot Wheels', '1999 hot wheels', 'ACTIVE')
+SELECT b.id, '1999 Hot Wheels', '1999 hot wheels', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1999 Final Run', '1999 final run', 'ACTIVE')
+SELECT b.id, '1999 Final Run', '1999 final run', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 First Editions', '1998 first editions', 'ACTIVE')
+SELECT b.id, '1998 First Editions', '1998 first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Treasure Hunts', '1998 treasure hunts', 'ACTIVE')
+SELECT b.id, '1998 Treasure Hunts', '1998 treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Tattoo Machines Series', '1998 tattoo machines series', 'ACTIVE')
+SELECT b.id, '1998 Tattoo Machines Series', '1998 tattoo machines series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Techno Bits Series', '1998 techno bits series', 'ACTIVE')
+SELECT b.id, '1998 Techno Bits Series', '1998 techno bits series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Tropicool Series', '1998 tropicool series', 'ACTIVE')
+SELECT b.id, '1998 Tropicool Series', '1998 tropicool series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Low ''N Cool Series', '1998 low ''n cool series', 'ACTIVE')
+SELECT b.id, '1998 Low ''N Cool Series', '1998 low ''n cool series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Biohazard Series', '1998 biohazard series', 'ACTIVE')
+SELECT b.id, '1998 Biohazard Series', '1998 biohazard series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Dash 4 Cash Series', '1998 dash 4 cash series', 'ACTIVE')
+SELECT b.id, '1998 Dash 4 Cash Series', '1998 dash 4 cash series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Race Team Series IV', '1998 race team series iv', 'ACTIVE')
+SELECT b.id, '1998 Race Team Series IV', '1998 race team series iv', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Artistic License Series', '1998 artistic license series', 'ACTIVE')
+SELECT b.id, '1998 Artistic License Series', '1998 artistic license series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Mixed Signals Series', '1998 mixed signals series', 'ACTIVE')
+SELECT b.id, '1998 Mixed Signals Series', '1998 mixed signals series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Flying Aces Series', '1998 flying aces series', 'ACTIVE')
+SELECT b.id, '1998 Flying Aces Series', '1998 flying aces series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Sugar Rush Series', '1998 sugar rush series', 'ACTIVE')
+SELECT b.id, '1998 Sugar Rush Series', '1998 sugar rush series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Tech Tone Series', '1998 tech tone series', 'ACTIVE')
+SELECT b.id, '1998 Tech Tone Series', '1998 tech tone series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Hot Wheels', '1998 hot wheels', 'ACTIVE')
+SELECT b.id, '1998 Hot Wheels', '1998 hot wheels', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1998 Bonus Cars', '1998 bonus cars', 'ACTIVE')
+SELECT b.id, '1998 Bonus Cars', '1998 bonus cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Model Series', 'model series', 'ACTIVE')
+SELECT b.id, 'Model Series', 'model series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'First Editions', 'first editions', 'ACTIVE')
+SELECT b.id, 'First Editions', 'first editions', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Race Truck Series', 'race truck series', 'ACTIVE')
+SELECT b.id, 'Race Truck Series', 'race truck series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Flamethrower Series', 'flamethrower series', 'ACTIVE')
+SELECT b.id, 'Flamethrower Series', 'flamethrower series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Space Series', 'space series', 'ACTIVE')
+SELECT b.id, 'Space Series', 'space series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Race Team Series II', 'race team series ii', 'ACTIVE')
+SELECT b.id, 'Race Team Series II', 'race team series ii', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Mod Bod Series', 'mod bod series', 'ACTIVE')
+SELECT b.id, 'Mod Bod Series', 'mod bod series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Dark Rider Series II', 'dark rider series ii', 'ACTIVE')
+SELECT b.id, 'Dark Rider Series II', 'dark rider series ii', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Sports Car Series', 'sports car series', 'ACTIVE')
+SELECT b.id, 'Sports Car Series', 'sports car series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Splatter Paint Series', 'splatter paint series', 'ACTIVE')
+SELECT b.id, 'Splatter Paint Series', 'splatter paint series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Street Eaters Series', 'street eaters series', 'ACTIVE')
+SELECT b.id, 'Street Eaters Series', 'street eaters series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fast Food Series', 'fast food series', 'ACTIVE')
+SELECT b.id, 'Fast Food Series', 'fast food series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Silver Series II', 'silver series ii', 'ACTIVE')
+SELECT b.id, 'Silver Series II', 'silver series ii', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Fire Squad Series', 'fire squad series', 'ACTIVE')
+SELECT b.id, 'Fire Squad Series', 'fire squad series', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1996 Treasure Hunts', '1996 treasure hunts', 'ACTIVE')
+SELECT b.id, '1996 Treasure Hunts', '1996 treasure hunts', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Bonus Cars', 'bonus cars', 'ACTIVE')
+SELECT b.id, 'Bonus Cars', 'bonus cars', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1996 Hot Wheels', '1996 hot wheels', 'ACTIVE')
+SELECT b.id, '1996 Hot Wheels', '1996 hot wheels', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Wheels Gift Pack', 'hot wheels gift pack', 'ACTIVE')
+SELECT b.id, 'Hot Wheels Gift Pack', 'hot wheels gift pack', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1994 INTL', '1994 intl', 'ACTIVE')
+SELECT b.id, '1994 INTL', '1994 intl', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Speed Demons', 'speed demons', 'ACTIVE')
+SELECT b.id, 'Speed Demons', 'speed demons', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Workhorses', 'workhorses', 'ACTIVE')
+SELECT b.id, 'Workhorses', 'workhorses', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Action Command', 'action command', 'ACTIVE')
+SELECT b.id, 'Action Command', 'action command', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Hot Ones', 'hot ones', 'ACTIVE')
+SELECT b.id, 'Hot Ones', 'hot ones', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'HiRakers', 'hirakers', 'ACTIVE')
+SELECT b.id, 'HiRakers', 'hirakers', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Wisconsin Toy Company', 'wisconsin toy company', 'ACTIVE')
+SELECT b.id, 'Wisconsin Toy Company', 'wisconsin toy company', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Heavyweights', 'heavyweights', 'ACTIVE')
+SELECT b.id, 'Heavyweights', 'heavyweights', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2025 Formula One Collection', '2025 formula one collection', 'ACTIVE')
+SELECT b.id, '2025 Formula One Collection', '2025 formula one collection', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1/8', '1/8', 'ACTIVE')
+SELECT b.id, '1/8', '1/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2/8', '2/8', 'ACTIVE')
+SELECT b.id, '2/8', '2/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '3/8', '3/8', 'ACTIVE')
+SELECT b.id, '3/8', '3/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '4/8', '4/8', 'ACTIVE')
+SELECT b.id, '4/8', '4/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '5/8', '5/8', 'ACTIVE')
+SELECT b.id, '5/8', '5/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '6/8', '6/8', 'ACTIVE')
+SELECT b.id, '6/8', '6/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '7/8', '7/8', 'ACTIVE')
+SELECT b.id, '7/8', '7/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '8/8', '8/8', 'ACTIVE')
+SELECT b.id, '8/8', '8/8', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '1/6', '1/6', 'ACTIVE')
+SELECT b.id, '1/6', '1/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '2/6', '2/6', 'ACTIVE')
+SELECT b.id, '2/6', '2/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '3/6', '3/6', 'ACTIVE')
+SELECT b.id, '3/6', '3/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '4/6', '4/6', 'ACTIVE')
+SELECT b.id, '4/6', '4/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '5/6', '5/6', 'ACTIVE')
+SELECT b.id, '5/6', '5/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, '6/6', '6/6', 'ACTIVE')
+SELECT b.id, '6/6', '6/6', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 INSERT INTO series (miniature_brand_id, name, normalized_name, status)
-VALUES ('ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, 'Premium Collector Set', 'premium collector set', 'ACTIVE')
+SELECT b.id, 'Premium Collector Set', 'premium collector set', 'ACTIVE'
+FROM miniature_brand b
+WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')
+LIMIT 1
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 
 -- 2. Tabela Temporária para Enriquecimento dos Itens
@@ -10582,33 +12194,43 @@ SET
   release_year = COALESCE(t.release_year, v.release_year)
 FROM temp_catalog_hw_delta t
 JOIN product_identifier pi ON upper(trim(pi.code)) = upper(trim(t.code))
-LEFT JOIN series s ON s.miniature_brand_id = 'ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid AND s.normalized_name = t.normalized_serie
+CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b
+LEFT JOIN series s ON s.miniature_brand_id = b.id AND s.normalized_name = t.normalized_serie
 WHERE v.id = pi.variation_id;
 
 -- 4. Cria Castings Inéditos (que não existem na base)
 INSERT INTO casting (miniature_brand_id, name, normalized_name, fantasy_flag, status)
-SELECT DISTINCT 'ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid, t.name, t.normalized_name, false, 'ACTIVE'
+SELECT DISTINCT b.id, t.name, t.normalized_name, false, 'ACTIVE'
 FROM temp_catalog_hw_delta t
+CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b
 WHERE NOT EXISTS (
   SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))
 )
 ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;
 
 -- 5. Cria Novas Variações e seus respectivos Product Identifiers
-WITH new_items AS (
+WITH hw_info AS (
+  SELECT 
+    (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) as brand_id,
+    (SELECT id FROM scale WHERE numerator = 1 AND denominator = 64 LIMIT 1) as scale_id,
+    (SELECT id FROM identifier_type WHERE code = 'MATTEL_CODE' LIMIT 1) as type_id
+),
+new_items AS (
   SELECT DISTINCT ON (t.code)
     gen_random_uuid() as new_var_id,
     c.id as casting_id,
     s.id as series_id,
-    '8c2a0edc-1f1b-4f5b-82b9-0efea84f7c56'::uuid as scale_id,
+    h.scale_id,
+    h.type_id,
     t.name,
     t.release_year,
     t.line_type,
     t.photo_url,
     t.code
   FROM temp_catalog_hw_delta t
-  JOIN casting c ON c.miniature_brand_id = 'ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid AND c.normalized_name = t.normalized_name
-  LEFT JOIN series s ON s.miniature_brand_id = 'ca8ae498-f0d5-4443-a682-af519bb2c760'::uuid AND s.normalized_name = t.normalized_serie
+  CROSS JOIN hw_info h
+  JOIN casting c ON c.miniature_brand_id = h.brand_id AND c.normalized_name = t.normalized_name
+  LEFT JOIN series s ON s.miniature_brand_id = h.brand_id AND s.normalized_name = t.normalized_serie
   WHERE NOT EXISTS (
     SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))
   )
@@ -10621,7 +12243,7 @@ ins_vars AS (
   RETURNING id
 )
 INSERT INTO product_identifier (variation_id, identifier_type_id, code, normalized_code, is_primary)
-SELECT n.new_var_id, '7b27cc89-168b-449f-86e6-f66a531dcc4f'::uuid, n.code, n.code, true
+SELECT n.new_var_id, n.type_id, n.code, n.code, true
 FROM new_items n
 ON CONFLICT (identifier_type_id, normalized_code) DO NOTHING;
 

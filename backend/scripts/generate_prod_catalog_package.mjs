@@ -2,7 +2,7 @@
  * Gerador do Pacote de Deploy do Catálogo para Produção
  * 
  * Gera:
- * 1. deploy/update_catalog_hw_prod.sql (Script SQL direto e transacional)
+ * 1. deploy/update_catalog_hw_prod.sql (Script SQL dinâmico, transacional e idempotente)
  * 2. deploy/catalog_hw_data.json (Arquivo de dados limpos pré-normalizados)
  * 3. deploy/apply_catalog_hw_prod.mjs (Script Node para execução via docker / pnpm)
  * 4. deploy/enviar_fotos_producao.bat (Script para envio rápido das fotos via scp)
@@ -26,10 +26,6 @@ const sqlConfig = {
 };
 
 const pg = postgres('postgresql://postgres:cmbp034349@localhost:5432/minihub_car');
-
-const HW_BRAND_ID = 'ca8ae498-f0d5-4443-a682-af519bb2c760';
-const SCALE_64_ID = '8c2a0edc-1f1b-4f5b-82b9-0efea84f7c56';
-const MATTEL_IDENTIFIER_TYPE_ID = '7b27cc89-168b-449f-86e6-f66a531dcc4f';
 const HW_DIR = 'C:\\Projetos\\minihubcar\\catalogos\\HW';
 
 function normalize(str) {
@@ -117,7 +113,7 @@ async function main() {
   fs.writeFileSync(jsonDataPath, JSON.stringify(processedItems, null, 2), 'utf-8');
   console.log(`1. Dados JSON gerados: ${jsonDataPath} (${(fs.statSync(jsonDataPath).size / 1024 / 1024).toFixed(2)} MB)`);
 
-  // 2. Gera Script SQL Idempotente usando strings bufferizadas
+  // 2. Gera Script SQL Idempotente e Dinâmico
   const sqlPath = path.join(deployDir, 'update_catalog_hw_prod.sql');
   const sqlChunks = [];
 
@@ -127,16 +123,33 @@ async function main() {
   sqlChunks.push(`-- ========================================================\n\n`);
   sqlChunks.push(`BEGIN;\n\n`);
 
-  // Garantir Séries
-  sqlChunks.push(`-- 1. Criação/Atualização de Séries Hot Wheels\n`);
+  // 0. Garantir Marca, Escala e Identificador
+  sqlChunks.push(`-- 0. Garantir entidades base no banco de produção\n`);
+  sqlChunks.push(`INSERT INTO miniature_brand (name, normalized_name, status)\n`);
+  sqlChunks.push(`VALUES ('Hot Wheels', 'hot wheels', 'ACTIVE')\n`);
+  sqlChunks.push(`ON CONFLICT (normalized_name) DO UPDATE SET name = EXCLUDED.name;\n\n`);
+
+  sqlChunks.push(`INSERT INTO scale (name, numerator, denominator, normalized_value, status)\n`);
+  sqlChunks.push(`VALUES ('1:64', 1, 64, 0.015625, 'ACTIVE')\n`);
+  sqlChunks.push(`ON CONFLICT (numerator, denominator) DO UPDATE SET name = EXCLUDED.name;\n\n`);
+
+  sqlChunks.push(`INSERT INTO identifier_type (code, name, status)\n`);
+  sqlChunks.push(`SELECT 'MATTEL_CODE', 'Código Mattel', 'ACTIVE'\n`);
+  sqlChunks.push(`WHERE NOT EXISTS (SELECT 1 FROM identifier_type WHERE code = 'MATTEL_CODE');\n\n`);
+
+  // 1. Garantir Séries Hot Wheels com busca dinâmica da marca
+  sqlChunks.push(`-- 1. Criação/Atualização de Séries Hot Wheels (com ID dinâmico da marca)\n`);
   for (const [normSerie, serieName] of uniqueSeries.entries()) {
     sqlChunks.push(`INSERT INTO series (miniature_brand_id, name, normalized_name, status)\n`);
-    sqlChunks.push(`VALUES ('${HW_BRAND_ID}'::uuid, ${escapeSql(serieName)}, ${escapeSql(normSerie)}, 'ACTIVE')\n`);
+    sqlChunks.push(`SELECT b.id, ${escapeSql(serieName)}, ${escapeSql(normSerie)}, 'ACTIVE'\n`);
+    sqlChunks.push(`FROM miniature_brand b\n`);
+    sqlChunks.push(`WHERE b.normalized_name IN ('hot wheels', 'hot-wheels')\n`);
+    sqlChunks.push(`LIMIT 1\n`);
     sqlChunks.push(`ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;\n`);
   }
   sqlChunks.push(`\n`);
 
-  // Tabela Temporária para Carga Rápida
+  // 2. Tabela Temporária para Carga Rápida
   sqlChunks.push(`-- 2. Tabela Temporária para Enriquecimento dos Itens\n`);
   sqlChunks.push(`CREATE TEMP TABLE temp_catalog_hw_delta (\n`);
   sqlChunks.push(`  code VARCHAR(150),\n`);
@@ -157,7 +170,7 @@ async function main() {
   }
   sqlChunks.push(`\n`);
 
-  // Query de atualização das variações existentes
+  // 3. Query de atualização das variações existentes
   sqlChunks.push(`-- 3. Atualiza as Variações já existentes pelo Código\n`);
   sqlChunks.push(`UPDATE variation v\n`);
   sqlChunks.push(`SET\n`);
@@ -167,35 +180,45 @@ async function main() {
   sqlChunks.push(`  release_year = COALESCE(t.release_year, v.release_year)\n`);
   sqlChunks.push(`FROM temp_catalog_hw_delta t\n`);
   sqlChunks.push(`JOIN product_identifier pi ON upper(trim(pi.code)) = upper(trim(t.code))\n`);
-  sqlChunks.push(`LEFT JOIN series s ON s.miniature_brand_id = '${HW_BRAND_ID}'::uuid AND s.normalized_name = t.normalized_serie\n`);
+  sqlChunks.push(`CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b\n`);
+  sqlChunks.push(`LEFT JOIN series s ON s.miniature_brand_id = b.id AND s.normalized_name = t.normalized_serie\n`);
   sqlChunks.push(`WHERE v.id = pi.variation_id;\n\n`);
 
-  // Castings que não existem
+  // 4. Castings que não existem
   sqlChunks.push(`-- 4. Cria Castings Inéditos (que não existem na base)\n`);
   sqlChunks.push(`INSERT INTO casting (miniature_brand_id, name, normalized_name, fantasy_flag, status)\n`);
-  sqlChunks.push(`SELECT DISTINCT '${HW_BRAND_ID}'::uuid, t.name, t.normalized_name, false, 'ACTIVE'\n`);
+  sqlChunks.push(`SELECT DISTINCT b.id, t.name, t.normalized_name, false, 'ACTIVE'\n`);
   sqlChunks.push(`FROM temp_catalog_hw_delta t\n`);
+  sqlChunks.push(`CROSS JOIN (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) b\n`);
   sqlChunks.push(`WHERE NOT EXISTS (\n`);
   sqlChunks.push(`  SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))\n`);
   sqlChunks.push(`)\n`);
   sqlChunks.push(`ON CONFLICT (miniature_brand_id, normalized_name) DO UPDATE SET name = EXCLUDED.name;\n\n`);
 
-  // Inserção das novas Variações e Identificadores via CTE
+  // 5. Inserção das novas Variações e Identificadores via CTE dinâmica
   sqlChunks.push(`-- 5. Cria Novas Variações e seus respectivos Product Identifiers\n`);
-  sqlChunks.push(`WITH new_items AS (\n`);
+  sqlChunks.push(`WITH hw_info AS (\n`);
+  sqlChunks.push(`  SELECT \n`);
+  sqlChunks.push(`    (SELECT id FROM miniature_brand WHERE normalized_name IN ('hot wheels', 'hot-wheels') LIMIT 1) as brand_id,\n`);
+  sqlChunks.push(`    (SELECT id FROM scale WHERE numerator = 1 AND denominator = 64 LIMIT 1) as scale_id,\n`);
+  sqlChunks.push(`    (SELECT id FROM identifier_type WHERE code = 'MATTEL_CODE' LIMIT 1) as type_id\n`);
+  sqlChunks.push(`),\n`);
+  sqlChunks.push(`new_items AS (\n`);
   sqlChunks.push(`  SELECT DISTINCT ON (t.code)\n`);
   sqlChunks.push(`    gen_random_uuid() as new_var_id,\n`);
   sqlChunks.push(`    c.id as casting_id,\n`);
   sqlChunks.push(`    s.id as series_id,\n`);
-  sqlChunks.push(`    '${SCALE_64_ID}'::uuid as scale_id,\n`);
+  sqlChunks.push(`    h.scale_id,\n`);
+  sqlChunks.push(`    h.type_id,\n`);
   sqlChunks.push(`    t.name,\n`);
   sqlChunks.push(`    t.release_year,\n`);
   sqlChunks.push(`    t.line_type,\n`);
   sqlChunks.push(`    t.photo_url,\n`);
   sqlChunks.push(`    t.code\n`);
   sqlChunks.push(`  FROM temp_catalog_hw_delta t\n`);
-  sqlChunks.push(`  JOIN casting c ON c.miniature_brand_id = '${HW_BRAND_ID}'::uuid AND c.normalized_name = t.normalized_name\n`);
-  sqlChunks.push(`  LEFT JOIN series s ON s.miniature_brand_id = '${HW_BRAND_ID}'::uuid AND s.normalized_name = t.normalized_serie\n`);
+  sqlChunks.push(`  CROSS JOIN hw_info h\n`);
+  sqlChunks.push(`  JOIN casting c ON c.miniature_brand_id = h.brand_id AND c.normalized_name = t.normalized_name\n`);
+  sqlChunks.push(`  LEFT JOIN series s ON s.miniature_brand_id = h.brand_id AND s.normalized_name = t.normalized_serie\n`);
   sqlChunks.push(`  WHERE NOT EXISTS (\n`);
   sqlChunks.push(`    SELECT 1 FROM product_identifier pi WHERE upper(trim(pi.code)) = upper(trim(t.code))\n`);
   sqlChunks.push(`  )\n`);
@@ -208,7 +231,7 @@ async function main() {
   sqlChunks.push(`  RETURNING id\n`);
   sqlChunks.push(`)\n`);
   sqlChunks.push(`INSERT INTO product_identifier (variation_id, identifier_type_id, code, normalized_code, is_primary)\n`);
-  sqlChunks.push(`SELECT n.new_var_id, '${MATTEL_IDENTIFIER_TYPE_ID}'::uuid, n.code, n.code, true\n`);
+  sqlChunks.push(`SELECT n.new_var_id, n.type_id, n.code, n.code, true\n`);
   sqlChunks.push(`FROM new_items n\n`);
   sqlChunks.push(`ON CONFLICT (identifier_type_id, normalized_code) DO NOTHING;\n\n`);
 
@@ -216,64 +239,6 @@ async function main() {
 
   fs.writeFileSync(sqlPath, sqlChunks.join(''), 'utf-8');
   console.log(`2. Script SQL gerado com sucesso: ${sqlPath} (${(fs.statSync(sqlPath).size / 1024 / 1024).toFixed(2)} MB)`);
-
-  // 3. Gera script Node runner para a VPS
-  const runnerPath = path.join(deployDir, 'apply_catalog_hw_prod.mjs');
-  fs.writeFileSync(runnerPath, `
-import fs from 'fs';
-import path from 'path';
-import postgres from 'postgres';
-
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://minihub_admin:MiniHubCar_SuperSenhaPostgres_2026@127.0.0.1:5434/minihub_car';
-console.log('Conectando ao banco de dados...');
-const sql = postgres(databaseUrl);
-
-async function run() {
-  const sqlFile = path.resolve(process.cwd(), 'deploy/update_catalog_hw_prod.sql');
-  console.log('Lendo script SQL:', sqlFile);
-  const content = fs.readFileSync(sqlFile, 'utf-8');
-  console.log('Executando atualizacoes no banco de producao...');
-  await sql.unsafe(content);
-  console.log('✅ Catalogo atualizado com sucesso em producao!');
-  await sql.end();
-}
-
-run().catch(err => {
-  console.error('Erro ao atualizar catalogo:', err);
-  process.exit(1);
-});
-`.trim(), 'utf-8');
-  console.log(`3. Script de execução Node gerado: ${runnerPath}`);
-
-  // 4. Gera arquivo bat para envio das fotos
-  const batPath = path.join(deployDir, 'enviar_fotos_producao.bat');
-  fs.writeFileSync(batPath, `@echo off
-chcp 65001 > nul
-echo ========================================================
-echo   ENVIAR FOTOS DO CATALOGO PARA A VPS (HOSTINGER)
-echo ========================================================
-set /p IP_VPS="Digite o IP da VPS Hostinger: "
-if "%IP_VPS%"=="" (
-    echo IP nao informado. Abortando.
-    pause
-    exit /b 1
-)
-
-echo.
-echo Criando diretorio de destino na VPS se necessario...
-ssh root@%IP_VPS% "mkdir -p /var/www/minihubcar/catalogos/HW"
-
-echo.
-echo Sincronizando 4.066 fotos via SCP para a VPS...
-scp -r C:\\Projetos\\minihubcar\\catalogos\\HW\\* root@%IP_VPS%:/var/www/minihubcar/catalogos/HW/
-
-echo.
-echo ========================================================
-echo Fotos enviadas com sucesso!
-echo ========================================================
-pause
-`, 'utf-8');
-  console.log(`4. Script BAT para envio de fotos gerado: ${batPath}`);
 
   await pool.close();
   await pg.end();
