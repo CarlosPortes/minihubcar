@@ -245,3 +245,63 @@ curl -I https://minihubcar.com.br/catalog-media/MINIGTBRASIL/fotos/MGT00928-007E
 ```
 Deve retornar `HTTP/2 200` e `content-type: image/jpeg`.
 
+---
+
+## 🏎️ Carga do Catálogo Legado e Miniaturas (8.954 HW + 455 Miniaturas de Todas as Marcas)
+
+Para aplicar a carga completa e garantir que 100% das fotos sejam exibidas sem erro na Hostinger:
+
+### 1. Enviar fotos e scripts para a VPS (No PowerShell do Windows):
+Você pode executar o script facilitador de 1 clique:
+```cmd
+deploy\enviar_fotos_producao.bat
+```
+*(Ele solicitará o IP da sua VPS e transmitirá via SCP as fotos de `HW`, `Miniaturas`, `backend/uploads` e a pasta `deploy`).*
+
+Ou envie manualmente via PowerShell:
+```powershell
+scp -r C:\Projetos\minihubcar\catalogos\HW root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/catalogos/
+scp -r C:\Projetos\minihubcar\catalogos\Miniaturas root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/catalogos/
+scp -r C:\Projetos\minihubcar\backend\uploads\* root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/backend/uploads/
+scp -r C:\Projetos\minihubcar\deploy\* root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/deploy/
+scp C:\Projetos\minihubcar\docker-compose.prod.yml root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/
+scp C:\Projetos\minihubcar\backend\src\app\app.ts root@SEU_IP_DA_HOSTINGER:/var/www/minihubcar/backend/src/app/
+```
+
+### 2. Sincronizar as fotos com o container e atualizar o Backend na VPS (SSH):
+Conecte-se na sua VPS (`ssh root@SEU_IP_DA_HOSTINGER`):
+
+```bash
+cd /var/www/minihubcar
+
+# Copia as fotos enviadas para uploads diretamente para dentro do container
+docker cp /var/www/minihubcar/backend/uploads/. minihub-backend:/app/backend/uploads/
+
+# Reinicia o backend para aplicar o mapeamento inteligente de fotos e montagem de volumes
+docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+### 3. Aplicar o SQL no PostgreSQL na VPS (SSH):
+Execute o script atualizado com os caminhos de casing exato e fallbacks de URLs oficiais:
+
+```bash
+cd /var/www/minihubcar
+docker compose -f docker-compose.prod.yml exec -T postgres psql -U minihub_admin -d minihub_car < deploy/update_catalog_complete_prod.sql
+```
+
+*(Ou se preferir executar via script Node no host da VPS):*
+```bash
+cd /var/www/minihubcar
+node deploy/apply_catalog_prod.mjs
+```
+
+### 4. Validação Rápida via curl:
+```bash
+# Foto local Hot Wheels (casing exato):
+curl -I https://minihubcar.com.br/catalog-media/HW/JHW68.jpg
+
+# Foto de miniatura cadastrada:
+curl -I https://minihubcar.com.br/uploads/miniatura-1776898827184-529864285.jpeg
+```
+Ambos devem responder com `HTTP/2 200` e `content-type: image/...`!
+

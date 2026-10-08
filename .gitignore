@@ -18,6 +18,7 @@ catalogos/**/*.jpg
 catalogos/**/*.jpeg
 catalogos/**/*.png
 catalogos/**/*.webp
+catalogos/**/*.jfif
 catalogos/**/cache/
 catalogos/**/__pycache__/
 catalogos/**/HW-2026*
@@ -36,6 +37,7 @@ scratch/
 *.pptx
 *.xlsx
 relatorio-pre-vendas.csv
-*.tsbuildinfo
 avatar/exp*.jpeg
-
+*.tsbuildinfo
+uploads/
+backend/uploads/

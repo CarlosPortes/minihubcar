@@ -41,7 +41,7 @@ services:
       DONATION_PIX_KEY: ${DONATION_PIX_KEY:-5accf9cd-a478-4e40-a223-a3fbff42b868}
       DONATION_MONTHLY_GOAL: ${DONATION_MONTHLY_GOAL:-110.00}
     volumes:
-      - minihub_uploads:/app/backend/uploads
+      - ./backend/uploads:/app/backend/uploads
       - ./catalogos:/app/catalogos:ro
     ports:
       # Porta 3334 no host para a API do MiniHub Car
@@ -73,7 +73,6 @@ services:
 
 volumes:
   minihub_pg_data:
-  minihub_uploads:
 
 networks:
   default:

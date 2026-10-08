@@ -9,6 +9,7 @@ import {
   AdminListUsersParams,
   AdminUserStats,
 } from '@/lib/api/users';
+import { communityApi } from '@/lib/api/community';
 import { useAuth } from '@/features/auth/context/auth-context';
 import {
   Users,
@@ -63,6 +64,22 @@ export default function AdminUsersPage() {
   // Roles modal state
   const [rolesModalUser, setRolesModalUser] = useState<AdminUserItem | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [isSendingWelcome, setIsSendingWelcome] = useState(false);
+
+  const handleSendRetroactiveWelcome = async () => {
+    if (!window.confirm('Deseja disparar a mensagem de boas-vindas do Carlos Portes para todos os novos usuários cadastrados que ainda não a receberam?')) {
+      return;
+    }
+    setIsSendingWelcome(true);
+    try {
+      const res = await communityApi.sendRetroactiveWelcome();
+      alert(`✅ Mensagens de boas-vindas processadas com sucesso!\n\n• Enviadas agora: ${res.data.sentCount}\n• Já possuíam conversa: ${res.data.skippedCount}\n• Total de membros avaliados: ${res.data.totalUsers}`);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao enviar mensagens de boas-vindas.');
+    } finally {
+      setIsSendingWelcome(false);
+    }
+  };
 
   // Debounce search input
   useEffect(() => {
@@ -182,7 +199,16 @@ export default function AdminUsersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleSendRetroactiveWelcome}
+            disabled={isSendingWelcome}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-all shadow-sm disabled:opacity-50"
+            title="Dispara a mensagem de onboarding do Carlos para todos os membros que ainda não a receberam"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            {isSendingWelcome ? 'Enviando Mensagens...' : 'Disparar Boas-Vindas aos Novos Membros'}
+          </button>
           <Link
             href="/admin/sellers"
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-border text-xs font-semibold text-foreground hover:bg-secondary/70 transition-all shadow-sm"

@@ -170,9 +170,14 @@ export class CommunityService {
     return updated;
   }
 
-  // Vitrine pública da Comunidade (lista colecionadores com isCollectionPublic = true)
-  async getCommunityShowcase(search?: string, page = 1, limit = 24) {
+  // Vitrine pública da Comunidade (lista todos os membros ativos da comunidade)
+  async getCommunityShowcase(search?: string, page = 1, limit = 24, sort = 'recent') {
     const offset = (page - 1) * limit;
+
+    const orderExpressions =
+      sort === 'items'
+        ? [desc(sql`COALESCE(count(DISTINCT ${collectionExemplar.id}), 0)`), desc(appUser.createdAt)]
+        : [desc(appUser.createdAt)];
 
     let query = db
       .select({
@@ -194,14 +199,12 @@ export class CommunityService {
       )
       .where(
         and(
-          eq(appUser.isCollectionPublic, true),
           eq(appUser.status, 'ACTIVE'),
           search ? ilike(appUser.name, `%${search}%`) : undefined
         )
       )
       .groupBy(appUser.id)
-      .having(sql`COALESCE(count(DISTINCT ${collectionExemplar.id}), 0) > 0`)
-      .orderBy(desc(sql`COALESCE(count(DISTINCT ${collectionExemplar.id}), 0)`))
+      .orderBy(...orderExpressions)
       .limit(limit)
       .offset(offset);
 
@@ -273,8 +276,8 @@ export class CommunityService {
       .where(and(eq(appUser.id, collectorId), eq(appUser.status, 'ACTIVE')))
       .limit(1);
 
-    if (!collector || !collector.isCollectionPublic) {
-      throw new NotFoundError('Colecionador não encontrado ou perfil não é público');
+    if (!collector) {
+      throw new NotFoundError('Colecionador não encontrado');
     }
 
     // Fotos aprovadas da coleção
@@ -500,5 +503,151 @@ export class CommunityService {
 
     return { unreadCount: unreadRes?.count || 0 };
   }
+
+  // --- MENSAGEM AUTOMÁTICA DE BOAS-VINDAS ---
+
+  async getFounderOrAdminSender(): Promise<{ id: string; name: string } | null> {
+    const FOUNDER_EMAIL = 'carlosportes@gmail.com';
+
+    // 1. Tentar encontrar a conta do idealizador Carlos Portes
+    const [founder] = await db
+      .select({ id: appUser.id, name: appUser.name })
+      .from(appUser)
+      .where(and(eq(appUser.normalizedEmail, FOUNDER_EMAIL), eq(appUser.status, 'ACTIVE')))
+      .limit(1);
+
+    if (founder) {
+      return founder;
+    }
+
+    // 2. Fallback: conta colecionador padrão do sistema
+    const [collector] = await db
+      .select({ id: appUser.id, name: appUser.name })
+      .from(appUser)
+      .where(and(eq(appUser.normalizedEmail, 'colecionador@minihubcar.com.br'), eq(appUser.status, 'ACTIVE')))
+      .limit(1);
+
+    if (collector) {
+      return collector;
+    }
+
+    // 3. Fallback: admin padrão do sistema
+    const [admin] = await db
+      .select({ id: appUser.id, name: appUser.name })
+      .from(appUser)
+      .where(and(eq(appUser.normalizedEmail, 'admin@minihubcar.com.br'), eq(appUser.status, 'ACTIVE')))
+      .limit(1);
+
+    if (admin) {
+      return admin;
+    }
+
+    // 4. Fallback final: primeiro usuário ativo disponível
+    const [anyUser] = await db
+      .select({ id: appUser.id, name: appUser.name })
+      .from(appUser)
+      .where(eq(appUser.status, 'ACTIVE'))
+      .limit(1);
+
+    return anyUser || null;
+  }
+
+  async sendWelcomeDirectMessage(recipientUserId: string, recipientName: string) {
+    const sender = await this.getFounderOrAdminSender();
+    if (!sender || sender.id === recipientUserId) {
+      return null;
+    }
+
+    // Verificar se já existe conversa entre eles
+    const [existingConv] = await db
+      .select({ id: directConversation.id })
+      .from(directConversation)
+      .where(
+        sql`(${directConversation.user1Id} = ${sender.id} AND ${directConversation.user2Id} = ${recipientUserId}) OR (${directConversation.user1Id} = ${recipientUserId} AND ${directConversation.user2Id} = ${sender.id})`
+      )
+      .limit(1);
+
+    if (existingConv) {
+      return null;
+    }
+
+    const content = WELCOME_MESSAGE_CONTENT(recipientName);
+    return await this.sendDirectMessage(sender.id, recipientUserId, content);
+  }
+
+  async sendRetroactiveWelcomeMessages() {
+    const sender = await this.getFounderOrAdminSender();
+    if (!sender) {
+      throw new BadRequestError('Nenhum usuário remetente (Carlos ou Admin) encontrado para envio das mensagens de boas-vindas.');
+    }
+
+    // Buscar todos os usuários ativos do sistema, exceto o remetente
+    const allUsers = await db
+      .select({
+        id: appUser.id,
+        name: appUser.name,
+        email: appUser.email,
+        createdAt: appUser.createdAt,
+      })
+      .from(appUser)
+      .where(
+        and(
+          eq(appUser.status, 'ACTIVE'),
+          sql`${appUser.id} != ${sender.id}`
+        )
+      )
+      .orderBy(asc(appUser.createdAt));
+
+    let sentCount = 0;
+    let skippedCount = 0;
+
+    for (const targetUser of allUsers) {
+      // Verificar se já existe conversa entre eles
+      const [existingConv] = await db
+        .select({ id: directConversation.id })
+        .from(directConversation)
+        .where(
+          sql`(${directConversation.user1Id} = ${sender.id} AND ${directConversation.user2Id} = ${targetUser.id}) OR (${directConversation.user1Id} = ${targetUser.id} AND ${directConversation.user2Id} = ${sender.id})`
+        )
+        .limit(1);
+
+      if (existingConv) {
+        skippedCount++;
+        continue;
+      }
+
+      const content = WELCOME_MESSAGE_CONTENT(targetUser.name);
+      await this.sendDirectMessage(sender.id, targetUser.id, content);
+      sentCount++;
+    }
+
+    return {
+      sender: {
+        id: sender.id,
+        name: sender.name,
+      },
+      totalUsers: allUsers.length,
+      sentCount,
+      skippedCount,
+    };
+  }
 }
+
+export function WELCOME_MESSAGE_CONTENT(userName: string): string {
+  const firstName = userName ? userName.split(' ')[0] : 'Colecionador';
+  return `Olá, ${firstName}! Seja muito bem-vindo ao MiniHubCar! 🏎️✨
+
+Eu sou o Carlos Portes, idealizador do projeto e colecionador como você. Criei essa plataforma feita de colecionador para colecionadores, com o propósito de organizar nossas garagens, valorizar nossos modelos diecast e aproximar toda a comunidade.
+
+Aqui está um resumo rápido do que você já pode aproveitar:
+• 🏎️ Garagem & Coleção: Catalogue seus modelos favoritos, organize por marcas/séries e acompanhe o valor estimado da sua coleção.
+• 📸 Fotos do Expositor: No seu Perfil, você pode enviar fotos da sua estante ou expositor para serem exibidas na Vitrine da Comunidade.
+• 👥 Comunidade & Chat: Conheça outros colecionadores, veja suas coleções e converse por aqui pelo chat privado para trocar ideias ou negociar miniaturas.
+• 📋 Wishlist & Desejos: Crie listas de desejos e marque os modelos que você ainda quer adicionar à sua coleção.
+
+Se você tiver qualquer dúvida, sugestão ou feedback sobre o sistema, pode me responder diretamente por aqui! 
+
+Grande abraço e boas coleções!`;
+}
+
 

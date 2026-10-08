@@ -22,6 +22,8 @@ import {
   Store,
   MessageSquare,
   Loader2,
+  Clock,
+  Trophy,
 } from 'lucide-react';
 import { DirectMessagesSection } from '@/features/community/DirectMessagesSection';
 
@@ -35,6 +37,7 @@ function CommunityContent() {
   );
   const [chatRecipientId, setChatRecipientId] = useState<string | null>(userParam || null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sort, setSort] = useState<'recent' | 'items'>('recent');
   const [onlyWithPhotos, setOnlyWithPhotos] = useState(false);
   const [selectedCollector, setSelectedCollector] = useState<ShowcaseCollector | null>(null);
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
@@ -50,8 +53,8 @@ function CommunityContent() {
   }, [tabParam, userParam]);
 
   const { data: showcaseRes, isLoading } = useQuery({
-    queryKey: ['community-showcase', searchTerm],
-    queryFn: () => communityApi.getShowcase(searchTerm || undefined),
+    queryKey: ['community-showcase', searchTerm, sort],
+    queryFn: () => communityApi.getShowcase(searchTerm || undefined, 1, 36, sort),
   });
 
   const collectors: ShowcaseCollector[] = showcaseRes?.data || [];
@@ -146,18 +149,44 @@ function CommunityContent() {
           )}
         </div>
 
-        {/* Toggle with photos */}
-        <div className="flex items-center gap-2">
+        {/* Toggle with photos & Sort filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Sort Switcher */}
+          <div className="flex items-center bg-card border border-border rounded-xl p-1 shadow-sm">
+            <button
+              onClick={() => setSort('recent')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                sort === 'recent'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Clock className="h-3.5 w-3.5" />
+              <span>Mais Recentes</span>
+            </button>
+            <button
+              onClick={() => setSort('items')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                sort === 'items'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Trophy className="h-3.5 w-3.5" />
+              <span>Maiores Coleções</span>
+            </button>
+          </div>
+
           <button
             onClick={() => setOnlyWithPhotos(!onlyWithPhotos)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
               onlyWithPhotos
                 ? 'bg-primary text-primary-foreground border-primary shadow-glow'
                 : 'bg-card text-muted-foreground border-border hover:text-foreground hover:bg-secondary'
             }`}
           >
             <Camera className="h-3.5 w-3.5" />
-            <span>Apenas com Fotos da Coleção</span>
+            <span>Apenas com Fotos</span>
           </button>
         </div>
       </div>
@@ -322,17 +351,31 @@ function CollectorCard({ collector, onOpenPhoto, onSelectCollector, onStartChat 
           /* Default Aesthetic Banner if no approved photo */
           <div className="h-full w-full bg-gradient-to-br from-secondary/80 via-primary/5 to-secondary/40 flex flex-col items-center justify-center text-center p-4">
             <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2 shadow-inner">
-              <Layers className="h-6 w-6" />
+              {collector.totalItems > 0 ? <Layers className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
             </div>
-            <p className="text-xs font-bold text-foreground">Galeria de Miniaturas</p>
-            <p className="text-[10px] text-muted-foreground">{collector.totalItems} miniaturas catalogadas</p>
+            <p className="text-xs font-bold text-foreground">
+              {collector.totalItems > 0 ? 'Galeria de Miniaturas' : 'Novo Colecionador'}
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              {collector.totalItems > 0
+                ? `${collector.totalItems} miniaturas catalogadas`
+                : 'Novo membro no MiniHubCar'}
+            </p>
           </div>
         )}
 
         {/* Counter Badge */}
         <div className="absolute top-2.5 right-2.5">
           <span className="inline-flex items-center gap-1 rounded-full bg-background/80 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-foreground border border-border/60 shadow-sm">
-            <Layers className="h-3 w-3 text-primary" /> {collector.totalItems}
+            {collector.totalItems > 0 ? (
+              <>
+                <Layers className="h-3 w-3 text-primary" /> {collector.totalItems}
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-3 w-3 text-primary" /> Novo Membro
+              </>
+            )}
           </span>
         </div>
       </div>
@@ -380,13 +423,13 @@ function CollectorCard({ collector, onOpenPhoto, onSelectCollector, onStartChat 
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary px-3 py-2.5 text-xs font-bold transition-all shadow-sm"
           >
             <MessageSquare className="h-3.5 w-3.5" />
-            <span>Mensagem</span>
+            <span>{collector.totalItems === 0 ? 'Boas-Vindas' : 'Mensagem'}</span>
           </button>
           <button
             onClick={onSelectCollector}
             className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground px-3 py-2.5 text-xs font-bold transition-all shadow-sm group/btn"
           >
-            <span>Ver Coleção</span>
+            <span>{collector.totalItems === 0 ? 'Ver Perfil' : 'Ver Coleção'}</span>
             <ExternalLink className="h-3.5 w-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
           </button>
         </div>
@@ -449,7 +492,7 @@ function PublicCollectionModal({ collector, onClose, onOpenPhoto, onStartChat }:
         {/* Modal Scrollable Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* Photos of the Collection */}
-          {photos.length > 0 && (
+          {photos.length > 0 ? (
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Camera className="h-4 w-4 text-primary" /> Espaço do Colecionador ({photos.length})
@@ -475,24 +518,37 @@ function PublicCollectionModal({ collector, onClose, onOpenPhoto, onStartChat }:
                 ))}
               </div>
             </div>
-          )}
-
-          {/* Direct Link to full catalog filter */}
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="space-y-1 text-center sm:text-left">
-              <h4 className="text-sm font-bold text-foreground">Deseja ver todas as miniaturas deste colecionador?</h4>
-              <p className="text-xs text-muted-foreground">
-                Explore a coleção completa cadastrada por {collector.name} em nosso catálogo interativo.
+          ) : collector.totalItems === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card/60 p-6 text-center space-y-3">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h4 className="text-sm font-bold text-foreground">Novo Membro na Comunidade</h4>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+                {collector.name} ingressou recentemente no MiniHubCar e ainda está organizando suas miniaturas e fotos do expositor.
+                Aproveite para enviar uma mensagem privada, dar as boas-vindas e trocar ideias sobre colecionismo diecast!
               </p>
             </div>
-            <Link
-              href={`/catalog`}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow hover:bg-primary/90 transition-all shrink-0"
-            >
-              <span>Explorar no Catálogo</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+          ) : null}
+
+          {/* Direct Link to full catalog filter if collector has items */}
+          {collector.totalItems > 0 && (
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-1 text-center sm:text-left">
+                <h4 className="text-sm font-bold text-foreground">Deseja ver todas as miniaturas deste colecionador?</h4>
+                <p className="text-xs text-muted-foreground">
+                  Explore a coleção completa cadastrada por {collector.name} em nosso catálogo interativo.
+                </p>
+              </div>
+              <Link
+                href={`/catalog`}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow hover:bg-primary/90 transition-all shrink-0"
+              >
+                <span>Explorar no Catálogo</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Modal Footer */}

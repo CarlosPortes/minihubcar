@@ -24,5 +24,8 @@ export async function communityRoutes(app: FastifyInstance) {
   app.get('/community/conversations/:conversationId/messages', { preHandler: [authenticate] }, controller.getMessages);
   app.post('/community/messages/:recipientUserId', { preHandler: [authenticate] }, controller.sendMessage);
   app.get('/community/messages/unread-count', { preHandler: [authenticate] }, controller.getUnreadCount);
+
+  // Disparo retroativo de boas-vindas (Admin)
+  app.post('/admin/community/send-welcome-retroactive', { preHandler: [authenticate, requireAdmin] }, controller.sendRetroactiveWelcome);
 }
 

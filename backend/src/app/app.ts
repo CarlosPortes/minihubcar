@@ -99,11 +99,28 @@ export async function buildApp() {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
-  await app.register(fastifyStatic, {
-    root: uploadsDir,
-    prefix: '/uploads/',
-    decorateReply: false,
-  });
+  // Helper to build case-insensitive file mapping for static folders (critical on Linux ext4)
+  const buildCaseMap = (baseDir: string, urlPrefix: string) => {
+    const map = new Map<string, string>();
+    const walk = (currentDir: string, currentPrefix: string) => {
+      if (!fs.existsSync(currentDir)) return;
+      try {
+        const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            walk(path.join(currentDir, entry.name), `${currentPrefix}${entry.name}/`);
+          } else if (entry.isFile()) {
+            const relPath = `${currentPrefix}${entry.name}`;
+            map.set(relPath.toLowerCase(), relPath);
+          }
+        }
+      } catch {
+        // ignore unreadable dirs
+      }
+    };
+    walk(baseDir, urlPrefix);
+    return map;
+  };
 
   // Serve catalog photos if catalogos folder exists
   const possibleCatalogDirs = [
@@ -117,20 +134,48 @@ export async function buildApp() {
   ].filter(Boolean) as string[];
 
   const catalogPhotosDir = possibleCatalogDirs.find((dir) => fs.existsSync(dir));
-  if (catalogPhotosDir) {
-    // Normalization hook: if someone requests /catalog-media/hw/ (lowercase), normalize to /catalog-media/HW/
-    app.addHook('onRequest', async (req) => {
-      if (req.raw.url?.startsWith('/catalog-media/hw/')) {
-        req.raw.url = req.raw.url.replace('/catalog-media/hw/', '/catalog-media/HW/');
-      }
-    });
 
+  // Build case-insensitive lookup table for static files
+  const staticCaseMap = new Map<string, string>();
+  const refreshStaticCaseMap = () => {
+    staticCaseMap.clear();
+    const uploadsMap = buildCaseMap(uploadsDir, '/uploads/');
+    for (const [k, v] of uploadsMap) staticCaseMap.set(k, v);
+    if (catalogPhotosDir) {
+      const catMap = buildCaseMap(catalogPhotosDir, '/catalog-media/');
+      for (const [k, v] of catMap) staticCaseMap.set(k, v);
+    }
+  };
+  refreshStaticCaseMap();
+
+  // Case-insensitive normalization hook: transforms /catalog-media/HW/jhw68.jpg -> /catalog-media/HW/JHW68.jpg
+  app.addHook('onRequest', async (req) => {
+    const rawUrl = req.raw.url;
+    if (!rawUrl) return;
+    if (rawUrl.startsWith('/catalog-media/') || rawUrl.startsWith('/uploads/')) {
+      const [pathname, query] = rawUrl.split('?');
+      if (pathname) {
+        const exactPath = staticCaseMap.get(pathname.toLowerCase());
+        if (exactPath) {
+          req.raw.url = exactPath + (query ? `?${query}` : '');
+        }
+      }
+    }
+  });
+
+  await app.register(fastifyStatic, {
+    root: uploadsDir,
+    prefix: '/uploads/',
+    decorateReply: false,
+  });
+
+  if (catalogPhotosDir) {
     await app.register(fastifyStatic, {
       root: catalogPhotosDir,
       prefix: '/catalog-media/',
       decorateReply: false,
     });
-    app.log.info(`📸 Static catalog media mounted from: ${catalogPhotosDir}`);
+    app.log.info(`📸 Static catalog media mounted from: ${catalogPhotosDir} (${staticCaseMap.size} static files indexed)`);
   } else {
     app.log.warn('⚠️ Diretório de fotos do catálogo (catalogos) não encontrado nas rotas esperadas.');
   }

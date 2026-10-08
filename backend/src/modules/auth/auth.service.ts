@@ -4,6 +4,7 @@ import { FastifyInstance } from 'fastify';
 import { AuthRepository } from './auth.repository';
 import { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from './auth.schemas';
 import { BadRequestError, ConflictError, UnauthorizedError } from '../../shared/errors/api-error';
+import { CommunityService } from '../community/community.service';
 
 export class AuthService {
   constructor(private readonly authRepository = new AuthRepository()) {}
@@ -26,6 +27,14 @@ export class AuthService {
       passwordHash,
       isCollectionPublic: input.isCollectionPublic,
     });
+
+    // Enviar mensagem de boas-vindas automática pelo Carlos Portes / Admin
+    try {
+      const communityService = new CommunityService();
+      await communityService.sendWelcomeDirectMessage(user.id, user.name);
+    } catch (welcomeErr) {
+      console.warn('Aviso: Falha não-bloqueante ao enviar mensagem de boas-vindas:', welcomeErr);
+    }
 
     const roles = await this.authRepository.getUserRoles(user.id);
 

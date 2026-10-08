@@ -76,10 +76,15 @@ export const communityApi = {
     });
   },
 
-  // Vitrine pública da Comunidade
-  getShowcase: async (search?: string, page = 1, limit = 24): Promise<{ data: ShowcaseCollector[]; meta: any }> => {
+  getShowcase: async (search?: string, page = 1, limit = 24, sort = 'recent'): Promise<{ data: ShowcaseCollector[]; meta: any }> => {
     return apiClient<{ data: ShowcaseCollector[]; meta: any }>('/community/showcase', {
-      params: { search, page, limit },
+      params: { search, page, limit, sort },
+    });
+  },
+
+  sendRetroactiveWelcome: async (): Promise<{ data: { totalUsers: number; sentCount: number; skippedCount: number; sender: { id: string; name: string } } }> => {
+    return apiClient('/admin/community/send-welcome-retroactive', {
+      method: 'POST',
     });
   },
 

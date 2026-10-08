@@ -61,11 +61,12 @@ export class CommunityController {
   };
 
   getShowcase = async (request: FastifyRequest, reply: FastifyReply) => {
-    const query = request.query as { search?: string; page?: string; limit?: string };
+    const query = request.query as { search?: string; page?: string; limit?: string; sort?: string };
     const page = query.page ? Math.max(1, parseInt(query.page, 10)) : 1;
     const limit = query.limit ? Math.min(100, Math.max(1, parseInt(query.limit, 10))) : 24;
+    const sort = query.sort === 'items' ? 'items' : 'recent';
 
-    const showcase = await communityService.getCommunityShowcase(query.search, page, limit);
+    const showcase = await communityService.getCommunityShowcase(query.search, page, limit, sort);
     return reply.status(200).send(showcase);
   };
 
@@ -107,6 +108,11 @@ export class CommunityController {
     const user = request.user as { sub: string };
     const count = await communityService.getUnreadCount(user.sub);
     return reply.status(200).send({ data: count });
+  };
+
+  sendRetroactiveWelcome = async (_request: FastifyRequest, reply: FastifyReply) => {
+    const result = await communityService.sendRetroactiveWelcomeMessages();
+    return reply.status(200).send({ data: result });
   };
 }
 
