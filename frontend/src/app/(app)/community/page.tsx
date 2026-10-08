@@ -26,8 +26,16 @@ import {
   Trophy,
 } from 'lucide-react';
 import { DirectMessagesSection } from '@/features/community/DirectMessagesSection';
+import { useAuth } from '@/features/auth/context/auth-context';
 
 function CommunityContent() {
+  const { user } = useAuth();
+  const isAdmin = Boolean(
+    user?.roles?.includes('SYSTEM_ADMIN') ||
+    user?.roles?.includes('CATALOG_ADMIN') ||
+    user?.email === 'carlosportes@gmail.com'
+  );
+
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
   const userParam = searchParams.get('userId');
@@ -41,6 +49,28 @@ function CommunityContent() {
   const [onlyWithPhotos, setOnlyWithPhotos] = useState(false);
   const [selectedCollector, setSelectedCollector] = useState<ShowcaseCollector | null>(null);
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
+  const [isSendingWelcome, setIsSendingWelcome] = useState(false);
+
+  const handleSendRetroactiveWelcome = async () => {
+    if (
+      !window.confirm(
+        'Deseja disparar a mensagem oficial de boas-vindas do Carlos Portes para todos os usuários cadastrados que ainda não a receberam?'
+      )
+    ) {
+      return;
+    }
+    setIsSendingWelcome(true);
+    try {
+      const res = await communityApi.sendRetroactiveWelcome();
+      alert(
+        `✅ Mensagens de boas-vindas processadas com sucesso!\n\n• Enviadas agora: ${res.data.sentCount}\n• Já possuíam conversa: ${res.data.skippedCount}\n• Total de membros avaliados: ${res.data.totalUsers}`
+      );
+    } catch (err: any) {
+      alert(err.message || 'Erro ao enviar mensagens de boas-vindas.');
+    } finally {
+      setIsSendingWelcome(false);
+    }
+  };
 
   useEffect(() => {
     if (tabParam === 'messages') {
@@ -73,17 +103,40 @@ function CommunityContent() {
     <div className="space-y-8">
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-card via-card/90 to-primary/10 p-6 md:p-10 shadow-glow">
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3 py-1 text-xs font-bold text-primary border border-primary/30">
-            <Sparkles className="h-3.5 w-3.5" /> Comunidade de Colecionadores
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3 py-1 text-xs font-bold text-primary border border-primary/30">
+              <Sparkles className="h-3.5 w-3.5" /> Comunidade de Colecionadores
+            </div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">
+              Comunidade MiniHubCar
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Conheça as coleções compartilhadas pelos entusiastas de miniaturas e colecionáveis, inspire-se
+              com estantes e expositores e converse diretamente com outros colecionadores.
+            </p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">
-            Comunidade MiniHubCar
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            Conheça as coleções compartilhadas pelos entusiastas de miniaturas e colecionáveis, inspire-se
-            com estantes e expositores e converse diretamente com outros colecionadores.
-          </p>
+
+          {isAdmin && (
+            <div className="shrink-0 flex flex-col items-start md:items-end gap-2 bg-card/60 backdrop-blur-sm p-4 rounded-2xl border border-primary/20">
+              <button
+                onClick={handleSendRetroactiveWelcome}
+                disabled={isSendingWelcome}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+                title="Dispara a mensagem oficial de boas-vindas do Carlos Portes para todos os membros que ainda não receberam"
+              >
+                {isSendingWelcome ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MessageSquare className="h-4 w-4" />
+                )}
+                <span>{isSendingWelcome ? 'Enviando Mensagens...' : 'Disparar Boas-Vindas aos Novos Membros'}</span>
+              </button>
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-primary" /> Novos cadastros recebem automaticamente
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Decorative background glow */}

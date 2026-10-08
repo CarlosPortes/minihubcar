@@ -33,6 +33,12 @@ export function DirectMessagesSection({
   onClearInitialRecipient,
 }: DirectMessagesSectionProps) {
   const { user } = useAuth();
+  const isAdmin = Boolean(
+    user?.roles?.includes('SYSTEM_ADMIN') ||
+    user?.roles?.includes('CATALOG_ADMIN') ||
+    user?.email === 'carlosportes@gmail.com'
+  );
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [conversations, setConversations] = useState<DirectConversationItem[]>([]);
@@ -44,6 +50,13 @@ export function DirectMessagesSection({
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
+
+  const handleInsertWelcomeTemplate = () => {
+    const firstName = activePartner?.name ? activePartner.name.split(' ')[0] : 'Colecionador';
+    setMessageText(
+      `Olá, ${firstName}! Seja muito bem-vindo ao MiniHubCar! 🏎️✨\n\nEu sou o Carlos Portes, idealizador do projeto e colecionador como você. Criei essa plataforma feita de colecionador para colecionadores, com o propósito de organizar nossas garagens, valorizar nossos modelos diecast e aproximar toda a comunidade.\n\nAqui está um resumo rápido do que você já pode aproveitar:\n• 🏎️ Garagem & Coleção: Catalogue seus modelos favoritos, organize por marcas/séries e acompanhe o valor estimado da sua coleção.\n• 📸 Fotos do Expositor: No seu Perfil, você pode enviar fotos da sua estante ou expositor para serem exibidas na Vitrine da Comunidade.\n• 👥 Comunidade & Chat: Conheça outros colecionadores, veja suas coleções e converse por aqui pelo chat privado para trocar ideias ou negociar miniaturas.\n• 📋 Wishlist & Desejos: Crie listas de desejos e marque os modelos que você ainda quer adicionar à sua coleção.\n\nSe você tiver qualquer dúvida, sugestão ou feedback sobre o sistema, pode me responder diretamente por aqui!\n\nGrande abraço e boas coleções!`
+    );
+  };
 
   const loadConversations = async () => {
     try {
@@ -302,10 +315,22 @@ export function DirectMessagesSection({
               {isLoadingMessages ? (
                 <div className="py-20 text-center text-xs text-muted-foreground">Carregando mensagens...</div>
               ) : messages.length === 0 ? (
-                <div className="py-20 text-center text-xs text-muted-foreground space-y-2">
+                <div className="py-16 text-center text-xs text-muted-foreground space-y-3">
                   <Sparkles className="w-8 h-8 text-primary mx-auto opacity-50" />
                   <p className="font-semibold text-foreground">Inicie uma nova conversa!</p>
                   <p>Diga um olá, pergunte sobre as peças da coleção ou negocie miniaturas.</p>
+                  {isAdmin && (
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleInsertWelcomeTemplate}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 border border-primary/25 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Inserir Mensagem de Boas-Vindas Oficial
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 messages.map((msg) => {
@@ -347,23 +372,45 @@ export function DirectMessagesSection({
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Quick Admin Action Toolbar */}
+            {isAdmin && messages.length === 0 && (
+              <div className="px-4 py-2 bg-primary/5 border-t border-primary/10 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-primary" /> Sugestão de Onboarding:
+                </span>
+                <button
+                  type="button"
+                  onClick={handleInsertWelcomeTemplate}
+                  className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+                >
+                  Carregar texto de boas-vindas do Carlos
+                </button>
+              </div>
+            )}
+
             {/* Message Input Form */}
-            <form onSubmit={handleSendMessage} className="p-3 md:p-4 border-t border-border bg-card flex items-center gap-2.5">
-              <input
-                type="text"
-                placeholder={`Mensagem para ${activePartner.name}...`}
+            <form onSubmit={handleSendMessage} className="p-3 md:p-4 border-t border-border bg-card flex items-end gap-2.5">
+              <textarea
+                rows={messageText.includes('\n') ? 4 : 1}
+                placeholder={`Mensagem para ${activePartner.name}... (Enter para enviar, Shift+Enter para nova linha)`}
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(e);
+                  }
+                }}
                 autoComplete="off"
                 spellCheck="false"
                 style={{ color: 'var(--foreground)' }}
-                className="flex-1 px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition-all shadow-inner"
+                className="flex-1 px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition-all shadow-inner resize-none"
               />
 
               <button
                 type="submit"
                 disabled={!messageText.trim() || isSending}
-                className="p-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-all shrink-0 shadow-md flex items-center justify-center cursor-pointer"
+                className="p-3.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-all shrink-0 shadow-md flex items-center justify-center cursor-pointer"
                 title="Enviar mensagem"
               >
                 <Send className="w-4 h-4" />
