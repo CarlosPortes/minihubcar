@@ -25,6 +25,7 @@
     "db:seed:matchbox": "pnpm --filter backend db:seed:matchbox",
     "db:seed:minigtbrasil": "pnpm --filter backend db:seed:minigtbrasil",
     "db:seed:ar": "pnpm --filter backend db:seed:ar",
-    "db:seed:fandom": "pnpm --filter backend db:seed:fandom"
+    "db:seed:fandom": "pnpm --filter backend db:seed:fandom",
+    "welcome:retroactive": "pnpm --filter backend welcome:retroactive"
   }
 }
