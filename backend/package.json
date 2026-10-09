@@ -27,6 +27,7 @@
     "db:seed:matchbox": "tsx src/database/seed-matchbox-catalog.ts",
     "db:seed:spark": "tsx src/database/seed-spark-catalog.ts",
     "db:seed:bburago": "tsx src/database/seed-bburago-catalog.ts",
+    "db:seed:majorette": "tsx src/database/seed-majorette-catalog.ts",
     "welcome:retroactive": "tsx src/database/send-welcome-retroactive.ts"
   },
 
