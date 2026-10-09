@@ -143,6 +143,9 @@ docker compose -f docker-compose.prod.yml exec backend pnpm db:seed:poprace
 
 # 5. Carga Matchbox (matchbox_catalogo.csv - Mainline, Moving Parts, Collectors, 5-Packs)
 docker compose -f docker-compose.prod.yml exec backend pnpm db:seed:matchbox
+
+# 6. Carga Majorette (majorette_catalogo.csv - 3.514 miniaturas e 2.828 fotos oficiais):
+docker compose -f docker-compose.prod.yml exec backend pnpm db:seed:majorette
 ```
 
 *(Opcional: se quiser carregar também os catálogos complementares de marcas e Hot Wheels):*
