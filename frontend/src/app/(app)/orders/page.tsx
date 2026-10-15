@@ -7,6 +7,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/context/auth-context';
 import { commercialApi, OrderResponse, OrderItem } from '@/lib/api/commercial';
 import { listBuyerPreOrders, BuyerPreOrderItem, PreOrderInstallmentItem } from '@/lib/api/pre-orders';
+import {
+  externalPreOrdersApi,
+  ExternalPreOrderItem,
+} from '@/lib/api/external-pre-orders';
+import { NewExternalPreOrderModal } from '@/components/pre-orders/NewExternalPreOrderModal';
+import { AddExternalPaymentModal } from '@/components/pre-orders/AddExternalPaymentModal';
+import { ConvertToCollectionModal } from '@/components/pre-orders/ConvertToCollectionModal';
+import { ExternalPreOrderCard } from '@/components/pre-orders/ExternalPreOrderCard';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import {
   PackageCheck,
@@ -26,18 +34,30 @@ import {
   Check,
   Package,
   AlertTriangle,
+  Plus,
+  Globe,
 } from 'lucide-react';
 
-type TabType = 'ALL' | 'ORDERS' | 'PRE_ORDERS';
+type TabType = 'ALL' | 'ORDERS' | 'PRE_ORDERS' | 'EXTERNAL_PRE_ORDERS';
 
 function OrdersContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const newOrderNumber = searchParams.get('newOrder');
-  const initialTab = searchParams.get('tab') === 'pre-orders' ? 'PRE_ORDERS' : 'ALL';
+  const initialTab =
+    searchParams.get('tab') === 'pre-orders'
+      ? 'PRE_ORDERS'
+      : searchParams.get('tab') === 'external'
+      ? 'EXTERNAL_PRE_ORDERS'
+      : 'ALL';
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [expandedSchedules, setExpandedSchedules] = useState<Record<string, boolean>>({});
+
+  // Modals state for external pre-orders
+  const [isNewExternalOpen, setIsNewExternalOpen] = useState(false);
+  const [payingExternalPreOrder, setPayingExternalPreOrder] = useState<ExternalPreOrderItem | null>(null);
+  const [convertingExternalPreOrder, setConvertingExternalPreOrder] = useState<ExternalPreOrderItem | null>(null);
 
   const toggleSchedule = (id: string) => {
     setExpandedSchedules((prev) => ({
@@ -59,7 +79,7 @@ function OrdersContent() {
     enabled: !!user?.id,
   });
 
-  // 2. Buyer Pre-Orders
+  // 2. Buyer Pre-Orders (Plataforma)
   const {
     data: preOrdersData,
     isLoading: isPreOrdersLoading,
@@ -71,11 +91,24 @@ function OrdersContent() {
     enabled: !!user?.id,
   });
 
+  // 3. Collector External Pre-Orders (Particulares / WhatsApp / Outros)
+  const {
+    data: externalPreOrdersData,
+    isLoading: isExternalLoading,
+  } = useQuery({
+    queryKey: ['external-pre-orders', user?.id],
+    queryFn: async () => {
+      return externalPreOrdersApi.list();
+    },
+    enabled: !!user?.id,
+  });
+
   const orders: OrderResponse[] = ordersData || [];
   const buyerPreOrders: BuyerPreOrderItem[] = preOrdersData || [];
-  const isLoading = isOrdersLoading || isPreOrdersLoading;
+  const externalPreOrders: ExternalPreOrderItem[] = externalPreOrdersData || [];
+  const isLoading = isOrdersLoading || isPreOrdersLoading || isExternalLoading;
 
-  // Compute Buyer Pre-Orders Metrics (Total, Paid, Remaining, Items)
+  // Compute Buyer Pre-Orders Metrics (Total Consolidado: Plataforma + Externas)
   const preOrdersMetrics = useMemo(() => {
     let totalContracted = 0;
     let totalPaid = 0;
@@ -89,20 +122,30 @@ function OrdersContent() {
       totalItems += po.quantity || 1;
     });
 
+    externalPreOrders.forEach((ext) => {
+      totalContracted += parseFloat(ext.totalAmount) || 0;
+      totalPaid += parseFloat(ext.paidAmount) || 0;
+      totalRemaining += parseFloat(ext.remainingAmount) || 0;
+      totalItems += ext.quantity || 1;
+    });
+
     return {
       totalContracted,
       totalPaid,
       totalRemaining,
       totalItems,
-      count: buyerPreOrders.length,
+      totalCount: buyerPreOrders.length + externalPreOrders.length,
+      platformCount: buyerPreOrders.length,
+      externalCount: externalPreOrders.length,
     };
-  }, [buyerPreOrders]);
+  }, [buyerPreOrders, externalPreOrders]);
 
   // Combined and sorted chronological list
   const combinedItems = useMemo(() => {
     const list: Array<
       | { type: 'ORDER'; item: OrderResponse; date: Date }
       | { type: 'PRE_ORDER'; item: BuyerPreOrderItem; date: Date }
+      | { type: 'EXTERNAL_PRE_ORDER'; item: ExternalPreOrderItem; date: Date }
     > = [];
 
     if (activeTab === 'ALL' || activeTab === 'ORDERS') {
@@ -117,8 +160,14 @@ function OrdersContent() {
       });
     }
 
+    if (activeTab === 'ALL' || activeTab === 'EXTERNAL_PRE_ORDERS') {
+      externalPreOrders.forEach((ext) => {
+        list.push({ type: 'EXTERNAL_PRE_ORDER', item: ext, date: new Date(ext.createdAt) });
+      });
+    }
+
     return list.sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [orders, buyerPreOrders, activeTab]);
+  }, [orders, buyerPreOrders, externalPreOrders, activeTab]);
 
   if (isLoading) {
     return (
@@ -163,20 +212,30 @@ function OrdersContent() {
         <div>
           <h1 className="text-2xl font-black text-foreground">Meus Pedidos & Reservas</h1>
           <p className="text-xs text-muted-foreground">
-            Acompanhe suas compras de pronta entrega e o cronograma financeiro de pré-vendas
+            Acompanhe suas compras de pronta entrega e o cronograma financeiro de pré-vendas (plataforma e particulares)
           </p>
         </div>
 
-        <Link
-          href="/marketplace"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-        >
-          Explorar mais miniaturas <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsNewExternalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover shadow-glow transition-all cursor-pointer"
+          >
+            <Plus className="h-4 w-4" /> Nova Pré-Venda Externa
+          </button>
+
+          <Link
+            href="/marketplace"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline px-2"
+          >
+            Explorar Loja <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
 
-      {/* Painel Financeiro de Pré-Vendas do Comprador */}
-      {buyerPreOrders.length > 0 && (
+      {/* Painel Financeiro de Pré-Vendas do Comprador (Consolidado: Loja + Externas) */}
+      {(buyerPreOrders.length > 0 || externalPreOrders.length > 0) && (
         <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -184,16 +243,25 @@ function OrdersContent() {
                 <Clock className="h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-foreground">Painel de Pré-Vendas do Comprador</h3>
+                <h3 className="text-sm font-bold text-foreground">Painel Financeiro de Pré-Vendas</h3>
                 <p className="text-[11px] text-muted-foreground">
-                  Consolidação dos valores contratados, pagamentos realizados e saldos pendentes
+                  Consolidação de valores contratados, sinais quitados e saldos futuros (Loja Oficial + Particulares)
                 </p>
               </div>
             </div>
 
-            <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-              {preOrdersMetrics.count} reserva(s) ativa(s)
-            </span>
+            <div className="flex items-center gap-1.5">
+              {buyerPreOrders.length > 0 && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  {buyerPreOrders.length} Loja
+                </span>
+              )}
+              {externalPreOrders.length > 0 && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {externalPreOrders.length} Externas
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
@@ -245,7 +313,7 @@ function OrdersContent() {
                 {preOrdersMetrics.totalItems} un.
               </p>
               <p className="text-[10px] text-muted-foreground">
-                Em {preOrdersMetrics.count} lote(s) contratado(s)
+                Em {preOrdersMetrics.totalCount} lote(s) contratado(s)
               </p>
             </div>
           </div>
@@ -253,7 +321,7 @@ function OrdersContent() {
       )}
 
       {/* Tabs Filter Bar */}
-      <div className="flex items-center gap-2 border-b border-border pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-2">
         <button
           onClick={() => setActiveTab('ALL')}
           className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -262,7 +330,7 @@ function OrdersContent() {
               : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
           }`}
         >
-          Todos ({orders.length + buyerPreOrders.length})
+          Todos ({orders.length + buyerPreOrders.length + externalPreOrders.length})
         </button>
 
         <button
@@ -284,7 +352,18 @@ function OrdersContent() {
               : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
           }`}
         >
-          <Clock className="h-3.5 w-3.5 text-amber-500" /> Pré-Vendas ({buyerPreOrders.length})
+          <Clock className="h-3.5 w-3.5 text-amber-500" /> Pré-Vendas da Loja ({buyerPreOrders.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('EXTERNAL_PRE_ORDERS')}
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'EXTERNAL_PRE_ORDERS'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+          }`}
+        >
+          <Globe className="h-3.5 w-3.5 text-primary" /> Pré-Vendas Externas ({externalPreOrders.length})
         </button>
       </div>
 
@@ -294,26 +373,51 @@ function OrdersContent() {
           <PackageCheck className="mx-auto h-12 w-12 text-muted-foreground/50" />
           <h3 className="text-lg font-bold text-foreground">
             {activeTab === 'PRE_ORDERS'
-              ? 'Nenhuma pré-venda ativa no momento'
+              ? 'Nenhuma pré-venda da loja ativa no momento'
+              : activeTab === 'EXTERNAL_PRE_ORDERS'
+              ? 'Nenhuma pré-venda externa cadastrada ainda'
               : activeTab === 'ORDERS'
               ? 'Nenhum pedido de pronta entrega'
               : 'Nenhum pedido ou reserva realizado ainda'}
           </h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Explore as miniaturas e novidades no catálogo oficial e marketplace.
+            {activeTab === 'EXTERNAL_PRE_ORDERS'
+              ? 'Adicione suas cotas e compras adquiridas em grupos de WhatsApp, redes sociais ou importadores independentes.'
+              : 'Explore as miniaturas e novidades no catálogo oficial e marketplace.'}
           </p>
           <div className="pt-2">
-            <Link
-              href="/marketplace"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-hover shadow-glow transition-all"
-            >
-              <ShoppingBag className="h-4 w-4" /> Ir às Compras
-            </Link>
+            {activeTab === 'EXTERNAL_PRE_ORDERS' ? (
+              <button
+                type="button"
+                onClick={() => setIsNewExternalOpen(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-hover shadow-glow transition-all cursor-pointer"
+              >
+                <Plus className="h-4 w-4" /> Cadastrar Pré-Venda Externa
+              </button>
+            ) : (
+              <Link
+                href="/marketplace"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-hover shadow-glow transition-all"
+              >
+                <ShoppingBag className="h-4 w-4" /> Ir às Compras
+              </Link>
+            )}
           </div>
         </div>
       ) : (
         <div className="space-y-4">
           {combinedItems.map((entry) => {
+            if (entry.type === 'EXTERNAL_PRE_ORDER') {
+              return (
+                <ExternalPreOrderCard
+                  key={`ext-${entry.item.id}`}
+                  item={entry.item}
+                  onAddPayment={(item) => setPayingExternalPreOrder(item)}
+                  onConvertToCollection={(item) => setConvertingExternalPreOrder(item)}
+                />
+              );
+            }
+
             if (entry.type === 'ORDER') {
               const ord = entry.item;
               const dateStr = new Date(ord.createdAt).toLocaleDateString('pt-BR', {
@@ -674,6 +778,24 @@ function OrdersContent() {
           })}
         </div>
       )}
+
+      {/* Modais de Pré-Vendas Externas */}
+      <NewExternalPreOrderModal
+        isOpen={isNewExternalOpen}
+        onClose={() => setIsNewExternalOpen(false)}
+      />
+
+      <AddExternalPaymentModal
+        isOpen={!!payingExternalPreOrder}
+        onClose={() => setPayingExternalPreOrder(null)}
+        preOrder={payingExternalPreOrder}
+      />
+
+      <ConvertToCollectionModal
+        isOpen={!!convertingExternalPreOrder}
+        onClose={() => setConvertingExternalPreOrder(null)}
+        preOrder={convertingExternalPreOrder}
+      />
     </div>
   );
 }

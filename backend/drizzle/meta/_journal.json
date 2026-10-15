@@ -120,6 +120,13 @@
       "when": 1790700000000,
       "tag": "0016_add_donations",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792014284925,
+      "tag": "0017_steady_captain_universe",
+      "breakpoints": true
     }
   ]
 }

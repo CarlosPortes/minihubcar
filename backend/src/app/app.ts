@@ -43,6 +43,7 @@ import { importExportRoutes } from '../modules/import-export/import-export.route
 import { collectiblesRoutes } from '../modules/collectibles/collectibles.routes';
 import { subscriptionsRoutes } from '../modules/subscriptions/subscriptions.routes';
 import { feedbackRoutes } from '../modules/feedback/feedback.routes';
+import { externalPreOrdersRoutes } from '../modules/external-pre-orders/external-pre-orders.routes';
 
 export async function buildApp() {
   const app = fastify({
@@ -220,6 +221,7 @@ export async function buildApp() {
       await v1.register(collectiblesRoutes);
       await v1.register(subscriptionsRoutes);
       await v1.register(feedbackRoutes);
+      await v1.register(externalPreOrdersRoutes);
     },
     { prefix: '/api/v1' }
   );
