@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ====================================================================
-echo     PUBLICACAO / ATUALIZACAO DO MININHUBCAR NA HOSTINGER VPS
+echo     PUBLICACAO / ATUALIZACAO DO MINIHUB CAR NA HOSTINGER VPS
 echo ====================================================================
 echo.
 
@@ -10,22 +10,22 @@ set /p IP_INPUT="Digite o IP ou Dominio da sua VPS [%IP_HOSTINGER%]: "
 if not "%IP_INPUT%"=="" set IP_HOSTINGER=%IP_INPUT%
 
 echo.
-echo Conectando na VPS (%IP_HOSTINGER%) para puxar o codigo e reconstruir os containers...
+echo Conectando na VPS (%IP_HOSTINGER%) para puxar o codigo e atualizar...
 echo.
 
 ssh root@%IP_HOSTINGER% "cd /var/www/minihubcar && git pull origin main && docker compose -f docker-compose.prod.yml up -d --build frontend backend evolution-api && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:external-pre-orders && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate"
 
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo.
-    echo ❌ Ocorreu um erro durante a atualizacao remota. Verifique a conexao e credenciais SSH.
+    echo [ERRO] Ocorreu um erro durante a atualizacao remota. Verifique a conexao e credenciais SSH.
     pause
-    exit /b %errorlevel%
+    exit /b 1
 )
 
 echo.
 echo ====================================================================
-echo  ✅ CODIGO ATUALIZADO, BANCO MIGRADO E CONTAINERS RECONSTRUIDOS!
-echo  ✅ EVOLUTION API INICIALIZADA NA PORTA 8088!
+echo  [OK] CODIGO ATUALIZADO, BANCO MIGRADO E CONTAINERS RECONSTRUIDOS!
+echo  [OK] EVOLUTION API INICIALIZADA NA PORTA 8088!
 echo ====================================================================
 echo.
 set /p DISPARAR="Deseja disparar as mensagens de boas-vindas retroativas agora? (S/N) [N]: "
