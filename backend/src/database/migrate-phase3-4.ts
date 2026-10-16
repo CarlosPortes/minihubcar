@@ -299,6 +299,10 @@ async function migratePhase3And4() {
   await sqlClient`CREATE INDEX IF NOT EXISTS ix_ext_pre_order_payment_order ON external_pre_order_payment(pre_order_id);`;
   console.log('✅ Tabelas de Pré-Vendas Externas verificadas/criadas.');
 
+  // 8. Schema evolution para Evolution API
+  await sqlClient`CREATE SCHEMA IF NOT EXISTS evolution;`;
+  console.log('✅ Schema evolution verificado/criado.');
+
   console.log('🎉 Migração concluída com 100% de sucesso!');
   process.exit(0);
 }

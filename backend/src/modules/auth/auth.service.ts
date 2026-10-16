@@ -5,6 +5,7 @@ import { AuthRepository } from './auth.repository';
 import { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from './auth.schemas';
 import { BadRequestError, ConflictError, UnauthorizedError } from '../../shared/errors/api-error';
 import { CommunityService } from '../community/community.service';
+import { WhatsAppService } from '../notifications/whatsapp.service';
 
 export class AuthService {
   constructor(private readonly authRepository = new AuthRepository()) {}
@@ -34,6 +35,18 @@ export class AuthService {
       await communityService.sendWelcomeDirectMessage(user.id, user.name);
     } catch (welcomeErr) {
       console.warn('Aviso: Falha não-bloqueante ao enviar mensagem de boas-vindas:', welcomeErr);
+    }
+
+    // Notificar o Administrador no WhatsApp sobre o novo cadastro
+    try {
+      const whatsAppService = new WhatsAppService();
+      await whatsAppService.notifyAdminNewCollector({
+        name: user.name,
+        email: user.email,
+        whatsapp: (user as any).whatsapp || null,
+      });
+    } catch (whatsappErr) {
+      console.warn('Aviso: Falha não-bloqueante ao notificar admin no WhatsApp:', whatsappErr);
     }
 
     const roles = await this.authRepository.getUserRoles(user.id);

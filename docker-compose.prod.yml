@@ -40,6 +40,10 @@ services:
       STORAGE_LOCAL_PATH: ./uploads
       DONATION_PIX_KEY: ${DONATION_PIX_KEY:-5accf9cd-a478-4e40-a223-a3fbff42b868}
       DONATION_MONTHLY_GOAL: ${DONATION_MONTHLY_GOAL:-110.00}
+      EVOLUTION_API_URL: http://minihub-evolution:8080
+      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-minihub-evolution-secret-key-2026}
+      EVOLUTION_INSTANCE_NAME: minihubcar
+      ADMIN_WHATSAPP_PHONE: ${ADMIN_WHATSAPP_PHONE:-}
     volumes:
       - ./backend/uploads:/app/backend/uploads
       - ./catalogos:/app/catalogos:ro
@@ -71,8 +75,37 @@ services:
       - default
       - eco_eco-network
 
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.2.3
+    container_name: minihub-evolution
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_URL: ${EVOLUTION_SERVER_URL:-http://localhost:8088}
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-minihub-evolution-secret-key-2026}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER:-minihub_admin}:${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}@postgres:5432/${POSTGRES_DB:-minihub_car}?schema=evolution
+      CACHE_REDIS_ENABLED: "false"
+      CACHE_LOCAL_ENABLED: "true"
+      CONFIG_SESSION_PHONE_CLIENT: "MiniHub Car"
+      CONFIG_SESSION_PHONE_NAME: "Chrome"
+      AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
+      LOG_LEVEL: "ERROR,WARN,INFO"
+    volumes:
+      - evolution_instances:/evolution/instances
+    ports:
+      # Porta 8088 no host para acesso local e seguro da Evolution API
+      - "127.0.0.1:8088:8080"
+    networks:
+      - default
+      - eco_eco-network
+
 volumes:
   minihub_pg_data:
+  evolution_instances:
 
 networks:
   default:

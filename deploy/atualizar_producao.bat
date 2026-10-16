@@ -13,7 +13,7 @@ echo.
 echo Conectando na VPS (%IP_HOSTINGER%) para puxar o codigo e reconstruir os containers...
 echo.
 
-ssh root@%IP_HOSTINGER% "cd /var/www/minihubcar && git pull origin main && docker compose -f docker-compose.prod.yml up -d --build frontend backend && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:external-pre-orders"
+ssh root@%IP_HOSTINGER% "cd /var/www/minihubcar && git pull origin main && docker compose -f docker-compose.prod.yml up -d --build frontend backend evolution-api && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:external-pre-orders && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate"
 
 if %errorlevel% neq 0 (
     echo.
@@ -25,6 +25,7 @@ if %errorlevel% neq 0 (
 echo.
 echo ====================================================================
 echo  ✅ CODIGO ATUALIZADO, BANCO MIGRADO E CONTAINERS RECONSTRUIDOS!
+echo  ✅ EVOLUTION API INICIALIZADA NA PORTA 8088!
 echo ====================================================================
 echo.
 set /p DISPARAR="Deseja disparar as mensagens de boas-vindas retroativas agora? (S/N) [N]: "
@@ -38,6 +39,7 @@ if /i "%DISPARAR%"=="S" (
 echo.
 echo ====================================================================
 echo  DEPLOY CONCLUIDO COM SUCESSO!
-echo  Acesse e teste: https://minihubcar.com.br/orders
+echo  Acesse o Painel Admin: https://minihubcar.com.br/admin/users
+echo  Clique em 'Conexao WhatsApp' para escanear o QR Code!
 echo ====================================================================
 pause

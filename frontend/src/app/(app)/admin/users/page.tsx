@@ -10,6 +10,7 @@ import {
   AdminUserStats,
 } from '@/lib/api/users';
 import { communityApi } from '@/lib/api/community';
+import { WhatsAppConnectModal } from '@/components/admin/WhatsAppConnectModal';
 import { useAuth } from '@/features/auth/context/auth-context';
 import {
   Users,
@@ -65,6 +66,7 @@ export default function AdminUsersPage() {
   const [rolesModalUser, setRolesModalUser] = useState<AdminUserItem | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [isSendingWelcome, setIsSendingWelcome] = useState(false);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const handleSendRetroactiveWelcome = async () => {
     if (!window.confirm('Deseja disparar a mensagem de boas-vindas do Carlos Portes para todos os novos usuários cadastrados que ainda não a receberam?')) {
@@ -215,6 +217,14 @@ export default function AdminUsersPage() {
           >
             <Store className="h-3.5 w-3.5 text-amber-500" /> Moderação de Vendedores
           </Link>
+          <button
+            type="button"
+            onClick={() => setIsWhatsAppModalOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-semibold text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm cursor-pointer"
+            title="Conectar WhatsApp ou verificar status das notificações da Evolution API"
+          >
+            <MessageCircle className="h-3.5 w-3.5" /> Conexão WhatsApp
+          </button>
         </div>
       </div>
 
@@ -1016,6 +1026,11 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+      {/* Modal de Conexão com WhatsApp (Evolution API) */}
+      <WhatsAppConnectModal
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+      />
     </div>
   );
 }

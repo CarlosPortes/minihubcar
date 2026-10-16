@@ -9,6 +9,10 @@ async function runMigrations() {
     await sqlClient`CREATE EXTENSION IF NOT EXISTS pgcrypto;`;
     console.log('✅ pgcrypto extension verified.');
 
+    // Ensure evolution schema is created for Evolution API
+    await sqlClient`CREATE SCHEMA IF NOT EXISTS evolution;`;
+    console.log('✅ evolution schema verified.');
+
     const migrationsFolder = path.resolve(process.cwd(), './drizzle');
     await migrate(db, { migrationsFolder });
     console.log('✅ Migrations applied successfully!');

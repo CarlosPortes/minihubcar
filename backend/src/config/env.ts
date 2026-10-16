@@ -14,6 +14,10 @@ const envSchema = z.object({
   STORAGE_LOCAL_PATH: z.string().default('./uploads'),
   DONATION_PIX_KEY: z.string().default('5accf9cd-a478-4e40-a223-a3fbff42b868'),
   DONATION_MONTHLY_GOAL: z.coerce.number().default(110.0),
+  EVOLUTION_API_URL: z.string().default('http://minihub-evolution:8080'),
+  EVOLUTION_API_KEY: z.string().default('minihub-evolution-secret-key-2026'),
+  EVOLUTION_INSTANCE_NAME: z.string().default('minihubcar'),
+  ADMIN_WHATSAPP_PHONE: z.string().optional(),
 });
 
 const parseEnv = () => {
