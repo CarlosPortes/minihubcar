@@ -21,6 +21,13 @@ import {
   Layers,
   Heart,
   ArrowRight,
+  Clock,
+  DollarSign,
+  Car,
+  Smartphone,
+  FileSpreadsheet,
+  Database,
+  Check,
 } from 'lucide-react';
 
 interface GuideDoc {
@@ -47,20 +54,20 @@ const GUIDES: GuideDoc[] = [
     subtitle: 'Arquitetura do Sistema, Módulos e Casos de Uso Ponta a Ponta',
     category: 'Técnico & Operacional',
     categoryColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    badge: 'Oficial v2.4',
+    badge: 'Oficial v2.6 - Atualizado 2026',
     icon: BookOpen,
-    pages: '4 Páginas',
-    size: '2.1 MB',
+    pages: '5 Páginas',
+    size: '2.4 MB',
     filename: 'Documento_1_Documentacao_Funcional_MiniHubCar.pdf',
     url: '/docs/Documento_1_Documentacao_Funcional_MiniHubCar.pdf',
     description:
-      'Visão aprofundada de todos os módulos do MiniHub Car: Catálogo Canônico (+22k miniaturas), Garagem Pessoal Patrimonial, Wishlist, Marketplace à Pronta Entrega, Motor de Pré-Vendas, Algoritmo Anticalote de Reputação e Casos de Uso detalhados.',
+      'Visão aprofundada de todos os módulos do MiniHub Car: Catálogo Canônico (+25k miniaturas com expansão Maisto, Mini GT e Kaido House), Garagem Pessoal Patrimonial, Motor de Pré-Vendas com 3 Condições de Pagamento, Pré-Vendas Externas Particulares, Notificações WhatsApp e Algoritmo Anticalote de Reputação.',
     topics: [
-      'Estrutura hierárquica do Catálogo Canônico de 22k+ miniaturas',
-      'Garagem Virtual: controle físico, conservação e valor patrimonial',
-      'Motor de Pré-Vendas: Sinal, Saldo e Parcelamento em até 10x',
-      'Collector Health Score: monitoramento de risco e adimplência',
-      'Provisionamento automático de compradores com senha provisória',
+      'Estrutura do Catálogo Canônico de 25k+ miniaturas com linha Maisto, Hot Wheels e Mini GT',
+      'Garagem Virtual: controle físico de prateleiras, conservação e exportação de acervo',
+      'Gestão Híbrida de Pré-Vendas: Compras da Plataforma e Pré-Vendas Externas (Particulares)',
+      '3 Condições de Pagamento: 100% no Recebimento, Sinal + Restante e Parcelamento',
+      'Notificações automáticas no WhatsApp (Evolution API) e Collector Health Score',
     ],
     audience: 'Colecionadores, Desenvolvedores, Curadores e Gestores',
   },
@@ -134,14 +141,161 @@ const GUIDES: GuideDoc[] = [
   },
 ];
 
+interface InteractiveModule {
+  id: string;
+  title: string;
+  shortDesc: string;
+  icon: any;
+  badge: string;
+  color: string;
+  sections: { heading: string; text: string }[];
+  linkText: string;
+  linkHref: string;
+}
+
+const INTERACTIVE_MODULES: InteractiveModule[] = [
+  {
+    id: 'garagem',
+    title: 'Garagem Virtual & Acervo Pessoal',
+    shortDesc: 'Cadastre, organize fisicamente e monitore o valor patrimonial da sua coleção',
+    icon: Car,
+    badge: 'Módulo Central',
+    color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    sections: [
+      {
+        heading: 'Cadastro Ágil & Canônico',
+        text: 'Busque no catálogo oficial de mais de 25.000 miniaturas para preencher foto, escala, fabricante e ano com 1 clique, ou cadastre peças customizadas e raras de forma avulsa.',
+      },
+      {
+        heading: 'Organização Física por Prateleiras e Gavetas',
+        text: 'Associe cada exemplar a uma prateleira, nicho, expositor acrílico ou gaveta personalizada. Você nunca mais perderá a localização física de uma miniatura.',
+      },
+      {
+        heading: 'Estado de Conservação & Custo Patrimonial',
+        text: 'Classifique a condição física (Lacrado no Blister, Loose impecável, Custom, Com Detalhes) e registre o valor pago. O sistema monitora a valorização histórica de mercado.',
+      },
+      {
+        heading: 'Backup & Exportação em Planilha (CSV/Excel)',
+        text: 'Exporte o inventário completo do seu acervo com data, custos e códigos para manter cópias offline de segurança ou apresentar a seguradoras patrimoniais.',
+      },
+    ],
+    linkText: 'Acessar Minha Coleção',
+    linkHref: '/collection',
+  },
+  {
+    id: 'pre-vendas',
+    title: 'Motor de Pré-Vendas & 3 Condições de Pagamento',
+    shortDesc: 'Gestão híbrida de compras na plataforma e reservas particulares externas',
+    icon: Clock,
+    badge: 'Atualizado 2026',
+    color: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    sections: [
+      {
+        heading: 'Pré-Vendas da Plataforma vs. Pré-Vendas Externas',
+        text: 'Além de reservar com lojistas homologados do MiniHub Car, qualquer colecionador pode cadastrar suas compras externas feitas no WhatsApp, Facebook ou lojas independentes.',
+      },
+      {
+        heading: 'As 3 Condições de Pagamento Disponíveis',
+        text: '1) 100% no Recebimento (paga apenas na chegada do lote); 2) Sinal + Restante (com atalhos rápidos de 20%, 30% ou 50%); 3) Parcelamento Mensal (divide em 2x até 12x com cálculo automático).',
+      },
+      {
+        heading: 'Painel Financeiro Consolidado de Reservas',
+        text: 'Acompanhe no topo de Meus Pedidos (/orders) o total financeiro contratado, quanto já foi amortizado e o saldo pendente de todas as suas pré-vendas combinadas.',
+      },
+      {
+        heading: 'Conversão Automática em 1 Clique para a Garagem',
+        text: 'Quando o pacote chegar na sua residência, clique em "Mover para Minha Coleção" no card da pré-venda. O modelo é incorporado à sua Garagem Virtual sem redigitação de dados.',
+      },
+    ],
+    linkText: 'Ver Meus Pedidos & Pré-Vendas',
+    linkHref: '/orders',
+  },
+  {
+    id: 'catalogo',
+    title: 'Catálogo Canônico Oficial (+25.000 Peças)',
+    shortDesc: 'Base unificada de modelos 1:64 com fotos, dados técnicos e variações',
+    icon: BookOpen,
+    badge: 'Expansão Maisto 2026',
+    color: 'text-primary bg-primary/10 border-primary/20',
+    sections: [
+      {
+        heading: 'Consolidação de Múltiplos Fabricantes Oficiais',
+        text: 'O acervo reúne mais de 25.000 miniaturas canônicas: Hot Wheels (Mainline, Premium, Boulevard, RLC), Mini GT, Kaido House, Inno64, Tarmac Works e o recém-integrado catálogo Maisto.',
+      },
+      {
+        heading: 'Linha Completa Maisto Integrada',
+        text: 'Agora você pode pesquisar, adicionar à garagem e controlar pré-vendas de linhas clássicas da Maisto: Fresh Metal, Design, Muscle Machines e Special Edition.',
+      },
+      {
+        heading: 'Filtros Inteligentes e Fichas Técnicas Detalhadas',
+        text: 'Filtre por fabricante, montadora real (Porsche, Nissan, Ford, etc.), escala (1:64, 1:43, 1:24, 1:18), tipo de roda (Real Riders, plástico) e ano de lançamento.',
+      },
+      {
+        heading: 'Colaboração & Curadoria Coletiva',
+        text: 'Encontrou uma miniatura rara ou customizada que ainda não está catalogada? Colecionadores podem sugerir variações e fotos para aprovação da moderação.',
+      },
+    ],
+    linkText: 'Explorar Catálogo',
+    linkHref: '/catalog',
+  },
+  {
+    id: 'seguranca',
+    title: 'Segurança, Notificações & Reputação',
+    shortDesc: 'Ecossistema seguro com alertas WhatsApp e semáforo anticalote',
+    icon: ShieldCheck,
+    badge: 'Proteção Ativa',
+    color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+    sections: [
+      {
+        heading: 'Notificações Instantâneas via WhatsApp (Evolution API)',
+        text: 'Integração direta com o WhatsApp oficial do MiniHub Car para disparo de notificações instantâneas de novos cadastros, confirmações de reservas e avisos de chegada.',
+      },
+      {
+        heading: 'Collector Health Score: O Semáforo Anticalote',
+        text: 'Proteção contra inadimplência: o algoritmo cruza pontualidade de pagamentos e cumprimento de prazos entre lojistas da rede, gerando reputação Verde, Amarela ou Vermelha.',
+      },
+      {
+        heading: 'Garantia de Estoque Atômico',
+        text: 'No Marketplace do MiniHub Car, transações garantem que cotas de pré-vendas e itens de pronta entrega nunca sejam vendidos em duplicidade.',
+      },
+      {
+        heading: 'Programa de Vendedores Homologados',
+        text: 'Importadores e lojistas contam com o Portal do Vendedor (/seller), importação de planilhas CSV do Excel e painel de baixa de parcelas via PIX.',
+      },
+    ],
+    linkText: 'Conhecer Portal do Vendedor',
+    linkHref: '/seller',
+  },
+];
+
 const FAQS = [
   {
-    q: 'Como posso acessar a Apostila de Treinamento se já sou Vendedor Homologado?',
-    a: 'Você pode baixar o PDF diretamente nesta página ou através do banner de auxílio rápido disponível no topo da aba Pré-Vendas do seu Portal do Vendedor (/seller).',
+    q: 'O que são Pré-Vendas Externas e como qualquer colecionador pode cadastrá-las?',
+    a: 'Qualquer colecionador pode acessar "Meus Pedidos" (/orders) e clicar no botão "+ Nova Pré-Venda Externa". Você pode registrar reservas feitas em grupos de WhatsApp, redes sociais ou importadores independentes, vinculando à miniatura do catálogo ou cadastrando de forma avulsa. Não é necessário ser vendedor homologado.',
+  },
+  {
+    q: 'Quais são as 3 Condições de Pagamento disponíveis no lançamento de Pré-Vendas?',
+    a: 'O sistema oferece 3 modalidades práticas com cálculo automático: 1) Total no Recebimento (paga 100% apenas quando o vendedor receber a peça); 2) Sinal + Restante (com atalhos rápidos de 20%, 30% ou 50% de entrada e saldo na entrega); 3) Parcelamento Mensal (divide em 2x até 12x com cálculo automático de cada parcela e registro das parcelas já quitadas).',
+  },
+  {
+    q: 'Como funciona a conversão automática de Pré-Venda para a Garagem Virtual?',
+    a: 'Quando a miniatura chegar fisicamente na sua casa, você não precisa cadastrá-la do zero. Basta acessar o card da pré-venda em "Meus Pedidos" e clicar em "Mover para Minha Coleção". O sistema cria o item na sua Garagem com status "Na Coleção", data de aquisição e custo pago já registrados.',
+  },
+  {
+    q: 'Quantas miniaturas o Catálogo Canônico possui e quais marcas estão incluídas?',
+    a: 'O catálogo canônico do MiniHub Car conta com mais de 25.000 variações catalogadas, incluindo Hot Wheels (Mainline, Premium, Boulevard, RLC), Mini GT, Kaido House, Inno64, Tarmac Works e o recém-integrado acervo Maisto (Fresh Metal, Design, Muscle Machines e Special Edition) em múltiplas escalas (1:64, 1:43, 1:24, 1:18).',
+  },
+  {
+    q: 'Posso exportar meu acervo da Garagem Virtual para backup ou seguro?',
+    a: 'Sim! Na tela da sua Coleção (/collection), você pode exportar seu inventário completo em formato CSV / Excel com marcas, modelos, estado de conservação, valor pago e cotações para manter um backup físico ou apresentar a seguradoras patrimoniais.',
+  },
+  {
+    q: 'Como funcionam as notificações automáticas via WhatsApp (Evolution API)?',
+    a: 'O MiniHub Car conta com integração nativa da Evolution API via Docker. Notificações importantes como novos cadastros de colecionadores e atualizações de status de pedidos são disparadas instantaneamente para o WhatsApp com segurança e estabilidade.',
   },
   {
     q: 'O colecionador precisa pagar para cadastrar miniaturas na Garagem Virtual?',
-    a: 'Não! O cadastro da Garagem Virtual, busca no catálogo de 22.000 miniaturas e acompanhamento de pré-vendas são 100% gratuitos para todos os colecionadores.',
+    a: 'Não! O cadastro da Garagem Virtual, busca no catálogo de mais de 25.000 miniaturas e acompanhamento de pré-vendas (plataforma e particulares) são 100% gratuitos para todos os colecionadores.',
   },
   {
     q: 'Como funciona o cruzamento de dados do Collector Health Score?',
@@ -149,13 +303,21 @@ const FAQS = [
   },
   {
     q: 'Minha loja já possui dezenas de pré-vendas em planilhas do Excel. Como migro?',
-    a: 'No Portal do Vendedor, acesse a aba Pré-Vendas e clique em "Importar Planilha (.csv)". Você pode baixar o nosso modelo formatado para o Excel brasileiro, colar seus dados e o sistema reconhece até mesmo as parcelas que já foram pagas anteriormente.',
+    a: 'No Portal do Vendedor (/seller), acesse a aba Pré-Vendas e clique em "Importar Planilha (.csv)". Você pode baixar o nosso modelo formatado para o Excel brasileiro, colar seus dados e o sistema reconhece até mesmo as parcelas que já foram pagas anteriormente.',
+  },
+  {
+    q: 'Como posso acessar a Apostila de Treinamento se já sou Vendedor Homologado?',
+    a: 'Você pode baixar o PDF diretamente nesta página ou através do banner de auxílio rápido disponível no topo da aba Pré-Vendas do seu Portal do Vendedor (/seller).',
   },
 ];
 
 export default function GuiasPage() {
   const [selectedPdf, setSelectedPdf] = useState<{ title: string; url: string } | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeModule, setActiveModule] = useState<string>('garagem');
+
+  const selectedModule =
+    INTERACTIVE_MODULES.find((m) => m.id === activeModule) || INTERACTIVE_MODULES[0];
 
   return (
     <div className="min-h-screen pb-16 pt-6">
@@ -303,6 +465,115 @@ export default function GuiasPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* GUIA OPERACIONAL INTERATIVO DOS MÓDULOS */}
+        <div className="space-y-6 pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-2">
+                <Sparkles className="h-3.5 w-3.5" />
+                Navegação Didática do Sistema
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
+                <Layers className="h-6 w-6 text-primary" />
+                Guia Operacional dos Principais Módulos
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Aprenda a operar cada ferramenta e descubra como tirar o máximo proveito da plataforma.
+              </p>
+            </div>
+          </div>
+
+          {/* Module Selector Tabs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {INTERACTIVE_MODULES.map((mod) => {
+              const ModIcon = mod.icon;
+              const isActive = activeModule === mod.id;
+              return (
+                <button
+                  key={mod.id}
+                  type="button"
+                  onClick={() => setActiveModule(mod.id)}
+                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    isActive
+                      ? 'border-primary bg-primary/10 shadow-md ring-1 ring-primary/40'
+                      : 'border-border bg-card hover:bg-secondary/60'
+                  }`}
+                >
+                  <div className="flex items-start justify-between w-full mb-3">
+                    <div className={`p-2.5 rounded-xl border ${mod.color}`}>
+                      <ModIcon className="h-5 w-5" />
+                    </div>
+                    {isActive ? (
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                    ) : (
+                      <span className="text-[10px] font-mono text-muted-foreground">{mod.badge}</span>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground leading-snug">
+                      {mod.title}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                      {mod.shortDesc}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Module Details Card */}
+          {selectedModule && (
+            <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-6 shadow-lg animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className={`p-3 rounded-xl border ${selectedModule.color}`}>
+                    <selectedModule.icon className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${selectedModule.color}`}>
+                        {selectedModule.badge}
+                      </span>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-black text-foreground mt-0.5">
+                      {selectedModule.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <Link
+                  href={selectedModule.linkHref}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-hover shadow-glow transition-all self-start sm:self-auto"
+                >
+                  {selectedModule.linkText}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* Grid of Topics inside active module */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedModule.sections.map((sec, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-xl bg-secondary/30 border border-border/70 space-y-1.5 hover:border-primary/40 transition-colors"
+                  >
+                    <h4 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2">
+                      <span className="h-5 w-5 rounded-full bg-primary/20 text-primary text-[11px] font-bold flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      {sec.heading}
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed pl-7">
+                      {sec.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* CALLOUT: VENDEDORES HOMOLOGADOS */}
