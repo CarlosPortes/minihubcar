@@ -22,6 +22,8 @@ import { apiClient } from '@/lib/api/client';
 import { externalPreOrdersApi, CreateExternalPreOrderInput } from '@/lib/api/external-pre-orders';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 
+export type PaymentCondition = 'FULL_ON_DELIVERY' | 'DEPOSIT_AND_BALANCE' | 'INSTALLMENTS';
+
 interface NewExternalPreOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,6 +55,10 @@ export function NewExternalPreOrderModal({
   const [sellerContact, setSellerContact] = useState('');
 
   // Values & Dates
+  const [paymentCondition, setPaymentCondition] = useState<PaymentCondition>('DEPOSIT_AND_BALANCE');
+  const [installmentCount, setInstallmentCount] = useState<number>(3);
+  const [paidInstallmentsCount, setPaidInstallmentsCount] = useState<number>(1);
+
   const [quantity, setQuantity] = useState('1');
   const [totalAmount, setTotalAmount] = useState('');
   const [paidAmount, setPaidAmount] = useState('');
@@ -63,6 +69,49 @@ export function NewExternalPreOrderModal({
   const [notes, setNotes] = useState('');
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleConditionChange = (condition: PaymentCondition) => {
+    setPaymentCondition(condition);
+    const total = parseFloat(totalAmount.replace(',', '.')) || 0;
+
+    if (condition === 'FULL_ON_DELIVERY') {
+      setPaidAmount('0');
+    } else if (condition === 'DEPOSIT_AND_BALANCE') {
+      if (total > 0 && (!paidAmount || paidAmount === '0')) {
+        setPaidAmount((total * 0.3).toFixed(2));
+      }
+    } else if (condition === 'INSTALLMENTS') {
+      if (total > 0) {
+        const perInst = total / installmentCount;
+        setPaidAmount((perInst * paidInstallmentsCount).toFixed(2));
+      }
+    }
+  };
+
+  const handleApplyPercentage = (pct: number) => {
+    const total = parseFloat(totalAmount.replace(',', '.')) || 0;
+    if (total > 0) {
+      setPaidAmount(((total * pct) / 100).toFixed(2));
+    }
+  };
+
+  const handleInstallmentCountChange = (count: number) => {
+    setInstallmentCount(count);
+    const total = parseFloat(totalAmount.replace(',', '.')) || 0;
+    if (total > 0 && paidInstallmentsCount > 0) {
+      const perInst = total / count;
+      setPaidAmount((perInst * Math.min(paidInstallmentsCount, count)).toFixed(2));
+    }
+  };
+
+  const handlePaidInstallmentsChange = (paidCount: number) => {
+    setPaidInstallmentsCount(paidCount);
+    const total = parseFloat(totalAmount.replace(',', '.')) || 0;
+    if (total > 0) {
+      const perInst = total / installmentCount;
+      setPaidAmount((perInst * paidCount).toFixed(2));
+    }
+  };
 
   // Search catalog variations query
   const { data: searchResults, isFetching: isSearching } = useQuery({
@@ -104,6 +153,9 @@ export function NewExternalPreOrderModal({
     setQuantity('1');
     setTotalAmount('');
     setPaidAmount('');
+    setPaymentCondition('DEPOSIT_AND_BALANCE');
+    setInstallmentCount(3);
+    setPaidInstallmentsCount(1);
     setOrderDate(new Date().toISOString().slice(0, 10));
     setEstimatedArrival('');
     setTrackingCode('');
@@ -146,6 +198,20 @@ export function NewExternalPreOrderModal({
       return;
     }
 
+    let conditionTag = '';
+    if (paymentCondition === 'FULL_ON_DELIVERY') {
+      conditionTag = '[Condição: 100% no recebimento]';
+    } else if (paymentCondition === 'DEPOSIT_AND_BALANCE') {
+      conditionTag = `[Condição: Sinal de R$ ${paid.toFixed(2)} + restante na chegada]`;
+    } else if (paymentCondition === 'INSTALLMENTS') {
+      const perInst = installmentCount > 0 ? (total / installmentCount).toFixed(2) : '0.00';
+      conditionTag = `[Condição: Parcelado em ${installmentCount}x de R$ ${perInst} (${paidInstallmentsCount} paga(s))]`;
+    }
+
+    const finalNotes = notes.trim()
+      ? `${conditionTag} ${notes.trim()}`
+      : conditionTag;
+
     const payload: CreateExternalPreOrderInput = {
       variationId: sourceMode === 'CATALOG' ? selectedVariation?.id : null,
       customMiniatureName: sourceMode === 'MANUAL' ? customName.trim() : null,
@@ -162,7 +228,7 @@ export function NewExternalPreOrderModal({
       status: 'RESERVED',
       trackingCode: trackingCode.trim() || null,
       trackingCarrier: trackingCarrier.trim() || null,
-      notes: notes.trim() || null,
+      notes: finalNotes || null,
     };
 
     createMutation.mutate(payload);
@@ -410,11 +476,87 @@ export function NewExternalPreOrderModal({
             </div>
           </div>
 
-          {/* 3. Valores Financeiros e Quantidade */}
-          <div className="space-y-3 pt-2 border-t border-border">
-            <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <DollarSign className="h-4 w-4 text-primary" /> Valores & Condições
-            </label>
+          {/* 3. Condições de Pagamento & Valores */}
+          <div className="space-y-4 pt-2 border-t border-border">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <DollarSign className="h-4 w-4 text-primary" /> Condição de Pagamento & Valores
+              </label>
+              <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                Selecione como combinou com o vendedor
+              </span>
+            </div>
+
+            {/* 3 Botões de Seleção da Condição */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <button
+                type="button"
+                onClick={() => handleConditionChange('FULL_ON_DELIVERY')}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  paymentCondition === 'FULL_ON_DELIVERY'
+                    ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/40'
+                    : 'border-border bg-card hover:bg-secondary/60'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="text-xs font-bold text-foreground">1. Total no Recebimento</span>
+                  {paymentCondition === 'FULL_ON_DELIVERY' ? (
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  ) : (
+                    <div className="h-3.5 w-3.5 rounded-full border border-border" />
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  Paga 100% apenas quando a miniatura chegar no vendedor / for enviada.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleConditionChange('DEPOSIT_AND_BALANCE')}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  paymentCondition === 'DEPOSIT_AND_BALANCE'
+                    ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/40'
+                    : 'border-border bg-card hover:bg-secondary/60'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="text-xs font-bold text-foreground">2. Sinal + Restante</span>
+                  {paymentCondition === 'DEPOSIT_AND_BALANCE' ? (
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  ) : (
+                    <div className="h-3.5 w-3.5 rounded-full border border-border" />
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  Paga uma entrada agora para garantir a cota e o saldo na entrega.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleConditionChange('INSTALLMENTS')}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  paymentCondition === 'INSTALLMENTS'
+                    ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/40'
+                    : 'border-border bg-card hover:bg-secondary/60'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="text-xs font-bold text-foreground">3. Parcelamento</span>
+                  {paymentCondition === 'INSTALLMENTS' ? (
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  ) : (
+                    <div className="h-3.5 w-3.5 rounded-full border border-border" />
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  Divide em parcelas mensais combinadas diretamente com o vendedor.
+                </p>
+              </button>
+            </div>
+
+            {/* Inputs de Valores e Quantidade */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1">
                 <label className="text-[11px] font-medium text-muted-foreground">Qtd. Cotas</label>
@@ -426,6 +568,7 @@ export function NewExternalPreOrderModal({
                   className="w-full px-3 py-2 text-xs rounded-xl bg-background border border-border focus:border-primary outline-none"
                 />
               </div>
+
               <div className="space-y-1">
                 <label className="text-[11px] font-medium text-muted-foreground">Valor Total (R$) *</label>
                 <input
@@ -433,26 +576,148 @@ export function NewExternalPreOrderModal({
                   required
                   placeholder="Ex: 180,00"
                   value={totalAmount}
-                  onChange={(e) => setTotalAmount(e.target.value)}
+                  onChange={(e) => {
+                    setTotalAmount(e.target.value);
+                    const val = parseFloat(e.target.value.replace(',', '.')) || 0;
+                    if (paymentCondition === 'FULL_ON_DELIVERY') {
+                      setPaidAmount('0');
+                    } else if (paymentCondition === 'INSTALLMENTS' && val > 0) {
+                      const perInst = val / installmentCount;
+                      setPaidAmount((perInst * paidInstallmentsCount).toFixed(2));
+                    }
+                  }}
                   className="w-full px-3 py-2 text-xs rounded-xl bg-background border border-border focus:border-primary outline-none font-bold text-foreground"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Sinal Já Pago (R$)</label>
-                <input
-                  type="text"
-                  placeholder="Ex: 50,00"
-                  value={paidAmount}
-                  onChange={(e) => setPaidAmount(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-background border border-border focus:border-primary outline-none text-emerald-500 font-semibold"
-                />
-              </div>
+
+              {/* Terceiro campo varia conforme a condição escolhida */}
+              {paymentCondition === 'FULL_ON_DELIVERY' ? (
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-muted-foreground">Adiantamento / Sinal</label>
+                  <input
+                    type="text"
+                    disabled
+                    value="R$ 0,00 (100% na chegada)"
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-secondary/50 border border-border text-muted-foreground outline-none font-semibold cursor-not-allowed"
+                  />
+                </div>
+              ) : paymentCondition === 'DEPOSIT_AND_BALANCE' ? (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-medium text-muted-foreground">Sinal Já Pago (R$)</label>
+                    {parseFloat(totalAmount.replace(',', '.')) > 0 && (
+                      <div className="flex items-center gap-1">
+                        {[20, 30, 50].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => handleApplyPercentage(pct)}
+                            className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-secondary hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors cursor-pointer"
+                          >
+                            {pct}%
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Ex: 50,00"
+                    value={paidAmount}
+                    onChange={(e) => setPaidAmount(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-background border border-border focus:border-primary outline-none text-emerald-500 font-semibold"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-muted-foreground">Total Já Pago Hoje (R$)</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 60,00"
+                    value={paidAmount}
+                    onChange={(e) => setPaidAmount(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-background border border-border focus:border-primary outline-none text-emerald-500 font-semibold"
+                  />
+                </div>
+              )}
             </div>
+
+            {/* Painel extra específico para a condição Parcelamento */}
+            {paymentCondition === 'INSTALLMENTS' && (
+              <div className="p-3.5 rounded-xl bg-secondary/40 border border-border space-y-3 animate-in fade-in duration-150">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-foreground flex items-center justify-between">
+                      <span>Número de Parcelas:</span>
+                      {parseFloat(totalAmount.replace(',', '.')) > 0 && (
+                        <span className="text-primary font-bold">
+                          R${' '}
+                          {(
+                            (parseFloat(totalAmount.replace(',', '.')) || 0) /
+                            installmentCount
+                          ).toFixed(2)}{' '}
+                          / parcela
+                        </span>
+                      )}
+                    </label>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {[2, 3, 4, 5, 6, 10, 12].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => handleInstallmentCountChange(num)}
+                          className={`px-3 py-1 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                            installmentCount === num
+                              ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                              : 'bg-background text-muted-foreground border-border hover:bg-secondary'
+                          }`}
+                        >
+                          {num}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-foreground">
+                      Quantas parcelas você já pagou hoje?
+                    </label>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {[0, 1, 2, 3, 4]
+                        .filter((n) => n <= installmentCount)
+                        .map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => handlePaidInstallmentsChange(n)}
+                            className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                              paidInstallmentsCount === n
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                : 'bg-background text-muted-foreground border-border hover:bg-secondary'
+                            }`}
+                          >
+                            {n === 0 ? 'Nenhuma (0)' : `${n} paga${n > 1 ? 's' : ''}`}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Cálculo visual do saldo restante */}
             {totalAmount && (
-              <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-secondary/50 text-xs">
-                <span className="text-muted-foreground">Saldo restante a pagar na chegada:</span>
+              <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-secondary/50 text-xs border border-border">
+                <span className="text-muted-foreground">
+                  {paymentCondition === 'FULL_ON_DELIVERY'
+                    ? 'Valor total a quitar na entrega:'
+                    : paymentCondition === 'INSTALLMENTS'
+                    ? `Saldo restante a parcelar (${Math.max(
+                        0,
+                        installmentCount - paidInstallmentsCount
+                      )} parcelas restantes):`
+                    : 'Saldo restante a pagar na chegada:'}
+                </span>
                 <span className="font-bold text-amber-500">
                   R${' '}
                   {Math.max(
