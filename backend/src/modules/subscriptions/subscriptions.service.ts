@@ -74,7 +74,7 @@ export class SubscriptionsService {
         userId,
         planId: freePlan.id,
         status: 'ACTIVE',
-        billingCycle: 'MONTHLY',
+        billingCycle: 'YEARLY',
         paymentMethod: 'FREE',
       })
       .returning();
@@ -363,7 +363,7 @@ export class SubscriptionsService {
         userWhatsapp: appUser.whatsapp,
         subscriptionId: userSubscription.id,
         status: sql<string>`coalesce(${userSubscription.status}, 'ACTIVE')`,
-        billingCycle: sql<string>`coalesce(${userSubscription.billingCycle}, 'MONTHLY')`,
+        billingCycle: sql<string>`coalesce(${userSubscription.billingCycle}, 'YEARLY')`,
         paymentMethod: sql<string>`coalesce(${userSubscription.paymentMethod}, 'FREE')`,
         startedAt: sql<Date | null>`coalesce(${userSubscription.startedAt}, ${appUser.createdAt})`,
         expiresAt: userSubscription.expiresAt,
@@ -373,7 +373,7 @@ export class SubscriptionsService {
         planName: sql<string>`coalesce(${subscriptionPlan.name}, 'Starter')`,
         monthlyPrice: sql<string>`coalesce(${subscriptionPlan.monthlyPrice}, '0.00')`,
         yearlyPrice: sql<string>`coalesce(${subscriptionPlan.yearlyPrice}, '0.00')`,
-        maxMiniatures: sql<number>`coalesce(${subscriptionPlan.maxMiniatures}, 200)`,
+        maxMiniatures: sql<number>`coalesce(${subscriptionPlan.maxMiniatures}, 100)`,
         maxOtherCollectibles: sql<number>`coalesce(${subscriptionPlan.maxOtherCollectibles}, 15)`,
       })
       .from(appUser)

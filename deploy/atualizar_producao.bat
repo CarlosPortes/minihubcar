@@ -13,7 +13,7 @@ echo.
 echo Conectando na VPS (%IP_HOSTINGER%) para puxar o codigo e atualizar...
 echo.
 
-ssh root@%IP_HOSTINGER% "cd /var/www/minihubcar && git pull origin main && docker compose -f docker-compose.prod.yml pull evolution-api && docker compose -f docker-compose.prod.yml up -d --build frontend backend evolution-api && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:external-pre-orders && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate"
+ssh root@%IP_HOSTINGER% "cd /var/www/minihubcar && git pull origin main && docker compose -f docker-compose.prod.yml pull evolution-api && docker compose -f docker-compose.prod.yml up -d --build frontend backend evolution-api && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:external-pre-orders && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate:annual-plans && docker compose -f docker-compose.prod.yml exec backend pnpm db:migrate"
 
 if errorlevel 1 (
     echo.

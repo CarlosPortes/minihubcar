@@ -353,7 +353,10 @@ export interface TranslationDictionary {
     popularBadge: string;
     vipBadge: string;
     perMonth: string;
+    perYear: string;
     billedYearly: string;
+    billedMonthly: string;
+    equivalentMonthly: string;
     diecastQuota: string;
     collectiblesQuota: string;
     unlimited: string;

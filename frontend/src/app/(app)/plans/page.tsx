@@ -69,7 +69,7 @@ export default function PlansPage() {
   const { t, tArray, language } = useTranslation();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [currentSub, setCurrentSub] = useState<UserSubscriptionInfo | null>(null);
-  const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
+  const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('YEARLY');
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal de Assinatura
@@ -190,10 +190,10 @@ export default function PlansPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans.map((plan) => {
             const isCurrent = currentSub?.plan.code === plan.code;
-            const price =
-              billingCycle === 'MONTHLY'
-                ? parseFloat(plan.monthlyPrice)
-                : parseFloat(plan.yearlyPrice) / 12;
+            const monthlyPriceNum = parseFloat(plan.monthlyPrice);
+            const yearlyPriceNum = parseFloat(plan.yearlyPrice);
+            const mainPrice = billingCycle === 'YEARLY' ? yearlyPriceNum : monthlyPriceNum;
+            const equivMonthly = yearlyPriceNum > 0 ? yearlyPriceNum / 12 : 0;
 
             const isVip = plan.code === 'LEGEND';
             const planInfo = getPlanInfo(plan, t, tArray);
@@ -238,19 +238,31 @@ export default function PlansPage() {
                   </div>
 
                   {/* Price */}
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 min-h-[64px] flex flex-col justify-end">
                     <div className="flex items-baseline gap-1">
                       <span className="text-xs font-semibold text-muted-foreground">R$</span>
                       <span className="text-3xl md:text-4xl font-black text-foreground">
-                        {price === 0 ? '0' : formatPlanPrice(price, language)}
+                        {mainPrice === 0 ? '0' : formatPlanPrice(mainPrice, language)}
                       </span>
-                      <span className="text-xs text-muted-foreground">{t('plans.perMonth')}</span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {mainPrice === 0 ? '' : billingCycle === 'YEARLY' ? t('plans.perYear') : t('plans.perMonth')}
+                      </span>
                     </div>
-                    {billingCycle === 'YEARLY' && parseFloat(plan.yearlyPrice) > 0 && (
+                    {billingCycle === 'YEARLY' && yearlyPriceNum > 0 ? (
+                      <p className="text-[11px] font-semibold text-emerald-500">
+                        <span className="inline-block px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                          {t('plans.equivalentMonthly', {
+                            price: formatPlanPrice(equivMonthly, language),
+                          })}
+                        </span>
+                      </p>
+                    ) : billingCycle === 'MONTHLY' && monthlyPriceNum > 0 ? (
                       <p className="text-[11px] text-muted-foreground">
-                        {t('plans.billedYearly', {
-                          price: formatPlanPrice(parseFloat(plan.yearlyPrice), language),
-                        })}
+                        {t('plans.billedMonthly')}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-muted-foreground font-medium">
+                        {t('plans.freeDesc')}
                       </p>
                     )}
                   </div>
@@ -367,9 +379,14 @@ export default function PlansPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t('plans.totalToPay')}</span>
-                <strong className="text-foreground text-sm font-black">
-                  R$ {formatPlanPrice(modalPrice, language)}
-                </strong>
+                <div className="text-right">
+                  <div className="text-foreground text-sm font-black">
+                    R$ {formatPlanPrice(modalPrice, language)}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {billingCycle === 'YEARLY' ? t('plans.yearlyBilling') : t('plans.monthlyBilling')}
+                  </div>
+                </div>
               </div>
             </div>
 
