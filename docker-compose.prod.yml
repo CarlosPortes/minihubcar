@@ -76,24 +76,28 @@ services:
       - eco_eco-network
 
   evolution-api:
-    image: evoapicloud/evolution-api:v2.2.3
+    image: evoapicloud/evolution-api:v2.3.0
     container_name: minihub-evolution
     restart: always
     depends_on:
       postgres:
         condition: service_healthy
     environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
       SERVER_URL: ${EVOLUTION_SERVER_URL:-http://localhost:8088}
       AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-minihub-evolution-secret-key-2026}
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
       DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER:-minihub_admin}:${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}@minihub-postgres:5432/${POSTGRES_DB:-minihub_car}?schema=evolution
+      DATABASE_CONNECTION_CLIENT_NAME: evolution-api
       CACHE_REDIS_ENABLED: "false"
       CACHE_LOCAL_ENABLED: "true"
-      CONFIG_SESSION_PHONE_CLIENT: "MiniHub Car"
+      CONFIG_SESSION_PHONE_CLIENT: "Evolution API"
       CONFIG_SESSION_PHONE_NAME: "Chrome"
       AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
       LOG_LEVEL: "ERROR,WARN,INFO"
+      LOG_BAILEYS: "error"
     volumes:
       - evolution_instances:/evolution/instances
     ports:

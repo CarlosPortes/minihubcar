@@ -125,8 +125,34 @@ export class WhatsAppService {
         headers: { apikey: this.apiKey },
       });
 
-      // Se a instância não existe, cria ela primeiro
-      if (connectRes.status === 404) {
+      let base64: string | null = null;
+      let qrcode: string | null = null;
+      let count = 1;
+      let state = 'connecting';
+
+      if (connectRes.ok) {
+        const data = (await connectRes.json()) as any;
+        base64 = data?.base64 || data?.qrcode?.base64 || null;
+        qrcode = data?.code || data?.qrcode?.code || null;
+        count = data?.count ?? 1;
+        state = data?.state || 'connecting';
+      }
+
+      // Se a instância não existe (404) ou se está travada (sem QR Code ou count 0)
+      if (!base64 || connectRes.status === 404 || count === 0) {
+        console.log(
+          `[WhatsAppService] Instância sem QR Code ou inexistente (status ${connectRes.status}, count ${count}). Recriando limpa...`
+        );
+
+        try {
+          await fetch(`${this.baseUrl}/instance/delete/${this.instanceName}`, {
+            method: 'DELETE',
+            headers: { apikey: this.apiKey },
+          });
+        } catch {
+          // ignora se não existia
+        }
+
         const createRes = await fetch(`${this.baseUrl}/instance/create`, {
           method: 'POST',
           headers: {
@@ -141,67 +167,25 @@ export class WhatsAppService {
           }),
         });
 
-        if (!createRes.ok) {
-          const errData = await createRes.text();
-          throw new Error(`Falha ao criar instância: ${createRes.status} - ${errData}`);
+        if (createRes.ok) {
+          const createData = (await createRes.json()) as any;
+          base64 = createData?.qrcode?.base64 || createData?.base64 || null;
+          qrcode = createData?.qrcode?.code || createData?.code || null;
+          state = createData?.instance?.status || 'connecting';
+          count = 1;
         }
 
-        // Tenta conectar novamente após criar
-        connectRes = await fetch(`${this.baseUrl}/instance/connect/${this.instanceName}`, {
-          headers: { apikey: this.apiKey },
-        });
-      }
-
-      if (!connectRes.ok) {
-        const errText = await connectRes.text();
-        throw new Error(`Erro ao gerar QR Code: ${connectRes.status} - ${errText}`);
-      }
-
-      const data = (await connectRes.json()) as any;
-      let base64 = data?.base64 || data?.qrcode?.base64 || null;
-      let qrcode = data?.code || data?.qrcode?.code || null;
-
-      // Se a instância estiver travada (count: 0 e sem QR code), recria ela do zero
-      if (!base64 && (data?.count === 0 || !qrcode)) {
-        console.log(`[WhatsAppService] Instância ${this.instanceName} travada com count 0. Recriando...`);
-        try {
-          await fetch(`${this.baseUrl}/instance/delete/${this.instanceName}`, {
-            method: 'DELETE',
-            headers: { apikey: this.apiKey },
-          });
-        } catch {
-          // ignore
-        }
-
-        const recreateRes = await fetch(`${this.baseUrl}/instance/create`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: this.apiKey,
-          },
-          body: JSON.stringify({
-            instanceName: this.instanceName,
-            token: this.apiKey,
-            qrcode: true,
-            integration: 'WHATSAPP-BAILEYS',
-          }),
-        });
-
-        if (recreateRes.ok) {
-          const recData = (await recreateRes.json()) as any;
-          base64 = recData?.qrcode?.base64 || recData?.base64 || null;
-          qrcode = recData?.qrcode?.code || recData?.code || null;
-        }
-
-        // Se ainda não veio no create, tenta connect novamente
+        // Se ainda não veio no create, tenta connect novamente após 1s
         if (!base64) {
-          const retryConnect = await fetch(`${this.baseUrl}/instance/connect/${this.instanceName}`, {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const retryRes = await fetch(`${this.baseUrl}/instance/connect/${this.instanceName}`, {
             headers: { apikey: this.apiKey },
           });
-          if (retryConnect.ok) {
-            const retryData = (await retryConnect.json()) as any;
+          if (retryRes.ok) {
+            const retryData = (await retryRes.json()) as any;
             base64 = retryData?.base64 || retryData?.qrcode?.base64 || null;
             qrcode = retryData?.code || retryData?.qrcode?.code || null;
+            count = retryData?.count ?? 1;
           }
         }
       }
@@ -209,8 +193,8 @@ export class WhatsAppService {
       return {
         qrcode,
         base64,
-        state: data?.state || 'connecting',
-        count: data?.count || 1,
+        state,
+        count,
       };
     } catch (err: any) {
       console.error('[WhatsAppService] Erro ao obter QR Code da Evolution API:', err.message);
