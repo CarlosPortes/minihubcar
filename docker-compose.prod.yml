@@ -99,6 +99,9 @@ services:
     ports:
       # Porta 8088 no host para acesso local e seguro da Evolution API
       - "127.0.0.1:8088:8080"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     networks:
       - default
 

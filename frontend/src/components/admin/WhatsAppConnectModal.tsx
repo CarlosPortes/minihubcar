@@ -38,7 +38,7 @@ export function WhatsAppConnectModal({ isOpen, onClose }: WhatsAppConnectModalPr
     refetchInterval: (query) => (isOpen && !query.state.data?.connected ? 4000 : false),
   });
 
-  // QR Code Query
+  // QR Code Query (polls every 3s if base64 is not ready yet)
   const {
     data: qrData,
     isLoading: isLoadingQR,
@@ -48,7 +48,8 @@ export function WhatsAppConnectModal({ isOpen, onClose }: WhatsAppConnectModalPr
     queryKey: ['admin-whatsapp-qr'],
     queryFn: whatsappApi.getQRCode,
     enabled: isOpen && !status?.connected,
-    retry: 1,
+    refetchInterval: (query) => (isOpen && !query.state.data?.base64 && !status?.connected ? 3000 : false),
+    retry: 2,
   });
 
   // Test Message Mutation
@@ -216,10 +217,14 @@ export function WhatsAppConnectModal({ isOpen, onClose }: WhatsAppConnectModalPr
                 ) : (
                   <div className="flex flex-col items-center justify-center gap-2 text-zinc-500 text-center p-3">
                     <AlertTriangle className="h-8 w-8 text-amber-500" />
-                    <p className="text-xs font-semibold text-zinc-800">Evolution API inicializando...</p>
-                    <p className="text-[10px] text-zinc-500">
-                      Clique no botão abaixo para tentar gerar o QR Code novamente.
-                    </p>
+                    <p className="text-xs font-semibold text-zinc-800">Aguardando geração do QR Code...</p>
+                    <button
+                      type="button"
+                      onClick={() => refetchQR()}
+                      className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer mt-1"
+                    >
+                      Gerar QR Code Agora
+                    </button>
                   </div>
                 )}
               </div>

@@ -158,9 +158,57 @@ export class WhatsAppService {
       }
 
       const data = (await connectRes.json()) as any;
+      let base64 = data?.base64 || data?.qrcode?.base64 || null;
+      let qrcode = data?.code || data?.qrcode?.code || null;
+
+      // Se a instância estiver travada (count: 0 e sem QR code), recria ela do zero
+      if (!base64 && (data?.count === 0 || !qrcode)) {
+        console.log(`[WhatsAppService] Instância ${this.instanceName} travada com count 0. Recriando...`);
+        try {
+          await fetch(`${this.baseUrl}/instance/delete/${this.instanceName}`, {
+            method: 'DELETE',
+            headers: { apikey: this.apiKey },
+          });
+        } catch {
+          // ignore
+        }
+
+        const recreateRes = await fetch(`${this.baseUrl}/instance/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: this.apiKey,
+          },
+          body: JSON.stringify({
+            instanceName: this.instanceName,
+            token: this.apiKey,
+            qrcode: true,
+            integration: 'WHATSAPP-BAILEYS',
+          }),
+        });
+
+        if (recreateRes.ok) {
+          const recData = (await recreateRes.json()) as any;
+          base64 = recData?.qrcode?.base64 || recData?.base64 || null;
+          qrcode = recData?.qrcode?.code || recData?.code || null;
+        }
+
+        // Se ainda não veio no create, tenta connect novamente
+        if (!base64) {
+          const retryConnect = await fetch(`${this.baseUrl}/instance/connect/${this.instanceName}`, {
+            headers: { apikey: this.apiKey },
+          });
+          if (retryConnect.ok) {
+            const retryData = (await retryConnect.json()) as any;
+            base64 = retryData?.base64 || retryData?.qrcode?.base64 || null;
+            qrcode = retryData?.code || retryData?.qrcode?.code || null;
+          }
+        }
+      }
+
       return {
-        qrcode: data?.code || data?.qrcode?.code || null,
-        base64: data?.base64 || data?.qrcode?.base64 || null,
+        qrcode,
+        base64,
         state: data?.state || 'connecting',
         count: data?.count || 1,
       };
