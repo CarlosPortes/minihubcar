@@ -87,7 +87,7 @@ services:
       AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-minihub-evolution-secret-key-2026}
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
-      DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER:-minihub_admin}:${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}@postgres:5432/${POSTGRES_DB:-minihub_car}?schema=evolution
+      DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER:-minihub_admin}:${POSTGRES_PASSWORD:-MiniHubCar_SuperSenhaPostgres_2026}@minihub-postgres:5432/${POSTGRES_DB:-minihub_car}?schema=evolution
       CACHE_REDIS_ENABLED: "false"
       CACHE_LOCAL_ENABLED: "true"
       CONFIG_SESSION_PHONE_CLIENT: "MiniHub Car"
@@ -101,7 +101,6 @@ services:
       - "127.0.0.1:8088:8080"
     networks:
       - default
-      - eco_eco-network
 
 volumes:
   minihub_pg_data:
