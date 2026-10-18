@@ -28,6 +28,7 @@ import {
   FileSpreadsheet,
   Database,
   Check,
+  Crown,
 } from 'lucide-react';
 
 interface GuideDoc {
@@ -266,6 +267,34 @@ const INTERACTIVE_MODULES: InteractiveModule[] = [
     linkText: 'Conhecer Portal do Vendedor',
     linkHref: '/seller',
   },
+  {
+    id: 'planos',
+    title: 'Planos de Assinatura & Capacidades Anuais',
+    shortDesc: 'Estrutura de planos anuais adaptada à realidade física de expositores e estantes',
+    icon: Crown,
+    badge: 'Modelo Anual 2026',
+    color: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    sections: [
+      {
+        heading: 'Plano Starter (100% Gratuito para Sempre)',
+        text: 'Comece com até 100 miniaturas diecast 1:64 (equivalente a 2 expositores cheios de 50 carros) e até 15 colecionáveis especiais (Funkos/Resinas). Sem pegadinhas, sem anúncios e com acesso ao catálogo de +25k peças.',
+      },
+      {
+        heading: 'Garagem Pro (R$ 49,90 / ano - Mais Escolhido)',
+        text: 'Multiplique sua capacidade por 6x (até 600 miniaturas e 50 colecionáveis) por cerca de R$ 4,15/mês. Inclui relatórios financeiros patrimoniais, exportação/importação em lote Excel/CSV e selo Pro destacado.',
+      },
+      {
+        heading: 'Curador Master (R$ 79,90 / ano)',
+        text: 'Espaço expandido para até 1.500 miniaturas e 100 colecionáveis (~R$ 6,65/mês), com estatísticas avançadas de valorização do acervo e prioridade na fila de aprovação de fotos e novos castings.',
+      },
+      {
+        heading: 'Legend VIP (R$ 119,90 / ano - Sem Limites)',
+        text: 'Capacidade ILIMITADA para miniaturas e colecionáveis (~R$ 9,99/mês), selo Legend VIP dourado exclusivo no perfil e vitrine, e canal direto com os desenvolvedores da plataforma.',
+      },
+    ],
+    linkText: 'Ver e Assinar Planos',
+    linkHref: '/plans',
+  },
 ];
 
 const FAQS = [
@@ -295,7 +324,11 @@ const FAQS = [
   },
   {
     q: 'O colecionador precisa pagar para cadastrar miniaturas na Garagem Virtual?',
-    a: 'Não! O cadastro da Garagem Virtual, busca no catálogo de mais de 25.000 miniaturas e acompanhamento de pré-vendas (plataforma e particulares) são 100% gratuitos para todos os colecionadores.',
+    a: 'Não para começar! O plano Starter é 100% gratuito para sempre para acervos de até 100 miniaturas diecast 1:64 (o equivalente a 2 expositores cheios de 50 carros) e 15 colecionáveis especiais, com busca no catálogo de mais de 25.000 peças e acompanhamento de pré-vendas. Para coleções que ultrapassam essa faixa, oferecemos planos anuais super acessíveis a partir de R$ 49,90/ano (apenas ~R$ 4,15/mês no Garagem Pro).',
+  },
+  {
+    q: 'Como funcionam os Planos de Assinatura Anuais e as capacidades por faixa de miniaturas?',
+    a: 'O MiniHub Car adota planos anuais acessíveis pensados na realidade física dos colecionadores: 1) Starter (Grátis até 100 miniaturas); 2) Garagem Pro (R$ 49,90/ano para até 600 miniaturas); 3) Curador Master (R$ 79,90/ano para até 1.500 miniaturas); e 4) Legend VIP (R$ 119,90/ano para miniaturas ilimitadas). O faturamento anual garante o menor custo mensal possível e pode ser assinado com ativação imediata via PIX ou Cartão em /plans.',
   },
   {
     q: 'Como funciona o cruzamento de dados do Collector Health Score?',
@@ -486,7 +519,7 @@ export default function GuiasPage() {
           </div>
 
           {/* Module Selector Tabs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {INTERACTIVE_MODULES.map((mod) => {
               const ModIcon = mod.icon;
               const isActive = activeModule === mod.id;
