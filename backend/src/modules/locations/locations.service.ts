@@ -109,6 +109,21 @@ export class LocationsService {
       }
     }
 
+    // Proteção de integridade física: se a grade (linhas, colunas ou hasGrid) mudar,
+    // só permitimos se o local não possuir miniaturas alocadas.
+    const hasGridChanged = input.hasGrid !== undefined && input.hasGrid !== existing.hasGrid;
+    const rowsChanged = input.gridRows !== undefined && input.gridRows !== existing.gridRows;
+    const colsChanged = input.gridColumns !== undefined && input.gridColumns !== existing.gridColumns;
+
+    if (hasGridChanged || rowsChanged || colsChanged) {
+      const occupiedItems = await this.locationsRepository.countItemsInLocation(id, userId);
+      if (occupiedItems > 0) {
+        throw new BadRequestError(
+          `Não é possível alterar a estrutura física (grade, linhas ou colunas) deste local pois existem ${occupiedItems} item(ns) alocado(s) nele. Desaloque as peças antes de redimensionar a grade.`
+        );
+      }
+    }
+
     const willHaveGrid = input.hasGrid !== undefined ? input.hasGrid : existing.hasGrid;
     if (willHaveGrid) {
       const rows = input.gridRows !== undefined ? input.gridRows : existing.gridRows;
@@ -137,6 +152,13 @@ export class LocationsService {
     const existing = await this.locationsRepository.findByIdAndUser(id, userId);
     if (!existing) {
       throw new NotFoundError('Localização não encontrada');
+    }
+
+    const occupiedItems = await this.locationsRepository.countItemsInLocation(id, userId);
+    if (occupiedItems > 0) {
+      throw new BadRequestError(
+        `Não é possível desativar esta localização pois existem ${occupiedItems} item(ns) alocado(s) nela. Desaloque ou mova as peças antes de excluir.`
+      );
     }
 
     return this.locationsRepository.archive(id, userId);

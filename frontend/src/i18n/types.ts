@@ -242,6 +242,10 @@ export interface TranslationDictionary {
     colsCount: string;
     createSuccess: string;
     deleteSuccess: string;
+    editLocation: string;
+    editSuccess: string;
+    structureLockedWarning: string;
+    structureEditableNotice: string;
   };
   wishlist: {
     title: string;

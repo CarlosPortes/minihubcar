@@ -20,6 +20,8 @@ import {
   Eye,
   Sliders,
   BarChart3,
+  Pencil,
+  Lock,
 } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 
@@ -103,6 +105,16 @@ export default function LocationsPage() {
   const [gridColumns, setGridColumns] = useState<number | ''>(10);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Edit Location state
+  const [editingLocation, setEditingLocation] = useState<LocationNode | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editParentLocationId, setEditParentLocationId] = useState('');
+  const [editLocationType, setEditLocationType] = useState('DISPLAY');
+  const [editHasGrid, setEditHasGrid] = useState(false);
+  const [editGridRows, setEditGridRows] = useState<number | ''>(5);
+  const [editGridColumns, setEditGridColumns] = useState<number | ''>(10);
+  const [editErrorMsg, setEditErrorMsg] = useState<string | null>(null);
+
   // Modal for Viewing Expositor Grid / 3D
   const [viewingGridLocation, setViewingGridLocation] = useState<LocationNode | null>(null);
   const [gridModalTab, setGridModalTab] = useState<'3D' | '2D'>('3D');
@@ -182,7 +194,65 @@ export default function LocationsPage() {
       setSuccessMsg(t('locations.deleteSuccess'));
       setTimeout(() => setSuccessMsg(null), 4000);
     },
+    onError: (err: any) => {
+      alert(err.message || 'Erro ao desativar localização');
+    },
   });
+
+  // Mutation: Update location
+  const updateMutation = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: any }) =>
+      apiClient(`/locations/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      setEditingLocation(null);
+      setEditErrorMsg(null);
+      setSuccessMsg(t('locations.editSuccess'));
+      setTimeout(() => setSuccessMsg(null), 4000);
+    },
+    onError: (err: any) => {
+      setEditErrorMsg(err.message || 'Erro ao atualizar localização');
+    },
+  });
+
+  const handleOpenEdit = (node: LocationNode) => {
+    setEditingLocation(node);
+    setEditName(node.name);
+    setEditLocationType(node.locationType || 'DISPLAY');
+    setEditParentLocationId(node.parentLocationId || '');
+    setEditHasGrid(Boolean(node.hasGrid));
+    setEditGridRows(node.gridRows ?? 5);
+    setEditGridColumns(node.gridColumns ?? 10);
+    setEditErrorMsg(null);
+  };
+
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingLocation || !editName.trim()) return;
+
+    const isLocked = (editingLocation.occupiedCount ?? 0) > 0;
+
+    const payload: any = {
+      name: editName.trim(),
+      locationType: editLocationType,
+      parentLocationId: editParentLocationId || null,
+    };
+
+    // If structure is not locked, allow updating grid attributes
+    if (!isLocked) {
+      payload.hasGrid = editHasGrid;
+      payload.gridRows = editHasGrid && editGridRows ? Number(editGridRows) : null;
+      payload.gridColumns = editHasGrid && editGridColumns ? Number(editGridColumns) : null;
+    }
+
+    updateMutation.mutate({
+      id: editingLocation.id,
+      body: payload,
+    });
+  };
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -320,6 +390,14 @@ export default function LocationsPage() {
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">{t('locations.sublocation')}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleOpenEdit(node)}
+                    title={t('locations.editLocation')}
+                    className="p-1 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
                   </button>
 
                   <button
@@ -887,6 +965,200 @@ export default function LocationsPage() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Location Modal */}
+      {editingLocation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-xl rounded-2xl bg-card border border-border shadow-2xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <Pencil className="h-4 w-4 text-primary" /> {t('locations.editLocation')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingLocation(null)}
+                className="text-muted-foreground hover:text-foreground p-1 rounded-lg"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {editErrorMsg && (
+              <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>{editErrorMsg}</span>
+              </div>
+            )}
+
+            {/* Structure Warning / Status Notice */}
+            {(editingLocation.occupiedCount ?? 0) > 0 ? (
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-500 text-xs flex items-start gap-2.5">
+                <Lock className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+                <div className="space-y-0.5">
+                  <p className="font-bold">Estrutura Física Bloqueada</p>
+                  <p className="text-[11px] text-amber-500/90 leading-relaxed">
+                    {t('locations.structureLockedWarning', { count: editingLocation.occupiedCount ?? 0 })}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2">
+                <Sparkles className="h-4 w-4 shrink-0" />
+                <span>{t('locations.structureEditableNotice')}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-foreground mb-1">
+                    {t('locations.locationName')}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="Ex: Expositor Acrílico 01"
+                    className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">
+                      {t('locations.locationType')}
+                    </label>
+                    <select
+                      value={editLocationType}
+                      onChange={(e) => setEditLocationType(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="DISPLAY">Expositor / Vitrine (Parede/LxC)</option>
+                      <option value="DRAWER">Gaveteiro / Estojo com Nichos</option>
+                      <option value="SHELF">Prateleira Corrida</option>
+                      <option value="CASE">Maleta de Colecionador</option>
+                      <option value="CLOSET">Armário / Estante Fechada</option>
+                      <option value="BOX">Caixa Organizadora</option>
+                      <option value="ROOM">Cômodo / Sala</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">
+                      {t('locations.parentLocation')}
+                    </label>
+                    <select
+                      value={editParentLocationId}
+                      onChange={(e) => setEditParentLocationId(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="">{t('locations.rootLocation')}</option>
+                      {flatList
+                        .filter((loc) => loc.id !== editingLocation.id)
+                        .map((loc) => (
+                          <option key={loc.id} value={loc.id}>
+                            {loc.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Grid Configuration Section */}
+                <div
+                  className={`p-4 rounded-xl border space-y-3 ${
+                    (editingLocation.occupiedCount ?? 0) > 0
+                      ? 'bg-secondary/20 border-border/40 opacity-75'
+                      : 'bg-secondary/40 border-border/80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <label
+                      className={`flex items-center gap-2 ${
+                        (editingLocation.occupiedCount ?? 0) > 0 ? 'cursor-not-allowed' : 'cursor-pointer'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        disabled={(editingLocation.occupiedCount ?? 0) > 0}
+                        checked={editHasGrid}
+                        onChange={(e) => setEditHasGrid(e.target.checked)}
+                        className="rounded border-border text-primary focus:ring-primary h-4 w-4 disabled:opacity-50"
+                      />
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <LayoutGrid className="h-3.5 w-3.5 text-accent" />
+                        {t('locations.hasGridCheckbox')}
+                      </span>
+                    </label>
+
+                    {editHasGrid && editGridRows && editGridColumns && (
+                      <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                        {t('locations.capacity')}: {Number(editGridRows) * Number(editGridColumns)} {t('locations.niches')}
+                      </span>
+                    )}
+                  </div>
+
+                  {editHasGrid && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                          {t('locations.rowsCount')}
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={100}
+                          disabled={(editingLocation.occupiedCount ?? 0) > 0}
+                          value={editGridRows}
+                          onChange={(e) =>
+                            setEditGridRows(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))
+                          }
+                          className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:bg-muted/50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                          {t('locations.colsCount')}
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={100}
+                          disabled={(editingLocation.occupiedCount ?? 0) > 0}
+                          value={editGridColumns}
+                          onChange={(e) =>
+                            setEditGridColumns(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))
+                          }
+                          className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:bg-muted/50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setEditingLocation(null)}
+                  className="px-4 py-2 rounded-xl bg-secondary text-xs font-semibold text-foreground hover:bg-muted border border-border"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={!editName.trim() || updateMutation.isPending}
+                  className="px-5 py-2 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary-hover shadow-glow disabled:opacity-50"
+                >
+                  {updateMutation.isPending ? t('common.loading') : t('common.save')}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

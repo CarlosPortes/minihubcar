@@ -214,6 +214,10 @@ export const en: TranslationDictionary = {
     colsCount: 'Number of Columns (Widths)',
     createSuccess: 'Location created successfully!',
     deleteSuccess: 'Location deactivated!',
+    editLocation: 'Edit / Rename Location',
+    editSuccess: 'Location updated successfully!',
+    structureLockedWarning: 'Structure protected: This location has {count} item(s) allocated. You can freely rename or change its type, but to modify grid dimensions, remove allocated miniatures first.',
+    structureEditableNotice: 'Empty location: You can freely change the name, type, and grid dimensions.',
   },
   wishlist: {
     title: 'Wishlist',

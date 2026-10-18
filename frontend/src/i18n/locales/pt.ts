@@ -214,6 +214,10 @@ export const pt: TranslationDictionary = {
     colsCount: 'Quantidade de Colunas (Larguras)',
     createSuccess: 'Localização criada com sucesso!',
     deleteSuccess: 'Localização desativada!',
+    editLocation: 'Editar / Renomear Local',
+    editSuccess: 'Localização atualizada com sucesso!',
+    structureLockedWarning: 'Estrutura protegida: Este local possui {count} miniatura(s) alocada(s). O nome e tipo podem ser alterados livremente, mas para alterar a grade (linhas e colunas), desaloque as miniaturas primeiro.',
+    structureEditableNotice: 'Local vazio: Você pode alterar o nome, tipo e também reconfigurar as dimensões da grade livremente.',
   },
   wishlist: {
     title: 'Wishlist de Miniaturas',

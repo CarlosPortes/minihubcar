@@ -214,6 +214,10 @@ export const es: TranslationDictionary = {
     colsCount: 'Cantidad de Columnas (Anchuras)',
     createSuccess: '¡Ubicación creada con éxito!',
     deleteSuccess: '¡Ubicación desactivada!',
+    editLocation: 'Editar / Renombrar Ubicación',
+    editSuccess: '¡Ubicación actualizada con éxito!',
+    structureLockedWarning: 'Estructura protegida: Esta ubicación tiene {count} miniatura(s) asignada(s). Puede cambiar el nombre y tipo libremente, pero para cambiar filas/columnas, retire primero las miniaturas.',
+    structureEditableNotice: 'Ubicación vacía: Puede cambiar el nombre, tipo y reconfigurar la cuadrícula libremente.',
   },
   wishlist: {
     title: 'Wishlist de Miniaturas',

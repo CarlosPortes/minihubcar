@@ -8,6 +8,7 @@ import {
   casting,
   miniatureBrand,
   conditionType,
+  customCollectible,
 } from '../../database/schema';
 import { CreateLocationInput, UpdateLocationInput } from './locations.schemas';
 
@@ -67,6 +68,28 @@ export class LocationsRepository {
       countMap.set(c.locationId, Number(c.count) || 0);
     }
 
+    // Count custom collectibles per location
+    const customCounts = await db
+      .select({
+        locationId: customCollectible.locationId,
+        count: sql<number>`count(${customCollectible.id})::int`,
+      })
+      .from(customCollectible)
+      .where(
+        and(
+          eq(customCollectible.userId, userId),
+          eq(customCollectible.status, 'ACTIVE'),
+          sql`${customCollectible.locationId} IS NOT NULL`
+        )
+      )
+      .groupBy(customCollectible.locationId);
+
+    for (const cc of customCounts) {
+      if (cc.locationId) {
+        countMap.set(cc.locationId, (countMap.get(cc.locationId) || 0) + (Number(cc.count) || 0));
+      }
+    }
+
     return locations.map((loc) => {
       const occupiedCount = countMap.get(loc.id) || 0;
       const totalCapacity = loc.hasGrid && loc.gridRows && loc.gridColumns ? loc.gridRows * loc.gridColumns : null;
@@ -83,6 +106,40 @@ export class LocationsRepository {
         availabilityPercent,
       };
     });
+  }
+
+  async countItemsInLocation(locationId: string, userId: string): Promise<number> {
+    const [exemplarsRes] = await db
+      .select({
+        count: sql<number>`count(${exemplarLocation.id})::int`,
+      })
+      .from(exemplarLocation)
+      .innerJoin(collectionExemplar, eq(exemplarLocation.exemplarId, collectionExemplar.id))
+      .where(
+        and(
+          eq(exemplarLocation.locationId, locationId),
+          eq(exemplarLocation.userId, userId),
+          eq(exemplarLocation.isCurrent, true),
+          eq(collectionExemplar.status, 'ACTIVE')
+        )
+      );
+
+    const [collectiblesRes] = await db
+      .select({
+        count: sql<number>`count(${customCollectible.id})::int`,
+      })
+      .from(customCollectible)
+      .where(
+        and(
+          eq(customCollectible.locationId, locationId),
+          eq(customCollectible.userId, userId),
+          eq(customCollectible.status, 'ACTIVE')
+        )
+      );
+
+    const exemplarsCount = Number(exemplarsRes?.count) || 0;
+    const collectiblesCount = Number(collectiblesRes?.count) || 0;
+    return exemplarsCount + collectiblesCount;
   }
 
   async findByIdAndUser(id: string, userId: string) {
