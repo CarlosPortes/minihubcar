@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/features/theme/context/theme-context';
 import { I18nProvider } from '@/i18n';
 import { AppShell } from '@/components/layout/AppShell';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
+import { SiteAnalyticsTracker } from '@/components/analytics/SiteAnalyticsTracker';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -50,6 +51,7 @@ export default function RootLayout({
           <I18nProvider>
             <QueryProvider>
               <AuthProvider>
+                <SiteAnalyticsTracker />
                 <AppShell>{children}</AppShell>
                 <PwaRegister />
               </AuthProvider>

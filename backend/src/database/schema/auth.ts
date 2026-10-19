@@ -21,11 +21,13 @@ export const appUser = pgTable('app_user', {
   state: varchar('state', { length: 50 }),
   status: varchar('status', { length: 20 }).default('ACTIVE').notNull(),
   isCollectionPublic: boolean('is_collection_public').default(true).notNull(),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
   uniqueIndex('ux_app_user_email').on(table.normalizedEmail),
+  index('ix_app_user_last_login').on(table.lastLoginAt),
 ]);
 
 // role

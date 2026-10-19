@@ -15,6 +15,7 @@
     "db:migrate:phases": "tsx src/database/migrate-phase3-4.ts",
     "db:migrate:annual-plans": "tsx src/database/migrate-annual-plans.ts",
     "db:migrate:external-pre-orders": "tsx src/database/migrate-external-pre-orders.ts",
+    "db:migrate:analytics": "tsx src/database/migrate-analytics.ts",
     "db:seed": "tsx src/database/seed.ts",
     "db:seed:prod": "tsx src/database/seed-prod-init.ts",
     "db:seed:automakers": "tsx src/database/seed-automakers.ts",

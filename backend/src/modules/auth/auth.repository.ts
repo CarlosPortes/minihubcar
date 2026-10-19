@@ -71,6 +71,13 @@ export class AuthRepository {
     return user;
   }
 
+  async updateLastLogin(userId: string) {
+    await db
+      .update(appUser)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(appUser.id, userId));
+  }
+
   async getUserRoles(userId: string) {
     const rows = await db
       .select({

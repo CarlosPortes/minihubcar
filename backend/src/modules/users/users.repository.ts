@@ -102,11 +102,23 @@ export class UsersRepository {
       .innerJoin(sellerAuthorization, eq(sellerAuthorization.sellerId, sellerProfile.id))
       .where(and(eq(sellerAuthorization.status, 'APPROVED'), eq(sellerProfile.isActive, true)));
 
+    const [activeTodayRes] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(appUser)
+      .where(sql`${appUser.lastLoginAt} >= NOW() - INTERVAL '24 hours'`);
+
+    const [activeThisWeekRes] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(appUser)
+      .where(sql`${appUser.lastLoginAt} >= NOW() - INTERVAL '7 days'`);
+
     return {
       totalUsers: totalUsersRes?.count || 0,
       activeUsers: activeUsersRes?.count || 0,
       inactiveUsers: inactiveUsersRes?.count || 0,
       homologatedSellers: homologatedSellersRes?.count || 0,
+      activeToday: activeTodayRes?.count || 0,
+      activeThisWeek: activeThisWeekRes?.count || 0,
     };
   }
 
@@ -188,6 +200,7 @@ export class UsersRepository {
         state: appUser.state,
         status: appUser.status,
         isCollectionPublic: appUser.isCollectionPublic,
+        lastLoginAt: appUser.lastLoginAt,
         createdAt: appUser.createdAt,
         updatedAt: appUser.updatedAt,
       })

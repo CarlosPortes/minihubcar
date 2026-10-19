@@ -45,6 +45,7 @@ import { subscriptionsRoutes } from '../modules/subscriptions/subscriptions.rout
 import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { externalPreOrdersRoutes } from '../modules/external-pre-orders/external-pre-orders.routes';
 import { whatsappRoutes } from '../modules/notifications/whatsapp.routes';
+import { analyticsRoutes } from '../modules/analytics/analytics.routes';
 
 export async function buildApp() {
   const app = fastify({
@@ -224,6 +225,7 @@ export async function buildApp() {
       await v1.register(feedbackRoutes);
       await v1.register(externalPreOrdersRoutes);
       await v1.register(whatsappRoutes);
+      await v1.register(analyticsRoutes);
     },
     { prefix: '/api/v1' }
   );

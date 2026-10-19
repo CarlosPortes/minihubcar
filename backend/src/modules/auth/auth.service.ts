@@ -91,6 +91,9 @@ export class AuthService {
       throw new UnauthorizedError('Credenciais inválidas');
     }
 
+    // Registrar data e hora do último acesso do usuário
+    await this.authRepository.updateLastLogin(user.id);
+
     const roles = await this.authRepository.getUserRoles(user.id);
 
     const accessToken = app.jwt.sign(

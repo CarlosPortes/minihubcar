@@ -67,6 +67,7 @@ export function Sidebar() {
   ];
 
   const adminNav = [
+    { name: 'Métricas & Acessos', href: '/admin/analytics', icon: BarChart3 },
     { name: t('catalog.title'), href: '/admin/catalog', icon: Layers },
     { name: t('nav.requests'), href: '/catalog-requests/pending', icon: Inbox },
     { name: t('nav.usersManage'), href: '/admin/users', icon: Users },

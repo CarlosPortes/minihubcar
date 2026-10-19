@@ -11,4 +11,5 @@ export * from './community';
 export * from './collectibles';
 export * from './subscriptions';
 export * from './external-pre-orders';
+export * from './analytics';
 

@@ -71,6 +71,7 @@ export interface AdminUserItem {
   isCollectionPublic: boolean;
   roles: string[];
   seller: AdminUserSellerInfo;
+  lastLoginAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -97,6 +98,8 @@ export interface AdminUserStats {
   activeUsers: number;
   inactiveUsers: number;
   homologatedSellers: number;
+  activeToday?: number;
+  activeThisWeek?: number;
 }
 
 export const usersApi = {
