@@ -295,7 +295,8 @@ export function MiniatureCameraScannerModal({
 
               {/* Viewfinder da Câmera */}
               {mode === 'camera' && (
-                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-primary/40 shadow-inner flex items-center justify-center">
+                <div className="space-y-3">
+                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-primary/40 shadow-inner flex items-center justify-center">
                   <video
                     ref={videoRef}
                     autoPlay
@@ -346,7 +347,7 @@ export function MiniatureCameraScannerModal({
                       type="button"
                       onClick={capturePhoto}
                       title="Capturar Foto"
-                      className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 border-4 border-white/20 transition-all active:scale-95 hover:scale-105"
+                      className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 border-4 border-white/20 transition-all active:scale-95 hover:scale-105 animate-pulse"
                     >
                       <Camera className="h-7 w-7" />
                     </button>
@@ -364,6 +365,25 @@ export function MiniatureCameraScannerModal({
                     </button>
                   </div>
                 </div>
+
+                {/* Barra de Ação Rápida e Instrução */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-xl bg-muted/40 border border-border">
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary font-bold text-[11px] shrink-0">
+                      1
+                    </span>
+                    <span>Posicione a miniatura em frente à webcam e clique no botão para fotografar:</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={capturePhoto}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/25 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95"
+                  >
+                    <Camera className="h-4 w-4" />
+                    Fotografar Miniatura
+                  </button>
+                </div>
+              </div>
               )}
 
               {/* Modo Upload de Imagem */}
