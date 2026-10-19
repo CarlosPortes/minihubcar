@@ -1,6 +1,21 @@
 import { eq, desc, and, sql, inArray } from 'drizzle-orm';
 import { db } from '../../database/client';
-import { appUser, role, userRole, sellerProfile, sellerAuthorization } from '../../database/schema';
+import {
+  appUser,
+  role,
+  userRole,
+  sellerProfile,
+  sellerAuthorization,
+  collectionExemplar,
+  variation,
+  casting,
+  miniatureBrand,
+  series,
+  scale,
+  conditionType,
+  userSubscription,
+  subscriptionPlan,
+} from '../../database/schema';
 import { UpdateProfileInput, AdminListUsersQuery } from './users.schemas';
 
 export class UsersRepository {
@@ -371,6 +386,97 @@ export class UsersRepository {
 
       return targetRoles.map((r) => r.code);
     });
+  }
+
+  async findByUsernameOrId(identifier: string) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+
+    if (isUuid) {
+      const [byUuid] = await db
+        .select()
+        .from(appUser)
+        .where(eq(appUser.id, identifier))
+        .limit(1);
+      if (byUuid) return byUuid;
+    }
+
+    const [byUsername] = await db
+      .select()
+      .from(appUser)
+      .where(sql`lower(${appUser.username}) = lower(${identifier})`)
+      .limit(1);
+
+    return byUsername || null;
+  }
+
+  async getCollectorSubscription(userId: string) {
+    const [sub] = await db
+      .select({
+        planCode: subscriptionPlan.code,
+        planName: subscriptionPlan.name,
+        badge: subscriptionPlan.badge,
+        status: userSubscription.status,
+      })
+      .from(userSubscription)
+      .innerJoin(subscriptionPlan, eq(userSubscription.planId, subscriptionPlan.id))
+      .where(eq(userSubscription.userId, userId))
+      .limit(1);
+
+    return sub || { planCode: 'FREE', planName: 'Colecionador', badge: 'FREE', status: 'ACTIVE' };
+  }
+
+  async getCollectorStats(userId: string) {
+    const [stats] = await db
+      .select({
+        totalMiniatures: sql<number>`count(*)::int`,
+        totalBrands: sql<number>`count(distinct ${casting.miniatureBrandId})::int`,
+        raresCount: sql<number>`count(case when ${variation.rarity} is not null and ${variation.rarity} != '' then 1 end)::int`,
+      })
+      .from(collectionExemplar)
+      .innerJoin(variation, eq(collectionExemplar.variationId, variation.id))
+      .innerJoin(casting, eq(variation.castingId, casting.id))
+      .where(and(eq(collectionExemplar.userId, userId), eq(collectionExemplar.status, 'ACTIVE')));
+
+    return {
+      totalMiniatures: stats?.totalMiniatures || 0,
+      totalBrands: stats?.totalBrands || 0,
+      raresCount: stats?.raresCount || 0,
+    };
+  }
+
+  async getCollectorPublicCollection(userId: string, limit = 150) {
+    return db
+      .select({
+        exemplarId: collectionExemplar.id,
+        variationId: variation.id,
+        name: variation.name,
+        releaseYear: variation.releaseYear,
+        color: variation.color,
+        finish: variation.finish,
+        packaging: variation.packaging,
+        edition: variation.edition,
+        rarity: variation.rarity,
+        photoUrl: variation.photoUrl,
+        seriesNumber: variation.seriesNumber,
+        collectorNumber: variation.collectorNumber,
+        brandName: miniatureBrand.name,
+        scaleName: scale.name,
+        seriesName: series.name,
+        conditionName: conditionType.name,
+        conditionCode: conditionType.code,
+        notes: collectionExemplar.notes,
+        addedAt: collectionExemplar.createdAt,
+      })
+      .from(collectionExemplar)
+      .innerJoin(variation, eq(collectionExemplar.variationId, variation.id))
+      .innerJoin(casting, eq(variation.castingId, casting.id))
+      .innerJoin(miniatureBrand, eq(casting.miniatureBrandId, miniatureBrand.id))
+      .innerJoin(conditionType, eq(collectionExemplar.conditionTypeId, conditionType.id))
+      .leftJoin(scale, eq(variation.scaleId, scale.id))
+      .leftJoin(series, eq(variation.seriesId, series.id))
+      .where(and(eq(collectionExemplar.userId, userId), eq(collectionExemplar.status, 'ACTIVE')))
+      .orderBy(desc(collectionExemplar.createdAt))
+      .limit(limit);
   }
 }
 

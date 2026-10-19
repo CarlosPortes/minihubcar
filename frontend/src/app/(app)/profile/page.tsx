@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi, UserProfile } from '@/lib/api/users';
 import { useAuth } from '@/features/auth/context/auth-context';
@@ -33,6 +34,8 @@ export default function ProfilePage() {
 
   // Form State: Profile & Contact
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [instagram, setInstagram] = useState('');
@@ -81,6 +84,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setName(profile.name || '');
+      setUsername(profile.username || '');
+      setBio(profile.bio || '');
       setAvatarUrl(profile.avatarUrl || '');
       setWhatsapp(profile.whatsapp || '');
       setInstagram(profile.instagram || '');
@@ -160,6 +165,8 @@ export default function ProfilePage() {
     mutationFn: () =>
       usersApi.updateProfile({
         name,
+        username: username.trim() || null,
+        bio: bio.trim() || null,
         avatarUrl: avatarUrl || null,
         whatsapp: whatsapp || null,
         instagram: instagram || null,
@@ -359,6 +366,17 @@ export default function ProfilePage() {
                 </span>
               )}
             </div>
+
+            {/* Link para Perfil Público */}
+            <div className="pt-2">
+              <Link
+                href={`/u/${username || profile.username || profile.id}`}
+                target="_blank"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary/10 text-primary border border-primary/20 text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer shadow-sm"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Ver Meu Perfil Público (/u/{username || profile.username || 'colecionador'})
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -450,6 +468,46 @@ export default function ProfilePage() {
                   className="w-full h-10 pl-9 pr-3 rounded-lg bg-background border border-border text-sm text-foreground focus:ring-2 focus:ring-primary/50"
                 />
               </div>
+            </div>
+
+            {/* Username / Handle */}
+            <div>
+              <label className="text-xs font-semibold text-foreground block mb-1">
+                Nome de Usuário (@username) • Link da Vitrine Pública
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">@</span>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
+                  placeholder="ex: carlos_diecast"
+                  className="w-full h-10 pl-8 pr-3 rounded-lg bg-background border border-border text-sm text-foreground focus:ring-2 focus:ring-primary/50 font-mono"
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Sua vitrine pública de miniaturas será acessível em:{' '}
+                <strong className="text-primary font-mono">
+                  https://minihubcar.com.br/u/{username || 'seu-username'}
+                </strong>
+              </p>
+            </div>
+
+            {/* Bio do Colecionador */}
+            <div>
+              <label className="text-xs font-semibold text-foreground block mb-1">
+                Biografia / Foco da Coleção (Bio)
+              </label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={3}
+                placeholder="Conte aos outros colecionadores o que você coleciona, linhas favoritas, marcas que busca, etc..."
+                className="w-full p-3 rounded-lg bg-background border border-border text-sm text-foreground focus:ring-2 focus:ring-primary/50 resize-y"
+              />
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Essa descrição aparecerá no topo da sua vitrine pública para outros colecionadores verem.
+              </p>
             </div>
 
             {/* URL da Foto / Avatar */}

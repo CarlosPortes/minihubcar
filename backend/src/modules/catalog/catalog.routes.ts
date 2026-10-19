@@ -10,4 +10,6 @@ export async function catalogRoutes(app: FastifyInstance) {
   app.get('/catalog/series', controller.series);
   app.get('/catalog/automakers', controller.automakers);
   app.get('/catalog/vehicle-models', controller.vehicleModels);
+  app.get('/catalog/sitemap-urls', controller.sitemapVariations);
 }
+

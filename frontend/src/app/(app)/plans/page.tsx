@@ -16,6 +16,8 @@ import {
   SubscriptionPlan,
   UserSubscriptionInfo,
 } from '@/lib/api/subscriptions';
+import { paymentsApi, PixChargeResponse } from '@/lib/api/payments';
+import { PixPaymentModal } from '@/components/payments/PixPaymentModal';
 import { useTranslation } from '@/i18n';
 
 function formatPlanPrice(value: number, lang: string): string {
@@ -78,6 +80,7 @@ export default function PlansPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [activePixCharge, setActivePixCharge] = useState<PixChargeResponse | null>(null);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -111,6 +114,28 @@ export default function PlansPage() {
     setErrorMessage(null);
 
     try {
+      const price =
+        billingCycle === 'MONTHLY'
+          ? parseFloat(selectedPlanToSubscribe.monthlyPrice)
+          : parseFloat(selectedPlanToSubscribe.yearlyPrice);
+
+      // Se for plano pago e selecionado PIX, gera cobrança dinâmica oficial com QR Code
+      if (selectedPlanToSubscribe.code !== 'FREE' && paymentMethod === 'PIX') {
+        const pixCharge = await paymentsApi.createPixCharge({
+          referenceType: 'SUBSCRIPTION',
+          amount: price,
+          description: `Assinatura MiniHub Car - ${selectedPlanToSubscribe.name}`,
+          metadata: {
+            planCode: selectedPlanToSubscribe.code,
+            billingCycle,
+          },
+        });
+        setActivePixCharge(pixCharge);
+        setSelectedPlanToSubscribe(null);
+        setIsProcessing(false);
+        return;
+      }
+
       const res = await subscriptionsApi.subscribe({
         planCode: selectedPlanToSubscribe.code,
         billingCycle,
@@ -447,6 +472,20 @@ export default function PlansPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de Pagamento PIX Instantâneo com QR Code e Copia-e-Cola */}
+      {activePixCharge && (
+        <PixPaymentModal
+          charge={activePixCharge}
+          isOpen={Boolean(activePixCharge)}
+          onClose={() => setActivePixCharge(null)}
+          onSuccess={async () => {
+            setActivePixCharge(null);
+            await loadData();
+          }}
+          title="Assinatura MiniHub Car via PIX"
+        />
       )}
     </div>
   );

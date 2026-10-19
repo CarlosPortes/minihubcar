@@ -25,6 +25,12 @@ export class UsersController {
     return reply.status(200).send({ data: updated });
   };
 
+  getPublicProfile = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { identifier } = request.params as { identifier: string };
+    const profile = await this.service.getPublicProfile(identifier);
+    return reply.status(200).send({ data: profile });
+  };
+
   updateEmail = async (request: FastifyRequest, reply: FastifyReply) => {
     const input = updateEmailSchema.parse(request.body);
     const result = await this.service.updateEmail(request.user.sub, input, request.server);

@@ -28,6 +28,8 @@ export class UsersService {
     return {
       id: user.id,
       name: user.name,
+      username: user.username,
+      bio: user.bio,
       email: user.email,
       avatarUrl: user.avatarUrl,
       whatsapp: user.whatsapp,
@@ -54,8 +56,20 @@ export class UsersService {
       throw new NotFoundError('Usuário não encontrado');
     }
 
+    if (input.username !== undefined && input.username !== null) {
+      const cleanUsername = input.username.trim().toLowerCase();
+      if (cleanUsername !== '') {
+        const existing = await this.repository.findByUsernameOrId(cleanUsername);
+        if (existing && existing.id !== userId) {
+          throw new ConflictError('Este nome de usuário (username) já está sendo utilizado por outro colecionador.');
+        }
+      }
+    }
+
     const updated = await this.repository.updateProfile(userId, {
       name: input.name !== undefined ? input.name.trim() : undefined,
+      username: input.username !== undefined ? (input.username ? input.username.trim().toLowerCase() : null) : undefined,
+      bio: input.bio !== undefined ? (input.bio ? input.bio.trim() : null) : undefined,
       avatarUrl: input.avatarUrl !== undefined ? input.avatarUrl : undefined,
       whatsapp: input.whatsapp !== undefined ? input.whatsapp : undefined,
       instagram: input.instagram !== undefined ? input.instagram : undefined,
@@ -79,6 +93,8 @@ export class UsersService {
     return {
       id: updated.id,
       name: updated.name,
+      username: updated.username,
+      bio: updated.bio,
       email: updated.email,
       avatarUrl: updated.avatarUrl,
       whatsapp: updated.whatsapp,
@@ -96,6 +112,36 @@ export class UsersService {
       roles,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
+    };
+  }
+
+  async getPublicProfile(identifier: string) {
+    const user = await this.repository.findByUsernameOrId(identifier);
+    if (!user || user.status !== 'ACTIVE') {
+      throw new NotFoundError('Perfil de colecionador não encontrado ou inativo.');
+    }
+
+    const [subscription, stats, collection] = await Promise.all([
+      this.repository.getCollectorSubscription(user.id),
+      this.repository.getCollectorStats(user.id),
+      user.isCollectionPublic ? this.repository.getCollectorPublicCollection(user.id, 200) : Promise.resolve([]),
+    ]);
+
+    return {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      city: user.city,
+      state: user.state,
+      instagram: user.instagram,
+      website: user.website,
+      isCollectionPublic: user.isCollectionPublic,
+      memberSince: user.createdAt,
+      plan: subscription,
+      stats,
+      collection,
     };
   }
 

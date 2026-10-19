@@ -13,6 +13,8 @@ export const updateProfileSchema = z.object({
   neighborhood: z.string().max(100).optional().nullable(),
   city: z.string().max(100).optional().nullable(),
   state: z.string().max(50).optional().nullable(),
+  username: z.string().min(3, 'Username deve ter pelo menos 3 caracteres').max(50).regex(/^[a-zA-Z0-9._-]+$/, 'Username deve conter apenas letras, números, ponto, hífen ou underline').optional().nullable(),
+  bio: z.string().max(1000).optional().nullable(),
   isCollectionPublic: z.boolean().optional(),
 });
 

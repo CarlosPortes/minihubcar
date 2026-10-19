@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/context/auth-context';
-import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag, MessageSquare, Menu } from 'lucide-react';
+import { Search, User as UserIcon, LogOut, Car, Shield, ShoppingBag, MessageSquare, Menu, Camera, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { communityApi, DirectConversationItem } from '@/lib/api/community';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 import { useTranslation } from '@/i18n';
+import { MiniatureCameraScannerModal } from '@/components/camera/MiniatureCameraScannerModal';
 
 interface NavbarProps {
   onSearchFocus?: () => void;
@@ -18,6 +19,7 @@ interface NavbarProps {
 export function Navbar({ onSearchFocus, onOpenMobileMenu }: NavbarProps) {
   const { user, logout, isAuthenticated, claimAdmin } = useAuth();
   const { t } = useTranslation();
+  const [scannerOpen, setScannerOpen] = useState(false);
   const isAdmin = user?.roles?.includes('CATALOG_ADMIN') || user?.roles?.includes('SYSTEM_ADMIN');
 
   // Consulta conversas com mensagens não lidas
@@ -78,6 +80,18 @@ export function Navbar({ onSearchFocus, onOpenMobileMenu }: NavbarProps) {
 
       {/* User Actions */}
       <div className="flex items-center gap-2">
+        {/* Botão Scanner IA em destaque */}
+        <button
+          type="button"
+          onClick={() => setScannerOpen(true)}
+          title="Identificar miniatura por Câmera / IA"
+          className="flex h-9 items-center gap-1.5 px-2.5 sm:px-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 transition-all shadow-sm group"
+        >
+          <Camera className="h-4 w-4 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline text-xs font-bold tracking-tight">Scanner IA</span>
+          <Sparkles className="h-3 w-3 text-amber-400 animate-pulse" />
+        </button>
+
         <LanguageSelector />
         <ThemeSelector />
 
@@ -162,6 +176,11 @@ export function Navbar({ onSearchFocus, onOpenMobileMenu }: NavbarProps) {
           </div>
         )}
       </div>
+
+      <MiniatureCameraScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+      />
     </header>
   );
 }

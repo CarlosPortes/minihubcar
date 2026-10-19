@@ -39,4 +39,10 @@ export class CatalogController {
     const list = await this.catalogService.getVehicleModels(automakerId);
     return reply.status(200).send({ data: list });
   };
+
+  sitemapVariations = async (request: FastifyRequest, reply: FastifyReply) => {
+    const list = await this.catalogService.getSitemapVariations(500);
+    return reply.status(200).send({ data: list });
+  };
 }
+

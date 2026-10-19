@@ -39,12 +39,14 @@ export const collectionExemplar = pgTable('collection_exemplar', {
   purchaseLocation: varchar('purchase_location', { length: 255 }),
   automakerId: uuid('automaker_id').references(() => automaker.id),
   vehicleModelId: uuid('vehicle_model_id').references(() => vehicleModel.id),
+  isForTrade: boolean('is_for_trade').default(false).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [
   index('ix_collection_exemplar_user').on(table.userId),
   index('ix_collection_exemplar_user_variation').on(table.userId, table.variationId),
   index('ix_collection_exemplar_variation').on(table.variationId),
+  index('ix_collection_exemplar_trade').on(table.isForTrade),
   index('ix_collection_exemplar_automaker').on(table.automakerId),
 ]);
 

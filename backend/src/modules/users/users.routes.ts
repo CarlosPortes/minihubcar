@@ -11,6 +11,9 @@ export async function usersRoutes(app: FastifyInstance) {
   app.patch('/users/me/email', { preHandler: [authenticate] }, controller.updateEmail);
   app.patch('/users/me/password', { preHandler: [authenticate] }, controller.updatePassword);
 
+  // Public Collector Profile ("Instagram do Colecionador" /u/[username])
+  app.get('/users/public/:identifier', controller.getPublicProfile);
+
   // Admin Management Endpoints
   app.get('/admin/users/stats', { preHandler: [authenticate, requireAdmin] }, controller.adminGetStats);
   app.get('/admin/users', { preHandler: [authenticate, requireAdmin] }, controller.adminListUsers);

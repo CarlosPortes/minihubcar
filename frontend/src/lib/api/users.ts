@@ -3,6 +3,8 @@ import { apiClient } from './client';
 export interface UserProfile {
   id: string;
   name: string;
+  username?: string | null;
+  bio?: string | null;
   email: string;
   avatarUrl: string | null;
   whatsapp: string | null;
@@ -24,6 +26,8 @@ export interface UserProfile {
 
 export interface UpdateProfileInput {
   name?: string;
+  username?: string | null;
+  bio?: string | null;
   avatarUrl?: string | null;
   whatsapp?: string | null;
   instagram?: string | null;
@@ -190,5 +194,57 @@ export const usersApi = {
       body: JSON.stringify({ roles }),
     });
   },
+
+  getPublicProfile: async (identifier: string): Promise<{ data: PublicCollectorProfile }> => {
+    return apiClient<{ data: PublicCollectorProfile }>(`/users/public/${encodeURIComponent(identifier)}`);
+  },
 };
+
+export interface PublicCollectorItem {
+  exemplarId: string;
+  variationId: string;
+  name: string;
+  releaseYear: number | null;
+  color: string | null;
+  finish: string | null;
+  packaging: string | null;
+  edition: string | null;
+  rarity: string | null;
+  photoUrl: string | null;
+  seriesNumber: string | null;
+  collectorNumber: string | null;
+  brandName: string;
+  scaleName: string | null;
+  seriesName: string | null;
+  conditionName: string;
+  conditionCode: string;
+  notes: string | null;
+  addedAt: string;
+}
+
+export interface PublicCollectorProfile {
+  id: string;
+  name: string;
+  username: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  city: string | null;
+  state: string | null;
+  instagram: string | null;
+  website: string | null;
+  isCollectionPublic: boolean;
+  memberSince: string;
+  plan: {
+    planCode: string;
+    planName: string;
+    badge: string;
+    status: string;
+  };
+  stats: {
+    totalMiniatures: number;
+    totalBrands: number;
+    raresCount: number;
+  };
+  collection: PublicCollectorItem[];
+}
 

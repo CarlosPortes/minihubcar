@@ -36,6 +36,7 @@ import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import { MiniatureDetailModal } from '@/components/catalog/MiniatureDetailModal';
 import { exportCollectionToCSV } from '@/lib/export/collection-exporter';
 import { ImportCollectionModal } from '@/components/collection/ImportCollectionModal';
+import { MiniatureCameraScannerModal } from '@/components/camera/MiniatureCameraScannerModal';
 import { useTranslation } from '@/i18n';
 
 interface Exemplar {
@@ -111,6 +112,7 @@ export default function CollectionPage() {
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [isExporting, setIsExporting] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isScannerModalOpen, setIsScannerModalOpen] = useState(false);
 
   const [moveExemplar, setMoveExemplar] = useState<Exemplar | null>(null);
   const [selectedTargetLocation, setSelectedTargetLocation] = useState('');
@@ -576,6 +578,16 @@ export default function CollectionPage() {
           >
             <Upload className="h-3.5 w-3.5 text-emerald-400" />
             {t('collection.importCSV')}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsScannerModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-sm shadow-primary/25 hover:shadow-primary/40 transition-all border border-primary/40"
+            title="Identificar miniatura por foto e adicionar à coleção"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+            Escanear com IA
           </button>
 
           {/* Toggle Modo de Visualização */}
@@ -2223,6 +2235,12 @@ export default function CollectionPage() {
           setSuccessMsg('Importação concluída com sucesso!');
           setTimeout(() => setSuccessMsg(null), 5000);
         }}
+      />
+
+      {/* Modal: Scanner de Câmera e Identificação por IA */}
+      <MiniatureCameraScannerModal
+        isOpen={isScannerModalOpen}
+        onClose={() => setIsScannerModalOpen(false)}
       />
     </div>
   );

@@ -59,6 +59,7 @@ export const en: TranslationDictionary = {
     catalog: 'Catalog',
     marketplace: 'Marketplace',
     collection: 'My Collection',
+    trades: 'Trades & Match',
     collectibles: 'Other Collectibles',
     community: 'Community',
     locations: 'Locations',

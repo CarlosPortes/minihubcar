@@ -1,5 +1,8 @@
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { db, sqlClient } from './client.js';
+import { migratePayments } from './migrate-payments.js';
+import { migrateCollectorProfile } from './migrate-collector-profile.js';
+import { migrateTrades } from './migrate-trades.js';
 import path from 'node:path';
 
 async function runMigrations() {
@@ -29,6 +32,12 @@ async function runMigrations() {
         throw migErr;
       }
     }
+
+    // Run modular domain migrations
+    await migratePayments();
+    await migrateCollectorProfile();
+    await migrateTrades();
+    console.log('✅ Todas as migrações modulares (PIX, Perfil Público, Trocas) concluídas!');
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);

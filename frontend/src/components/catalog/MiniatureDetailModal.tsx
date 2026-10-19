@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import {
@@ -25,6 +26,7 @@ import {
   FileText,
   Store,
   Trash2,
+  ExternalLink,
 } from 'lucide-react';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 
@@ -231,6 +233,18 @@ export function MiniatureDetailModal({
                 <Pencil className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Editar Cadastro</span>
               </button>
+            )}
+
+            {detail && (
+              <Link
+                href={`/catalog/${detail.id}`}
+                target="_blank"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/80 text-foreground border border-border text-xs font-medium hover:bg-secondary transition-all cursor-pointer"
+                title="Abrir página dedicada da miniatura para SEO / Compartilhar"
+              >
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="hidden sm:inline">Página Pública</span>
+              </Link>
             )}
 
             <button

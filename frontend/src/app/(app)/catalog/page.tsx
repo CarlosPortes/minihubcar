@@ -35,6 +35,7 @@ import { MiniatureDetailModal } from '@/components/catalog/MiniatureDetailModal'
 import { CatalogCreateOfferModal } from './CatalogCreateOfferModal';
 import { commercialApi } from '@/lib/api/commercial';
 import { QuickCreateMiniatureModal } from '@/components/seller/QuickCreateMiniatureModal';
+import { MiniatureCameraScannerModal } from '@/components/camera/MiniatureCameraScannerModal';
 import { useTranslation } from '@/i18n';
 
 interface Variation {
@@ -190,6 +191,7 @@ export default function CatalogPage() {
   // Modal State for Seller Offer / Pre-Order Creation
   const [sellingVariation, setSellingVariation] = useState<Variation | null>(null);
   const [showQuickCreateModal, setShowQuickCreateModal] = useState(false);
+  const [showScannerModal, setShowScannerModal] = useState(false);
 
   // Modal State for adding to Collection
   const [modalVariation, setModalVariation] = useState<Variation | null>(null);
@@ -362,6 +364,15 @@ export default function CatalogPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setShowScannerModal(true)}
+            className="inline-flex items-center gap-2 h-9 px-3.5 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground text-xs font-bold shadow-md shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-95 border border-primary/40"
+          >
+            <Sparkles className="h-4 w-4 text-amber-300" />
+            <span>Escanear com IA</span>
+          </button>
+
           {catalogData?.pagination && (
             <div className="flex items-center gap-2 self-start text-xs font-semibold px-3 py-1.5 rounded-xl bg-card border border-border text-muted-foreground">
               <Car className="h-4 w-4 text-primary" />
@@ -1101,6 +1112,12 @@ export default function CatalogPage() {
           queryClient.invalidateQueries({ queryKey: ['catalog'] });
           setSellingVariation(createdVariation as any);
         }}
+      />
+
+      {/* Modal: Scanner de Câmera e Identificação por IA */}
+      <MiniatureCameraScannerModal
+        isOpen={showScannerModal}
+        onClose={() => setShowScannerModal(false)}
       />
     </div>
   );

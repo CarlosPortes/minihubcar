@@ -12,4 +12,5 @@ export * from './collectibles';
 export * from './subscriptions';
 export * from './external-pre-orders';
 export * from './analytics';
-
+export * from './payments';
+export * from './trades';

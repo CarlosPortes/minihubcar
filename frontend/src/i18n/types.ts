@@ -87,6 +87,7 @@ export interface TranslationDictionary {
     catalog: string;
     marketplace: string;
     collection: string;
+    trades: string;
     collectibles: string;
     community: string;
     locations: string;

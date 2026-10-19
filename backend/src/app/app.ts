@@ -46,6 +46,9 @@ import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { externalPreOrdersRoutes } from '../modules/external-pre-orders/external-pre-orders.routes';
 import { whatsappRoutes } from '../modules/notifications/whatsapp.routes';
 import { analyticsRoutes } from '../modules/analytics/analytics.routes';
+import { paymentsRoutes } from '../modules/payments/payments.routes';
+import { tradesRoutes } from '../modules/trades/trades.routes';
+import { aiIdentifierRoutes } from '../modules/ai-identifier/ai-identifier.routes';
 
 export async function buildApp() {
   const app = fastify({
@@ -226,6 +229,9 @@ export async function buildApp() {
       await v1.register(externalPreOrdersRoutes);
       await v1.register(whatsappRoutes);
       await v1.register(analyticsRoutes);
+      await v1.register(paymentsRoutes);
+      await v1.register(tradesRoutes);
+      await v1.register(aiIdentifierRoutes);
     },
     { prefix: '/api/v1' }
   );

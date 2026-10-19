@@ -19,6 +19,8 @@ export const appUser = pgTable('app_user', {
   neighborhood: varchar('neighborhood', { length: 100 }),
   city: varchar('city', { length: 100 }),
   state: varchar('state', { length: 50 }),
+  username: varchar('username', { length: 50 }),
+  bio: text('bio'),
   status: varchar('status', { length: 20 }).default('ACTIVE').notNull(),
   isCollectionPublic: boolean('is_collection_public').default(true).notNull(),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
@@ -27,6 +29,7 @@ export const appUser = pgTable('app_user', {
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
   uniqueIndex('ux_app_user_email').on(table.normalizedEmail),
+  uniqueIndex('ux_app_user_username').on(table.username),
   index('ix_app_user_last_login').on(table.lastLoginAt),
 ]);
 

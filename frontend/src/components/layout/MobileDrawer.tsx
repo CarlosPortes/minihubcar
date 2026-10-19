@@ -30,6 +30,7 @@ import {
   LogOut,
   Car,
   User as UserIcon,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/context/auth-context';
 import { useTranslation } from '@/i18n';
@@ -82,6 +83,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     { name: t('nav.catalog'), href: '/catalog', icon: Search },
     { name: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag },
     { name: t('nav.collection'), href: '/collection', icon: Layers },
+    { name: t('nav.trades'), href: '/trades', icon: ArrowRightLeft },
     { name: t('nav.collectibles'), href: '/collectibles', icon: Shapes },
     { name: t('nav.community'), href: '/community', icon: Users },
     { name: t('nav.locations'), href: '/locations', icon: MapPin },

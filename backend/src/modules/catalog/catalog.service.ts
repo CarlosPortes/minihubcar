@@ -48,4 +48,9 @@ export class CatalogService {
   async getVehicleModels(automakerId?: string) {
     return this.catalogRepository.getVehicleModels(automakerId);
   }
+
+  async getSitemapVariations(limit = 1000) {
+    return this.catalogRepository.getSitemapVariations(limit);
+  }
 }
+

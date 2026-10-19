@@ -19,6 +19,8 @@ import {
   Users,
 } from 'lucide-react';
 import { fetchDonationsCampaign, notifyDonation, CampaignStatusResponse } from '@/lib/api/donations';
+import { paymentsApi, PixChargeResponse } from '@/lib/api/payments';
+import { PixPaymentModal } from '@/components/payments/PixPaymentModal';
 import { useAuth } from '@/features/auth/context/auth-context';
 
 export default function DonatePage() {
@@ -34,6 +36,31 @@ export default function DonatePage() {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [activePixCharge, setActivePixCharge] = useState<PixChargeResponse | null>(null);
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
+
+  const handleGeneratePix = async () => {
+    const numericAmount = parseFloat(amount);
+    if (!numericAmount || numericAmount <= 0) return;
+
+    setIsGeneratingPix(true);
+    try {
+      const charge = await paymentsApi.createPixCharge({
+        referenceType: 'DONATION',
+        amount: numericAmount,
+        description: 'Apoio Infraestrutura MiniHub Car',
+        metadata: {
+          donorName: donorName.trim() || user?.name || 'Apoiador MiniHub',
+          message: message.trim() || undefined,
+        },
+      });
+      setActivePixCharge(charge);
+    } catch (err: any) {
+      alert(err.message || 'Falha ao gerar cobrança PIX.');
+    } finally {
+      setIsGeneratingPix(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -255,6 +282,21 @@ export default function DonatePage() {
                   </button>
                 ))}
               </div>
+
+              {/* Botão de Geração de PIX Dinâmico com QR Code */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleGeneratePix}
+                  disabled={isGeneratingPix}
+                  className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-hover shadow-glow flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                >
+                  <QrCode className="h-4 w-4" />
+                  {isGeneratingPix
+                    ? 'Gerando PIX Oficial...'
+                    : `Gerar QR Code PIX (R$ ${parseFloat(amount || '10').toFixed(2).replace('.', ',')})`}
+                </button>
+              </div>
             </div>
 
             {/* QR Code toggle */}
@@ -446,6 +488,21 @@ export default function DonatePage() {
           </div>
         </div>
       </section>
+
+      {/* Modal de Pagamento PIX Instantâneo com QR Code Oficial e Copia-e-Cola */}
+      {activePixCharge && (
+        <PixPaymentModal
+          charge={activePixCharge}
+          isOpen={Boolean(activePixCharge)}
+          onClose={() => setActivePixCharge(null)}
+          onSuccess={async () => {
+            setActivePixCharge(null);
+            setSubmittedSuccess(true);
+            await loadData();
+          }}
+          title="Contribuição MiniHub Car via PIX"
+        />
+      )}
     </div>
   );
 }

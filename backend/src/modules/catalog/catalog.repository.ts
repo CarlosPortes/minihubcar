@@ -315,4 +315,18 @@ export class CatalogRepository {
       .orderBy(variation.rarity);
     return rows.map((r) => r.rarity).filter((r): r is string => r !== null);
   }
+
+  async getSitemapVariations(limit = 1000) {
+    return db
+      .select({
+        id: variation.id,
+        name: variation.name,
+        updatedAt: variation.updatedAt,
+      })
+      .from(variation)
+      .where(eq(variation.status, 'ACTIVE'))
+      .orderBy(sql`${variation.updatedAt} DESC`)
+      .limit(limit);
+  }
 }
+
