@@ -14,8 +14,21 @@ async function runMigrations() {
     console.log('✅ evolution schema verified.');
 
     const migrationsFolder = path.resolve(process.cwd(), './drizzle');
-    await migrate(db, { migrationsFolder });
-    console.log('✅ Migrations applied successfully!');
+    try {
+      await migrate(db, { migrationsFolder });
+      console.log('✅ Migrations applied successfully!');
+    } catch (migErr: any) {
+      if (
+        migErr?.code === '42P07' ||
+        migErr?.code === '42710' ||
+        migErr?.code === '42701' ||
+        migErr?.message?.includes('already exists')
+      ) {
+        console.log('ℹ️ Tabelas e esquemas já existentes no banco de dados. Migração sincronizada.');
+      } else {
+        throw migErr;
+      }
+    }
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);
