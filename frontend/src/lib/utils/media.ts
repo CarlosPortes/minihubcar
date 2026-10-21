@@ -10,6 +10,12 @@ export function getMediaUrl(url: string | null | undefined): string | null {
   const trimmed = url.trim();
   if (!trimmed) return null;
 
+  // Immediately filter out unreachable/dead external image domains (e.g. rodasocial.com)
+  // to avoid browser ERR_TIMED_OUT and prevent page rendering freezes
+  if (trimmed.includes('rodasocial.com')) {
+    return null;
+  }
+
   // External full URL or base64 data URI
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
     return trimmed;

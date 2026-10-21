@@ -22,12 +22,29 @@ export function MiniatureImage({
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const resolvedUrl = getMediaUrl(src);
+
   React.useEffect(() => {
     setHasError(false);
     setIsLoading(true);
-  }, [src]);
 
-  const resolvedUrl = getMediaUrl(src);
+    if (!resolvedUrl) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Safety timeout: if external image doesn't load within 3.5 seconds, abort waiting
+    const timer = setTimeout(() => {
+      setIsLoading((loading) => {
+        if (loading) {
+          setHasError(true);
+        }
+        return false;
+      });
+    }, 3500);
+
+    return () => clearTimeout(timer);
+  }, [resolvedUrl]);
 
   if (!resolvedUrl || hasError) {
     return (
