@@ -37,6 +37,19 @@ async function runMigrations() {
     await migratePayments();
     await migrateCollectorProfile();
     await migrateTrades();
+
+    // Ensure catalog admin roles for collector account
+    await sqlClient`
+      INSERT INTO user_role ("user_id", "role_id")
+      SELECT u.id, r.id
+      FROM app_user u
+      CROSS JOIN role r
+      WHERE u.normalized_email = 'colecionador@minihubcar.com.br'
+        AND r.code IN ('CATALOG_ADMIN', 'SYSTEM_ADMIN')
+      ON CONFLICT DO NOTHING;
+    `;
+    console.log('✅ Papéis de administração garantidos para colecionador@minihubcar.com.br.');
+
     console.log('✅ Todas as migrações modulares (PIX, Perfil Público, Trocas) concluídas!');
   } catch (error) {
     console.error('❌ Migration failed:', error);
