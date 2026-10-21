@@ -30,8 +30,24 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
 }
 
 export async function requireAdmin(request: FastifyRequest, reply: FastifyReply) {
-  const roles = request.user?.roles || [];
+  let roles = request.user?.roles || [];
   if (!roles.includes('CATALOG_ADMIN') && !roles.includes('SYSTEM_ADMIN')) {
+    if (request.user?.sub) {
+      const { eq } = await import('drizzle-orm');
+      const { db } = await import('../../database/client');
+      const { userRole, role } = await import('../../database/schema');
+      const userRoles = await db
+        .select({ code: role.code })
+        .from(userRole)
+        .innerJoin(role, eq(userRole.roleId, role.id))
+        .where(eq(userRole.userId, request.user.sub));
+      roles = userRoles.map((r) => r.code);
+      if (roles.includes('CATALOG_ADMIN') || roles.includes('SYSTEM_ADMIN')) {
+        request.user.roles = roles;
+        return;
+      }
+    }
     throw new ForbiddenError('Acesso restrito a administradores');
   }
 }
+

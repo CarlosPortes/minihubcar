@@ -37,6 +37,48 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
+let refreshTokenPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshTokenPromise) {
+    return refreshTokenPromise;
+  }
+
+  refreshTokenPromise = (async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        setAuthToken(null);
+        return null;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      const newAccessToken = data?.data?.accessToken;
+      if (newAccessToken) {
+        setAuthToken(newAccessToken);
+        return newAccessToken;
+      }
+
+      setAuthToken(null);
+      return null;
+    } catch {
+      setAuthToken(null);
+      return null;
+    } finally {
+      refreshTokenPromise = null;
+    }
+  })();
+
+  return refreshTokenPromise;
+}
+
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { params, headers, ...customConfig } = options;
 
@@ -67,7 +109,7 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
+  let response = await fetch(url, {
     ...customConfig,
     headers: {
       ...defaultHeaders,
@@ -75,6 +117,29 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
     },
     credentials: 'include', // sends refresh cookie
   });
+
+  // If 401 Unauthorized, try to refresh token once and retry (excluding auth routes)
+  const isAuthRoute =
+    endpoint.includes('/auth/login') ||
+    endpoint.includes('/auth/register') ||
+    endpoint.includes('/auth/refresh');
+
+  if (response.status === 401 && !isAuthRoute) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      const retryHeaders = {
+        ...defaultHeaders,
+        ...headers,
+        Authorization: `Bearer ${newToken}`,
+      };
+
+      response = await fetch(url, {
+        ...customConfig,
+        headers: retryHeaders,
+        credentials: 'include',
+      });
+    }
+  }
 
   if (response.status === 204) {
     return {} as T;
@@ -94,3 +159,4 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
 
   return data as T;
 }
+

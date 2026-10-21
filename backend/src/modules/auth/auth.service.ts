@@ -53,12 +53,12 @@ export class AuthService {
 
     const accessToken = app.jwt.sign(
       { sub: user.id, email: user.email, roles },
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     const refreshToken = app.jwt.sign(
       { sub: user.id, tokenType: 'refresh' },
-      { expiresIn: '7d' }
+      { expiresIn: '30d' }
     );
 
     return {
@@ -98,12 +98,12 @@ export class AuthService {
 
     const accessToken = app.jwt.sign(
       { sub: user.id, email: user.email, roles },
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     const refreshToken = app.jwt.sign(
       { sub: user.id, tokenType: 'refresh' },
-      { expiresIn: '7d' }
+      { expiresIn: '30d' }
     );
 
     return {
@@ -135,12 +135,12 @@ export class AuthService {
 
       const newAccessToken = app.jwt.sign(
         { sub: user.id, email: user.email, roles },
-        { expiresIn: '15m' }
+        { expiresIn: '7d' }
       );
 
       const newRefreshToken = app.jwt.sign(
         { sub: user.id, tokenType: 'refresh' },
-        { expiresIn: '7d' }
+        { expiresIn: '30d' }
       );
 
       return {

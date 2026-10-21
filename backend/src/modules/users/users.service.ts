@@ -178,12 +178,12 @@ export class UsersService {
     // Generate fresh tokens with updated email
     const accessToken = app.jwt.sign(
       { sub: updated.id, email: updated.email, roles },
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     const refreshToken = app.jwt.sign(
       { sub: updated.id, tokenType: 'refresh' },
-      { expiresIn: '7d' }
+      { expiresIn: '30d' }
     );
 
     return {

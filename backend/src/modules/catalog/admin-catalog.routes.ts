@@ -11,8 +11,21 @@ export async function adminCatalogRoutes(app: FastifyInstance) {
 
   const requireAdmin = async (req: FastifyRequest, reply: FastifyReply) => {
     await authenticate(req, reply);
-    const roles = req.user?.roles || [];
+    let roles = req.user?.roles || [];
     if (!roles.includes('CATALOG_ADMIN') && !roles.includes('SYSTEM_ADMIN')) {
+      if (req.user?.sub) {
+        const { eq } = await import('drizzle-orm');
+        const userRoles = await db
+          .select({ code: role.code })
+          .from(userRole)
+          .innerJoin(role, eq(userRole.roleId, role.id))
+          .where(eq(userRole.userId, req.user.sub));
+        roles = userRoles.map((r) => r.code);
+        if (roles.includes('CATALOG_ADMIN') || roles.includes('SYSTEM_ADMIN')) {
+          req.user.roles = roles;
+          return;
+        }
+      }
       throw new ForbiddenError('Acesso restrito a administradores do catálogo');
     }
   };
@@ -20,6 +33,7 @@ export async function adminCatalogRoutes(app: FastifyInstance) {
   // Canonical Variation creation & update
   app.post('/admin/catalog/variations', { preHandler: [requireAdmin] }, controller.createVariation);
   app.put('/admin/catalog/variations/:id', { preHandler: [requireAdmin] }, controller.updateVariation);
+  app.patch('/admin/catalog/variations/:id', { preHandler: [requireAdmin] }, controller.updateVariation);
 
   // Automakers
   app.get('/admin/catalog/automakers', { preHandler: [requireAdmin] }, controller.listAutomakers);
@@ -60,7 +74,27 @@ export async function adminCatalogRoutes(app: FastifyInstance) {
         .values({ userId, roleId: r.id })
         .onConflictDoNothing();
     }
-    return reply.status(200).send({ data: { message: 'Permissões de Administrador ativadas com sucesso!' } });
+
+    const { eq } = await import('drizzle-orm');
+    const allRoles = await db
+      .select({ code: role.code })
+      .from(userRole)
+      .innerJoin(role, eq(userRole.roleId, role.id))
+      .where(eq(userRole.userId, userId));
+    const roleCodes = allRoles.map((r) => r.code);
+
+    const accessToken = app.jwt.sign(
+      { sub: userId, email: req.user.email, roles: roleCodes },
+      { expiresIn: '7d' }
+    );
+
+    return reply.status(200).send({
+      data: {
+        message: 'Permissões de Administrador ativadas com sucesso!',
+        accessToken,
+        roles: roleCodes,
+      },
+    });
   });
 }
 

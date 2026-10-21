@@ -247,7 +247,7 @@ export default function AdminCatalogPage() {
       }),
     onSuccess: (res: any) => {
       setSuccessMessage('Miniatura cadastrada com sucesso no catálogo oficial!');
-      setCreatedVariationId(res?.data?.variationId || null);
+      setCreatedVariationId(res?.data?.variation?.id || res?.data?.variationId || null);
       queryClient.invalidateQueries({ queryKey: ['catalog'] });
       // Reset form fields
       setVariationName('');

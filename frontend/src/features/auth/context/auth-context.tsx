@@ -96,7 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const claimAdmin = async () => {
-    await apiClient('/admin/claim-admin', { method: 'POST' });
+    const res = await apiClient<{ data: { accessToken?: string } }>('/admin/claim-admin', { method: 'POST' });
+    if (res?.data?.accessToken) {
+      setAuthToken(res.data.accessToken);
+    }
     await fetchCurrentUser();
   };
 

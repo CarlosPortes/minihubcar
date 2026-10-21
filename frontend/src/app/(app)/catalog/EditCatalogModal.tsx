@@ -89,48 +89,53 @@ export function EditCatalogModal({
   };
 
   // Fetch variation details
-  const { data: detailData, isLoading: isLoadingDetail } = useQuery({
+  const {
+    data: detailData,
+    isLoading: isLoadingDetail,
+    error: detailError,
+  } = useQuery({
     queryKey: ['catalog', 'detail', variationId],
     queryFn: () => apiClient<any>(`/catalog/variations/${variationId}`),
     enabled: isOpen && !!variationId,
   });
 
-  // Fetch auxiliary options
-  const { data: brandsData } = useQuery<{ data: Array<{ id: string; name: string }> }>({
-    queryKey: ['admin', 'miniature-brands'],
-    queryFn: () => apiClient('/admin/catalog/brands'),
-    enabled: isOpen,
-  });
-
-  const { data: automakersData } = useQuery<{ data: Array<{ id: string; name: string; country: string | null }> }>({
-    queryKey: ['admin', 'automakers'],
-    queryFn: () => apiClient('/admin/catalog/automakers'),
+  // Fetch auxiliary options from public catalog filters
+  const { data: filtersData } = useQuery<{
+    data: {
+      brands: Array<{ id: string; name: string }>;
+      automakers: Array<{ id: string; name: string; country: string | null }>;
+      scales: Array<{ id: string; name: string; numerator: number; denominator: number }>;
+      series: Array<{ id: string; name: string }>;
+    };
+  }>({
+    queryKey: ['catalog', 'filters'],
+    queryFn: () => apiClient('/catalog/filters'),
     enabled: isOpen,
   });
 
   const { data: modelsData } = useQuery<{ data: Array<{ id: string; name: string; automakerId: string }> }>({
-    queryKey: ['admin', 'vehicle-models', selectedAutomakerId],
+    queryKey: ['catalog', 'vehicle-models', selectedAutomakerId],
     queryFn: () =>
       apiClient(
         selectedAutomakerId
-          ? `/admin/catalog/vehicle-models?automakerId=${selectedAutomakerId}`
-          : '/admin/catalog/vehicle-models'
+          ? `/catalog/vehicle-models?automakerId=${selectedAutomakerId}`
+          : '/catalog/vehicle-models'
       ),
     enabled: isOpen,
   });
 
-  const { data: scalesData } = useQuery<{ data: Array<{ id: string; name: string; numerator: number; denominator: number }> }>({
-    queryKey: ['admin', 'scales'],
-    queryFn: () => apiClient('/admin/catalog/scales'),
+  const { data: seriesData } = useQuery<{ data: Array<{ id: string; name: string }> }>({
+    queryKey: ['catalog', 'series', brandId],
+    queryFn: () =>
+      apiClient(brandId ? `/catalog/series?brandId=${brandId}` : '/catalog/series'),
     enabled: isOpen,
   });
 
-  const { data: seriesData } = useQuery<{ data: Array<{ id: string; name: string }> }>({
-    queryKey: ['admin', 'series', brandId],
-    queryFn: () =>
-      apiClient(brandId ? `/admin/catalog/series?brandId=${brandId}` : '/admin/catalog/series'),
-    enabled: isOpen,
-  });
+  const brandsList = filtersData?.data?.brands || [];
+  const automakersList = filtersData?.data?.automakers || [];
+  const scalesList = filtersData?.data?.scales || [];
+  const seriesList = (brandId && seriesData?.data) ? seriesData.data : (filtersData?.data?.series || []);
+  const modelsList = modelsData?.data || [];
 
   // Populate form when detailData loads
   useEffect(() => {
@@ -198,6 +203,12 @@ export function EditCatalogModal({
       return;
     }
 
+    const parsedYear = releaseYear ? Number(releaseYear) : null;
+    if (parsedYear !== null && (isNaN(parsedYear) || parsedYear < 1900 || parsedYear > 2100)) {
+      setErrorMessage('Ano de lançamento deve estar entre 1900 e 2100');
+      return;
+    }
+
     updateMutation.mutate({
       name: name.trim(),
       castingName: castingName.trim() || undefined,
@@ -259,6 +270,13 @@ export function EditCatalogModal({
             </div>
           )}
 
+          {detailError && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 shrink-0 text-rose-400" />
+              <span>Falha ao carregar miniatura: {(detailError as any)?.message || 'Erro de conexão'}</span>
+            </div>
+          )}
+
           {isLoadingDetail ? (
             <div className="py-16 flex flex-col items-center justify-center text-muted-foreground text-xs">
               <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mb-3" />
@@ -308,7 +326,7 @@ export function EditCatalogModal({
                       className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">Selecione a Marca...</option>
-                      {brandsData?.data?.map((b) => (
+                      {brandsList.map((b) => (
                         <option key={b.id} value={b.id}>
                           {b.name}
                         </option>
@@ -338,7 +356,7 @@ export function EditCatalogModal({
                       className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">Filtrar por Montadora...</option>
-                      {automakersData?.data?.map((a) => (
+                      {automakersList.map((a) => (
                         <option key={a.id} value={a.id}>
                           {a.name}
                         </option>
@@ -356,7 +374,7 @@ export function EditCatalogModal({
                       className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">Sem veículo real associado</option>
-                      {modelsData?.data?.map((m) => (
+                      {modelsList.map((m) => (
                         <option key={m.id} value={m.id}>
                           {m.name}
                         </option>
@@ -444,7 +462,7 @@ export function EditCatalogModal({
                       className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">Selecione Escala...</option>
-                      {scalesData?.data?.map((s) => (
+                      {scalesList.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.name}
                         </option>
@@ -462,7 +480,7 @@ export function EditCatalogModal({
                       className="w-full h-10 px-3 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">Nenhuma / Padrão</option>
-                      {seriesData?.data?.map((s) => (
+                      {seriesList.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.name}
                         </option>
@@ -623,25 +641,35 @@ export function EditCatalogModal({
           )}
 
           {/* Footer Actions */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-border">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-secondary text-foreground hover:bg-muted font-semibold text-xs border border-border"
-            >
-              Cancelar
-            </button>
-
-            <button
-              type="submit"
-              disabled={updateMutation.isPending || isLoadingDetail}
-              className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-hover shadow-glow flex items-center gap-1.5 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              <Check className="h-4 w-4" />
-              <span>
-                {updateMutation.isPending ? 'Salvando Alterações...' : 'Salvar Alterações'}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-border">
+            {errorMessage ? (
+              <span className="text-xs text-rose-400 font-medium flex items-center gap-1.5">
+                <ShieldAlert className="h-4 w-4 shrink-0" />
+                {errorMessage}
               </span>
-            </button>
+            ) : (
+              <div />
+            )}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2.5 rounded-xl bg-secondary text-foreground hover:bg-muted font-semibold text-xs border border-border"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                disabled={updateMutation.isPending || isLoadingDetail}
+                className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-hover shadow-glow flex items-center gap-1.5 disabled:opacity-50 transition-all cursor-pointer"
+              >
+                <Check className="h-4 w-4" />
+                <span>
+                  {updateMutation.isPending ? 'Salvando Alterações...' : 'Salvar Alterações'}
+                </span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
