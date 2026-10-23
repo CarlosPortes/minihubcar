@@ -7,19 +7,26 @@ echo ====================================================================
 set /p IP_HOSTINGER="Digite o IP da sua VPS Hostinger: "
 
 echo.
-echo [1/3] Enviando Fotos Hot Wheels (catalogos/HW)...
+echo [1/5] Enviando Fotos Hot Wheels (catalogos/HW)...
 scp -r "C:\Projetos\minihubcar\catalogos\HW" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/
 
 echo.
-echo [2/4] Enviando Fotos de Miniaturas (catalogos/Miniaturas)...
+echo [2/5] Enviando Fotos de Miniaturas (catalogos/Miniaturas)...
 scp -r "C:\Projetos\minihubcar\catalogos\Miniaturas" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/
 
 echo.
-echo [3/4] Enviando Fotos Majorette (catalogos/Majorette)...
+echo [3/5] Enviando Fotos Majorette (catalogos/Majorette)...
 scp -r "C:\Projetos\minihubcar\catalogos\Majorette" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/
 
 echo.
-echo [4/4] Enviando Fotos de Miniaturas para Uploads (backend/uploads)...
+echo [4/5] Enviando Fotos Fandom, AR, Bburago, Maisto...
+scp -r "C:\Projetos\minihubcar\catalogos\Fandom" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/ 2>nul
+scp -r "C:\Projetos\minihubcar\catalogos\AR" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/ 2>nul
+scp -r "C:\Projetos\minihubcar\catalogos\Bburago" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/ 2>nul
+scp -r "C:\Projetos\minihubcar\catalogos\Maisto" root@%IP_HOSTINGER%:/var/www/minihubcar/catalogos/ 2>nul
+
+echo.
+echo [5/5] Enviando Fotos de Miniaturas para Uploads (backend/uploads)...
 scp -r "C:\Projetos\minihubcar\backend\uploads\*" root@%IP_HOSTINGER%:/var/www/minihubcar/backend/uploads/
 
 echo.

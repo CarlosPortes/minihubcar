@@ -26,8 +26,12 @@ export function getMediaUrl(url: string | null | undefined): string | null {
 
   // If NEXT_PUBLIC_BACKEND_URL is explicitly set to an absolute URL,
   // prepend it only if not creating a Mixed Content conflict in the browser
+  // and not exposing internal docker hostnames (e.g. minihub-backend)
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (backendUrl && (backendUrl.startsWith('http://') || backendUrl.startsWith('https://'))) {
+    if (backendUrl.includes('minihub-backend')) {
+      return path;
+    }
     if (typeof window !== 'undefined' && window.location.protocol === 'https:' && backendUrl.startsWith('http://')) {
       return path;
     }

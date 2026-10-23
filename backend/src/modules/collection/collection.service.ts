@@ -191,4 +191,13 @@ export class CollectionService {
       ...result,
     };
   }
+
+  async getUserVariationCounts(userId: string) {
+    return this.collectionRepository.getUserVariationCounts(userId);
+  }
+
+  async checkVariationOwnership(userId: string, variationId: string) {
+    return this.collectionRepository.checkVariationOwnership(userId, variationId);
+  }
 }
+

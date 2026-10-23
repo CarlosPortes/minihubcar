@@ -5,6 +5,8 @@ import { authenticate } from '../auth/auth.middleware';
 export async function collectionRoutes(app: FastifyInstance) {
   const controller = new CollectionController();
 
+  app.get('/collection/variation-counts', { preHandler: [authenticate] }, controller.getVariationCounts);
+  app.get('/collection/check/:variationId', { preHandler: [authenticate] }, controller.checkOwnership);
   app.get('/collection/exemplars', { preHandler: [authenticate] }, controller.list);
   app.get('/collection/exemplars/:id', { preHandler: [authenticate] }, controller.getById);
   app.post('/collection/exemplars', { preHandler: [authenticate] }, controller.create);

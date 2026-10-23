@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/context/auth-context';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import { getRarityBadge } from '@/components/catalog/MiniatureDetailModal';
 import { commercialApi } from '@/lib/api/commercial';
+import { CatalogCreateOfferModal } from '../CatalogCreateOfferModal';
 import {
   Car,
   Building2,
@@ -27,6 +28,7 @@ import {
   ShieldCheck,
   Info,
   CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 interface VariationData {
@@ -96,6 +98,32 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
     initialData,
   });
 
+  // Seller Profile & Authorization Check
+  const { data: profileRes } = useQuery({
+    queryKey: ['my-seller-profile'],
+    queryFn: () => commercialApi.getMySellerProfile(),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  });
+  const isSeller = profileRes?.data?.authorizationStatus === 'APPROVED';
+  const [showCreateOfferModal, setShowCreateOfferModal] = useState(false);
+
+  // Ownership Check in Collection
+  const { data: ownershipRes } = useQuery<{
+    data: {
+      inCollection: boolean;
+      count: number;
+      exemplars: Array<any>;
+    };
+  }>({
+    queryKey: ['collection-ownership', variation.id],
+    queryFn: () => apiClient(`/collection/check/${variation.id}`),
+    enabled: !!user,
+  });
+  const ownership = ownershipRes?.data;
+  const isOwned = Boolean(ownership?.inCollection && (ownership?.count || 0) > 0);
+  const ownedCount = ownership?.count || 0;
+
   // Fetch Marketplace Offers for this variation
   const { data: offersData } = useQuery({
     queryKey: ['variation-offers', variation.id],
@@ -115,7 +143,7 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
   // Add to collection mutation
   const addToCollectionMutation = useMutation({
     mutationFn: async () => {
-      return apiClient('/collection', {
+      return apiClient('/collection/exemplars', {
         method: 'POST',
         body: JSON.stringify({
           variationId: variation.id,
@@ -127,6 +155,8 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
     onSuccess: () => {
       setAddedToCollectionSuccess(true);
       queryClient.invalidateQueries({ queryKey: ['collection'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-ownership', variation.id] });
+      queryClient.invalidateQueries({ queryKey: ['my-collection-variation-counts'] });
       setTimeout(() => setAddedToCollectionSuccess(false), 4000);
     },
   });
@@ -216,6 +246,11 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
           <div>
             {/* Top Tags */}
             <div className="flex flex-wrap items-center gap-2 mb-2">
+              {isOwned && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-0.5 text-xs font-bold text-emerald-400 border border-emerald-500/30">
+                  <Check className="h-3.5 w-3.5 stroke-[3]" /> {ownedCount}x na sua Coleção
+                </span>
+              )}
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary border border-primary/20">
                 <Car className="h-3.5 w-3.5" /> {variation.brand?.name}
               </span>
@@ -322,6 +357,32 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
               </div>
             )}
 
+            {isOwned && (
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="text-xs space-y-1.5 flex-1">
+                    <p className="font-semibold text-amber-300">
+                      Você já possui este modelo na sua coleção!
+                    </p>
+                    <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                      Atualmente você possui <strong className="text-amber-200">{ownedCount}x</strong> {ownedCount === 1 ? 'unidade' : 'unidades'} desta miniatura. Deseja adicionar mais uma unidade à coleção ou anunciá-la para venda no Marketplace?
+                    </p>
+                    {isSeller && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateOfferModal(true)}
+                        className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold border border-amber-500/30 transition-colors cursor-pointer"
+                      >
+                        <Store className="h-3.5 w-3.5" />
+                        Anunciar para Venda no Marketplace
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-3">
               {user ? (
                 <>
@@ -333,6 +394,8 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
                     <Plus className="h-4 w-4" />
                     {addToCollectionMutation.isPending
                       ? 'Adicionando...'
+                      : isOwned
+                      ? `+ Adicionar mais 1 Unidade (${ownedCount + 1}ª)`
                       : '+ Tenho na Coleção'}
                   </button>
 
@@ -420,6 +483,17 @@ export function MiniatureDetailPageClient({ initialData }: Props) {
           </div>
         </div>
       )}
+
+      {/* Modal: Anunciar no Marketplace */}
+      <CatalogCreateOfferModal
+        variation={variation}
+        isOpen={showCreateOfferModal}
+        onClose={() => setShowCreateOfferModal(false)}
+        onSuccess={(title, isPreOrder) => {
+          setShowCreateOfferModal(false);
+          queryClient.invalidateQueries({ queryKey: ['variation-offers', variation.id] });
+        }}
+      />
     </div>
   );
 }

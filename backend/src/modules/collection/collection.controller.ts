@@ -63,4 +63,16 @@ export class CollectionController {
     const result = await this.collectionService.getPublicCollection(userId, requestingUserId, query);
     return reply.status(200).send(result);
   };
+
+  getVariationCounts = async (request: FastifyRequest, reply: FastifyReply) => {
+    const counts = await this.collectionService.getUserVariationCounts(request.user.sub);
+    return reply.status(200).send({ data: counts });
+  };
+
+  checkOwnership = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { variationId } = request.params as { variationId: string };
+    const result = await this.collectionService.checkVariationOwnership(request.user.sub, variationId);
+    return reply.status(200).send({ data: result });
+  };
 }
+

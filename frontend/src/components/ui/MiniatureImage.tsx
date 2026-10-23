@@ -33,7 +33,7 @@ export function MiniatureImage({
       return;
     }
 
-    // Safety timeout: if external image doesn't load within 3.5 seconds, abort waiting
+    // Safety timeout: if external image doesn't load within 12 seconds, abort waiting
     const timer = setTimeout(() => {
       setIsLoading((loading) => {
         if (loading) {
@@ -41,7 +41,7 @@ export function MiniatureImage({
         }
         return false;
       });
-    }, 3500);
+    }, 12000);
 
     return () => clearTimeout(timer);
   }, [resolvedUrl]);

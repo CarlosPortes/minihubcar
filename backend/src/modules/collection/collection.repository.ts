@@ -805,4 +805,65 @@ export class CollectionRepository {
       rejected,
     };
   }
+
+  async getUserVariationCounts(userId: string): Promise<Record<string, number>> {
+    const rows = await db
+      .select({
+        variationId: collectionExemplar.variationId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(collectionExemplar)
+      .where(
+        and(
+          eq(collectionExemplar.userId, userId),
+          eq(collectionExemplar.status, 'ACTIVE')
+        )
+      )
+      .groupBy(collectionExemplar.variationId);
+
+    const map: Record<string, number> = {};
+    for (const r of rows) {
+      map[r.variationId] = r.count;
+    }
+    return map;
+  }
+
+  async checkVariationOwnership(userId: string, variationId: string) {
+    const rows = await db
+      .select({
+        id: collectionExemplar.id,
+        status: collectionExemplar.status,
+        acquisitionDate: collectionExemplar.acquisitionDate,
+        purchasePrice: collectionExemplar.purchasePrice,
+        purchaseLocation: collectionExemplar.purchaseLocation,
+        isForTrade: collectionExemplar.isForTrade,
+        conditionName: conditionType.name,
+        conditionCode: conditionType.code,
+        locationName: location.name,
+      })
+      .from(collectionExemplar)
+      .innerJoin(conditionType, eq(collectionExemplar.conditionTypeId, conditionType.id))
+      .leftJoin(
+        exemplarLocation,
+        and(
+          eq(exemplarLocation.exemplarId, collectionExemplar.id),
+          eq(exemplarLocation.isCurrent, true)
+        )
+      )
+      .leftJoin(location, eq(exemplarLocation.locationId, location.id))
+      .where(
+        and(
+          eq(collectionExemplar.userId, userId),
+          eq(collectionExemplar.variationId, variationId),
+          eq(collectionExemplar.status, 'ACTIVE')
+        )
+      );
+
+    return {
+      inCollection: rows.length > 0,
+      count: rows.length,
+      exemplars: rows,
+    };
+  }
 }
+

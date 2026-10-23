@@ -28,6 +28,7 @@ import {
   Pencil,
   RotateCcw,
   Store,
+  AlertCircle,
 } from 'lucide-react';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import { EditCatalogModal } from './EditCatalogModal';
@@ -238,6 +239,14 @@ export default function CatalogPage() {
     enabled: isAuthenticated,
   });
 
+  // Fetch user's collection counts by variation to show existing units and duplicate alerts
+  const { data: variationCountsRes } = useQuery<{ data: Record<string, number> }>({
+    queryKey: ['my-collection-variation-counts'],
+    queryFn: () => apiClient('/collection/variation-counts'),
+    enabled: isAuthenticated,
+  });
+  const ownedVariationCounts = variationCountsRes?.data || {};
+
   // Fetch catalog search
   const { data: catalogData, isLoading } = useQuery<CatalogResponse>({
     queryKey: [
@@ -279,6 +288,7 @@ export default function CatalogPage() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collection'] });
+      queryClient.invalidateQueries({ queryKey: ['my-collection-variation-counts'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['acquisitions'] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
@@ -720,6 +730,13 @@ export default function CatalogPage() {
                     {item.releaseYear}
                   </span>
                 )}
+
+                {/* In Collection Badge */}
+                {ownedVariationCounts[item.id] ? (
+                  <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-emerald-600/95 text-white text-[10px] font-black z-10 shadow-md flex items-center gap-1 backdrop-blur-md border border-emerald-400/40">
+                    <Check className="h-3 w-3 stroke-[3]" /> {ownedVariationCounts[item.id]}x na Coleção
+                  </span>
+                ) : null}
               </div>
 
               {/* Card Content - Normalized Heights for Uniform Presentation */}
@@ -790,10 +807,14 @@ export default function CatalogPage() {
                       }
                       setModalVariation(item);
                     }}
-                    className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary-hover transition-colors shadow-glow"
+                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+                      ownedVariationCounts[item.id]
+                        ? 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30'
+                        : 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-glow'
+                    }`}
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    <span>Coleção</span>
+                    <span>{ownedVariationCounts[item.id] ? '+1 Coleção' : 'Coleção'}</span>
                   </button>
 
                   <button
@@ -877,6 +898,7 @@ export default function CatalogPage() {
         onClose={() => setDetailVariationId(null)}
         isAdmin={isAdmin}
         isSeller={isSeller}
+        inCollectionCount={detailVariationId ? (ownedVariationCounts[detailVariationId] || 0) : 0}
         onEditVariation={(id) => setEditingVariationId(id)}
         onCreateOffer={(detail) => {
           setSellingVariation(detail as any);
@@ -913,7 +935,10 @@ export default function CatalogPage() {
           <div className="w-full max-w-sm rounded-2xl bg-card border border-border p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-border">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <Layers className="h-4 w-4 text-primary" /> Adicionar à Minha Coleção
+                <Layers className="h-4 w-4 text-primary" />
+                {ownedVariationCounts[modalVariation.id] > 0
+                  ? `Adicionar +1 Unidade (${ownedVariationCounts[modalVariation.id] + 1}ª)`
+                  : 'Adicionar à Minha Coleção'}
               </h3>
               <button
                 onClick={() => setModalVariation(null)}
@@ -936,6 +961,34 @@ export default function CatalogPage() {
                 <p className="text-[11px] text-muted-foreground truncate">{modalVariation.brand.name}</p>
               </div>
             </div>
+
+            {ownedVariationCounts[modalVariation.id] > 0 && (
+              <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="text-xs space-y-1.5 flex-1">
+                    <p className="font-semibold text-amber-300">
+                      Você já possui este modelo na sua coleção!
+                    </p>
+                    <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                      Atualmente você tem <strong className="text-amber-200">{ownedVariationCounts[modalVariation.id]}x</strong> cadastrada{ownedVariationCounts[modalVariation.id] > 1 ? 's' : ''}. Você pode adicionar mais uma unidade (+1) à coleção ou anunciá-la diretamente para venda no Marketplace.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = modalVariation;
+                        setModalVariation(null);
+                        setSellingVariation(target);
+                      }}
+                      className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold border border-amber-500/30 transition-colors cursor-pointer"
+                    >
+                      <Store className="h-3.5 w-3.5" />
+                      Anunciar no Marketplace
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleAddToCollection} className="space-y-4">
               <div>
@@ -1070,7 +1123,11 @@ export default function CatalogPage() {
                   disabled={addCollectionMutation.isPending}
                   className="flex-1 py-2.5 rounded-xl bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary-hover shadow-glow transition-all disabled:opacity-50"
                 >
-                  {addCollectionMutation.isPending ? 'Salvando...' : 'Confirmar Adição'}
+                  {addCollectionMutation.isPending
+                    ? 'Salvando...'
+                    : ownedVariationCounts[modalVariation.id] > 0
+                    ? `+ Adicionar mais 1 Unidade (${ownedVariationCounts[modalVariation.id] + 1}ª)`
+                    : 'Confirmar Adição'}
                 </button>
               </div>
             </form>

@@ -21,6 +21,7 @@ import {
   Plus,
   ArrowRightLeft,
   DollarSign,
+  Check,
   CheckCircle2,
   AlertCircle,
   FileText,
@@ -167,6 +168,7 @@ interface MiniatureDetailModalProps {
   wishlistContext?: WishlistContext | null;
   isAdmin?: boolean;
   isSeller?: boolean;
+  inCollectionCount?: number;
   onEditVariation?: (variationId: string) => void;
   onAddToCollection?: (variation: VariationDetail) => void;
   onAddToWishlist?: (variationId: string) => void;
@@ -181,6 +183,7 @@ export function MiniatureDetailModal({
   wishlistContext,
   isAdmin = false,
   isSeller = false,
+  inCollectionCount,
   onEditVariation,
   onAddToCollection,
   onAddToWishlist,
@@ -210,9 +213,16 @@ export function MiniatureDetailModal({
               <Info className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm sm:text-base font-bold text-foreground truncate">
-                {detail?.name || 'Detalhes da Miniatura'}
-              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-sm sm:text-base font-bold text-foreground truncate">
+                  {detail?.name || 'Detalhes da Miniatura'}
+                </h3>
+                {inCollectionCount !== undefined && inCollectionCount > 0 && (
+                  <span className="shrink-0 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black flex items-center gap-1 shadow-sm">
+                    <Check className="h-3 w-3 stroke-[3]" /> {inCollectionCount}x na Coleção
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground truncate">
                 {exemplarContext
                   ? 'Exemplar em sua Coleção • Ficha Técnica Oficial'
@@ -668,7 +678,11 @@ export function MiniatureDetailModal({
                   className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary-hover shadow-glow transition-all"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>Adicionar à Coleção</span>
+                  <span>
+                    {inCollectionCount !== undefined && inCollectionCount > 0
+                      ? `+ Mais 1 Unidade (${inCollectionCount + 1}ª)`
+                      : 'Adicionar à Coleção'}
+                  </span>
                 </button>
               )}
             </div>
