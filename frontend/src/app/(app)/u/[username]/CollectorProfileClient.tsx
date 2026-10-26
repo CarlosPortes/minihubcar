@@ -24,6 +24,7 @@ import {
 import { PublicCollectorProfile, PublicCollectorItem } from '@/lib/api/users';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import { getRarityBadge } from '@/components/catalog/MiniatureDetailModal';
+import { ShareCollectionModal } from '@/components/collection/ShareCollectionModal';
 
 interface Props {
   initialProfile: PublicCollectorProfile;
@@ -32,6 +33,7 @@ interface Props {
 export function CollectorProfileClient({ initialProfile }: Props) {
   const [profile] = useState<PublicCollectorProfile>(initialProfile);
   const [copied, setCopied] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('ALL');
   const [selectedRarityOnly, setSelectedRarityOnly] = useState(false);
@@ -210,6 +212,15 @@ export function CollectorProfileClient({ initialProfile }: Props) {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30 transition-all cursor-pointer"
             >
               WhatsApp
+            </button>
+
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 transition-all cursor-pointer"
+              title="Gerar Card de Stories para o Instagram e QR Code"
+            >
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              Story / QR
             </button>
           </div>
         </div>
@@ -406,6 +417,18 @@ export function CollectorProfileClient({ initialProfile }: Props) {
           )}
         </div>
       )}
+
+      {/* Modal: Compartilhar Coleção (WhatsApp, Instagram Stories, QR Code) */}
+      <ShareCollectionModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        username={profile.username || profile.id}
+        collectorName={profile.name}
+        avatarUrl={profile.avatarUrl}
+        totalMiniatures={profile.stats.totalMiniatures}
+        totalBrands={profile.stats.totalBrands}
+        raresCount={profile.stats.raresCount}
+      />
     </div>
   );
 }

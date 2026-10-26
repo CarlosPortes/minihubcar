@@ -31,6 +31,7 @@ import {
   List,
   ExternalLink,
   Coins,
+  Share2,
 } from 'lucide-react';
 import { MiniatureImage } from '@/components/ui/MiniatureImage';
 import { MiniatureDetailModal } from '@/components/catalog/MiniatureDetailModal';
@@ -38,6 +39,8 @@ import { EditCatalogModal } from '../catalog/EditCatalogModal';
 import { exportCollectionToCSV } from '@/lib/export/collection-exporter';
 import { ImportCollectionModal } from '@/components/collection/ImportCollectionModal';
 import { MiniatureCameraScannerModal } from '@/components/camera/MiniatureCameraScannerModal';
+import { ShareCollectionModal } from '@/components/collection/ShareCollectionModal';
+import { usersApi } from '@/lib/api/users';
 import { useTranslation } from '@/i18n';
 
 interface Exemplar {
@@ -116,6 +119,7 @@ export default function CollectionPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isScannerModalOpen, setIsScannerModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const [moveExemplar, setMoveExemplar] = useState<Exemplar | null>(null);
   const [selectedTargetLocation, setSelectedTargetLocation] = useState('');
@@ -220,6 +224,13 @@ export default function CollectionPage() {
           brandId: selectedBrand || undefined,
         },
       }),
+    enabled: isAuthenticated && !!user?.id,
+  });
+
+  // Fetch user profile for public sharing
+  const { data: profileRes } = useQuery({
+    queryKey: ['users', 'profile', user?.id],
+    queryFn: () => usersApi.getProfile(),
     enabled: isAuthenticated && !!user?.id,
   });
 
@@ -591,6 +602,16 @@ export default function CollectionPage() {
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-300" />
             Escanear com IA
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsShareModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600/15 text-emerald-400 hover:bg-emerald-600/25 border border-emerald-500/30 shadow-sm transition-all cursor-pointer"
+            title="Compartilhar sua coleção no WhatsApp, Instagram e gerar QR Code"
+          >
+            <Share2 className="h-3.5 w-3.5 text-emerald-400" />
+            Compartilhar Coleção
           </button>
 
           {/* Toggle Modo de Visualização */}
@@ -2280,6 +2301,17 @@ export default function CollectionPage() {
           setSuccessMsg('Miniatura atualizada com sucesso no catálogo!');
           setTimeout(() => setSuccessMsg(null), 4000);
         }}
+      />
+
+      {/* Modal: Compartilhar Coleção (WhatsApp, Instagram Stories, QR Code) */}
+      <ShareCollectionModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        username={profileRes?.data?.username || user?.name || ''}
+        collectorName={profileRes?.data?.name || user?.name || 'Colecionador'}
+        avatarUrl={profileRes?.data?.avatarUrl || user?.avatarUrl}
+        totalMiniatures={collectionData?.pagination?.total ?? exemplars.length}
+        totalBrands={filtersData?.data?.brands?.length}
       />
     </div>
   );

@@ -23,8 +23,10 @@ import {
   Loader2,
   Calendar,
   Sparkles,
+  Share2,
 } from 'lucide-react';
 import { CollectionPhotosSection } from '@/features/profile/components/CollectionPhotosSection';
+import { ShareCollectionModal } from '@/components/collection/ShareCollectionModal';
 
 export default function ProfilePage() {
   const queryClient = useQueryClient();
@@ -41,6 +43,7 @@ export default function ProfilePage() {
   const [instagram, setInstagram] = useState('');
   const [website, setWebsite] = useState('');
   const [isCollectionPublic, setIsCollectionPublic] = useState(true);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Form State: Address
   const [postalCode, setPostalCode] = useState('');
@@ -367,15 +370,23 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Link para Perfil Público */}
-            <div className="pt-2">
+            {/* Link para Perfil Público e Compartilhamento */}
+            <div className="pt-2 flex flex-wrap items-center gap-2">
               <Link
                 href={`/u/${username || profile.username || profile.id}`}
                 target="_blank"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary/10 text-primary border border-primary/20 text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer shadow-sm"
               >
-                <ExternalLink className="h-3.5 w-3.5" /> Ver Meu Perfil Público (/u/{username || profile.username || 'colecionador'})
+                <ExternalLink className="h-3.5 w-3.5" /> Ver Perfil Público
               </Link>
+
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-600/25 transition-all cursor-pointer shadow-sm"
+              >
+                <Share2 className="h-3.5 w-3.5" /> Compartilhar Perfil & WhatsApp
+              </button>
             </div>
           </div>
         </div>
@@ -1018,6 +1029,16 @@ export default function ProfilePage() {
           <CollectionPhotosSection />
         </div>
       )}
+
+      {/* Modal: Compartilhar Coleção (WhatsApp, Instagram Stories, QR Code) */}
+      <ShareCollectionModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        username={username || profile?.username || ''}
+        collectorName={name || profile?.name || 'Colecionador'}
+        avatarUrl={avatarUrl || profile?.avatarUrl}
+        totalMiniatures={0}
+      />
     </div>
   );
 }

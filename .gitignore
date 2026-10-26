@@ -10,6 +10,7 @@ yarn-error.log*
 pnpm-debug.log*
 .DS_Store
 coverage/
+*.tsbuildinfo
 drizzle/meta/
 # Catalogos: ignore heavy media, zips and caches; track scripts, CSVs and docs
 catalogos/**/fotos/
